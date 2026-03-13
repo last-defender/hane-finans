@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Hane Finans: Cloud Master 2.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; --bg: #f8fafc; --white: #ffffff; --text: #1e293b; --light: #64748b;
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --purple: #8b5cf6; --info: #0ea5e9;
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        header { background: var(--primary); padding: 15px; padding-top: 20px; color: white; border-radius: 0 0 20px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex-shrink: 0; z-index: 50; }
+        .head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .head-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap:8px;}
+        .cloud-icon { font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; font-weight:normal; }
+        .head-actions { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .act-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
+        
+        /* TABS */
+        .tabs { display: flex; background: rgba(0,0,0,0.2); padding: 3px; border-radius: 10px; margin-top: 5px; }
+        .tab { flex: 1; text-align: center; padding: 8px; font-size: 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.6); cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .tab.active { background: white; color: var(--primary); }
+
+        /* MAIN */
+        main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; z-index: 1; }
+
+        /* CARDS & STATS */
+        .card { background: var(--white); border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .stat-box { background: #f1f5f9; padding: 12px; border-radius: 10px; text-align: center; }
+        .stat-lbl { font-size: 0.7rem; font-weight: bold; color: var(--light); text-transform: uppercase; }
+        .stat-val { font-size: 1.1rem; font-weight: 800; margin-top: 4px; }
+        
+        /* HEALTH SCORE CARD */
+        .health-card { background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+        .score-circle { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; border: 3px solid white; }
+
+        /* PROGRESS BAR */
+        .prog-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .prog-fill { height: 100%; background: var(--success); border-radius: 4px; transition: 0.3s; }
+
+        /* LISTS */
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+        .item:last-child { border-bottom: none; }
+        .i-tit { font-weight: 600; font-size: 0.9rem; }
+        .i-sub { font-size: 0.75rem; color: var(--light); }
+        .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: #e0e7ff; color: var(--primary); margin-left: 5px; font-weight: bold; }
+
+        /* CALENDAR */
+        .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .cal-day { height: 38px; border: 1px solid #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; position: relative; }
+        .cal-day.today { background: #eef2ff; border-color: var(--primary); color: var(--primary); font-weight: bold; }
+        .cal-day.past-act { background: #f8fafc; border-color: #cbd5e1; font-weight: bold; }
+
+        /* PERIODS */
+        .p-row { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+        .p-card { flex: 0 0 140px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
+        .p-head { font-size: 0.8rem; font-weight: bold; color: var(--light); margin-bottom: 5px; }
+        .p-net { font-weight: 800; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; text-align: center; }
+
+        /* NAV & FAB */
+        nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #e2e8f0; display: flex; height: calc(60px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); z-index: 100; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light); font-size: 0.7rem; cursor: pointer; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
+
+        .fabs { position: fixed; bottom: calc(75px + var(--safe-bottom)); right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 90; }
+        .fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
+        
+        /* MODALS */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 2000; pointer-events: none; }
+        .modal.show { display: flex; pointer-events: auto; }
+        .modal-box { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(30px + var(--safe-bottom)); max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .inp-grp { margin-bottom: 15px; }
+        .inp-lbl { display: block; margin-bottom: 5px; font-size: 0.8rem; font-weight: bold; color: var(--light); }
+        .inp { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 1rem; background: #f8fafc; -webkit-appearance: none; outline:none; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-pri { background: var(--primary); color: white; }
+        .btn-pur { background: var(--purple); color: white; }
+        .btn-clo { background: transparent; color: var(--light); }
+        .btn-del { background: none; border: none; color: var(--light); font-size: 1.2rem; cursor:pointer;}
+        .d-none { display: none !important; }
+        .text-grn { color: var(--success); } .text-red { color: var(--danger); }
+        
+        .pie { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto; background: conic-gradient(#eee 0% 100%); }
+        .page { display: none; animation: fadeIn 0.3s; } 
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="head-row">
+        <div class="head-title">Hane Finans <span class="cloud-icon" id="cloud-status">☁️ Bağlanıyor...</span></div>
+        <button class="act-btn" style="background:#ef4444; border-color:#ef4444;" onclick="resetApp()">⚠️ SIFIRLA</button>
+    </div>
+    <div class="head-actions">
+        <button class="act-btn" onclick="openModal('m-paste')">JSON Ekle</button>
+        <button class="act-btn" onclick="triggerExport()">Yedekle</button>
+        <button class="act-btn" onclick="document.getElementById('f-in').click()">Yükle</button>
+        <input type="file" id="f-in" hidden onchange="processImport(this)">
+    </div>
+    <div class="tabs">
+        <div class="tab" id="t-Baba" onclick="setPro('Baba')">BABA</div>
+        <div class="tab active" id="t-Hane" onclick="setPro('Hane')">HANE</div>
+        <div class="tab" id="t-Anne" onclick="setPro('Anne')">ANNE</div>
+    </div>
+</header>
+
+<main>
+    <div id="p-home" class="page active">
+        <div class="health-card">
+            <div>
+                <div style="font-size:0.8rem; opacity:0.8;">Finansal Sağlık Skoru</div>
+                <div id="health-desc" style="font-weight:bold; margin-top:5px; font-size:1.1rem;">Hesaplanıyor...</div>
+            </div>
+            <div class="score-circle" id="health-score">0</div>
+        </div>
+
+        <div class="card" style="text-align:center;">
+            <div style="color:var(--light); font-size:0.85rem;">Net Durum (Portföy + Hesaplar - Borçlar)</div>
+            <h1 id="dash-net" style="margin:5px 0">0.00 ₺</h1>
+            <div class="stat-grid">
+                <div class="stat-box"><div class="stat-lbl">VARLIKLAR</div><div class="stat-val text-grn" id="dash-ast">0</div></div>
+                <div class="stat-box"><div class="stat-lbl">BORÇLAR</div><div class="stat-val text-red" id="dash-dbt">0</div></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="stat-lbl" style="margin-bottom:10px;">BANKA DURUMU</div>
+            <div id="list-banks-status"></div>
+        </div>
+        <div class="card">
+            <div class="stat-lbl" style="margin-bottom:10px;">YAKLAŞAN (7 GÜN)</div>
+            <div id="list-upcoming"></div>
+        </div>
+    </div>
+
+    <div id="p-assets" class="page">
+        <div class="head-row">
+            <h3>Hesaplar</h3>
+            <div style="display:flex; gap:5px;">
+                <button class="act-btn" style="background:#64748b" onclick="openModal('m-bank-list')">Bankalar</button>
+                <button class="act-btn" style="background:var(--primary)" onclick="openModal('m-acc')">+ Ekle</button>
+            </div>
+        </div>
+        <div class="card" id="list-acc"></div>
+
+        <div class="head-row" style="margin-top:20px;">
+            <h3>Yatırımlar / Varlıklar</h3>
+            <button class="act-btn" style="background:var(--success)" onclick="openModal('m-asset')">+ Ekle</button>
+        </div>
+        <div class="card" id="list-assets"></div>
+
+        <div class="head-row" style="margin-top:20px;">
+            <h3>Birikim Hedefleri</h3>
+            <button class="act-btn" style="background:var(--info)" onclick="openModal('m-goal')">+ Hedef</button>
+        </div>
+        <div class="card" id="list-goals"></div>
+    </div>
+
+    <div id="p-calendar" class="page">
+        <div class="cal-nav">
+            <span onclick="chgMonth(-1)" style="cursor:pointer; padding:10px;">❮ Önceki</span>
+            <span id="cal-title" style="font-size:1.1rem;"></span>
+            <span onclick="chgMonth(1)" style="cursor:pointer; padding:10px;">Sonraki ❯</span>
+        </div>
+        <div class="card"><div class="cal-grid" id="cal-grid"></div></div>
+        <h4 style="margin:15px 5px 10px;">Ay İçi Nakit Akışı</h4>
+        <div id="period-view" class="p-row"></div>
+        <h4 style="margin:15px 5px 10px;">İşlem Geçmişi & Gelecek Planlar</h4>
+        <div class="card" id="list-plans"></div>
+    </div>
+
+    <div id="p-debts" class="page">
+        <div class="head-row">
+            <h3>Borçlar</h3>
+            <button class="act-btn" style="background:var(--purple)" onclick="switchPage('analysis-loan')">Yapılandırma</button>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn-pri" style="margin:0; padding:10px;" onclick="openModal('m-card')">+ Kart</button>
+            <button class="btn-pri" style="margin:0; padding:10px;" onclick="openModal('m-loan')">+ Kredi</button>
+        </div>
+        <div id="list-debts"></div>
+    </div>
+
+    <div id="p-analysis-loan" class="page">
+        <div class="head-row"><h3>Yapılandırma</h3><button class="btn-clo" onclick="switchPage('debts')">Geri</button></div>
+        <div class="card" style="border:1px solid var(--purple);">
+            <h4>Yeni Teklif</h4>
+            <div class="inp-grp"><input type="number" id="la-amt" class="inp" placeholder="Ele Geçen Tutar"></div>
+            <div class="inp-grp"><input type="number" id="la-term" class="inp" placeholder="Vade (Ay)"></div>
+            <div class="inp-grp"><input type="number" id="la-inst" class="inp" placeholder="Aylık Taksit"></div>
+            <button class="btn-pur" onclick="calcLoan()">Hesapla</button>
+        </div>
+        <div id="loan-compare-res"></div>
+    </div>
+
+    <div id="p-analysis" class="page">
+        <div class="head-row">
+            <h3>Analiz</h3>
+            <button class="act-btn" style="background:#64748b" onclick="openModal('m-cat-list')">Kategoriler</button>
+        </div>
+        <div class="card">
+            <div style="position:relative; margin:20px 0;">
+                <div class="pie" id="pie-chart"></div>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-weight:bold;" id="anl-total">0</div>
+            </div>
+            <div id="anl-legend"></div>
+        </div>
+    </div>
+</main>
+
+<div class="fabs">
+    <button class="fab" style="background:#0ea5e9" onclick="openTrans('transfer')">⇄</button>
+    <button class="fab" style="background:#10b981" onclick="openTrans('income')">+</button>
+    <button class="fab" style="background:#ef4444" onclick="openTrans('expense')">-</button>
+</div>
+
+<nav>
+    <div class="nav-btn active" onclick="switchPage('home')"><div class="nav-icon">🏠</div>Özet</div>
+    <div class="nav-btn" onclick="switchPage('assets')"><div class="nav-icon">💼</div>Portföy</div>
+    <div class="nav-btn" onclick="switchPage('calendar')"><div class="nav-icon">📅</div>Takvim</div>
+    <div class="nav-btn" onclick="switchPage('debts')"><div class="nav-icon">📉</div>Borç</div>
+    <div class="nav-btn" onclick="switchPage('analysis')"><div class="nav-icon">📊</div>Analiz</div>
+</nav>
+
+<div class="modal" id="m-asset"><div class="modal-box">
+    <h3>Yatırım / Varlık Ekle</h3>
+    <div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ias-own" class="inp"><option>Hane</option><option>Baba</option><option>Anne</option></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Tür</label><select id="ias-type" class="inp"><option>Altın</option><option>Döviz</option><option>Kripto</option><option>Gayrimenkul</option><option>Araç</option><option>Diğer</option></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Varlık Adı (Örn: Gram Altın)</label><input id="ias-name" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Güncel Toplam Değeri (TL)</label><input type="number" id="ias-val" class="inp"></div>
+    <button class="btn-pri" onclick="saveAsset()">Kaydet</button>
+    <button class="btn-clo" onclick="closeModal('m-asset')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-goal"><div class="modal-box">
+    <h3>Birikim Hedefi Ekle</h3>
+    <div class="inp-grp"><label class="inp-lbl">Hedef Adı (Örn: Tatil Fonu)</label><input id="ig-name" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Hedeflenen Tutar</label><input type="number" id="ig-target" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Şu An Biriken (Opsiyonel)</label><input type="number" id="ig-current" class="inp"></div>
+    <button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Hedefi Başlat</button>
+    <button class="btn-clo" onclick="closeModal('m-goal')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-acc"><div class="modal-box">
+    <h3>Hesap Ekle</h3>
+    <div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ia-own" class="inp"><option>Baba</option><option>Anne</option></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ia-bank" class="inp"></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ia-name" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Bakiye</label><input type="number" id="ia-bal" class="inp"></div>
+    <button class="btn-pri" onclick="saveAcc()">Kaydet</button>
+    <button class="btn-clo" onclick="closeModal('m-acc')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-card"><div class="modal-box">
+    <h3>Kart Ekle</h3>
+    <div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ic-bank" class="inp"></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ic-name" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Limit</label><input type="number" id="ic-lim" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Borç</label><input type="number" id="ic-debt" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Gelecek Taksitler</label><input type="number" id="ic-fut" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Kesim / Son Ödeme</label><div style="display:flex; gap:10px"><input type="number" id="ic-cut" class="inp" placeholder="Kesim"><input type="number" id="ic-due" class="inp" placeholder="Son Ö."></div></div>
+    <button class="btn-pri" onclick="saveCard()">Kaydet</button>
+    <button class="btn-clo" onclick="closeModal('m-card')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-loan"><div class="modal-box">
+    <h3>Kredi Ekle</h3>
+    <div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="il-own" class="inp"><option>Baba</option><option>Anne</option></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Banka</label><select id="il-bank" class="inp"></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Ad</label><input id="il-name" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Toplam Tutar</label><input type="number" id="il-tot" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Taksit Sayısı</label><input type="number" id="il-cnt" class="inp"></div>
+    <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px;">
+        <label class="inp-lbl">1. Taksit</label>
+        <div style="display:flex; gap:10px;"><input type="date" id="il-date" class="inp"><input type="number" id="il-amt1" class="inp" placeholder="Tutar"></div>
+    </div>
+    <div class="inp-grp"><label class="inp-lbl">Diğer Taksitler</label><input type="number" id="il-amtr" class="inp"></div>
+    <button class="btn-pri" onclick="saveLoan()">Kaydet</button>
+    <button class="btn-clo" onclick="closeModal('m-loan')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-trans"><div class="modal-box">
+    <h3 id="it-tit">İşlem</h3>
+    <input type="hidden" id="it-type">
+    <div class="inp-grp"><label class="inp-lbl">Tarih</label><input type="date" id="it-date" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Tutar</label><input type="number" id="it-amt" class="inp"></div>
+    <div class="inp-grp" id="it-cat-div"><label class="inp-lbl">Kategori</label><select id="it-cat" class="inp"></select></div>
+    <div class="inp-grp"><label class="inp-lbl">Hesap</label><select id="it-acc" class="inp"></select></div>
+    <div class="inp-grp d-none" id="it-to-div"><label class="inp-lbl">Alıcı</label><select id="it-to" class="inp"></select></div>
+    <div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;">
+        <label><input type="checkbox" id="it-plan" onchange="toggle('it-plan-opts', this.checked)"> Planlı / Gelecek İşlem</label>
+        <div id="it-plan-opts" class="d-none" style="margin-top:5px;">
+            <input type="number" id="it-rep" class="inp" placeholder="Kaç Ay Tekrar Etsin?" value="1">
+        </div>
+    </div>
+    <button class="btn-pri" onclick="saveTrans()">Kaydet</button>
+    <button class="btn-clo" onclick="closeModal('m-trans')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-pay"><div class="modal-box">
+    <h3>Ödeme Yap</h3>
+    <p id="mp-desc"></p>
+    <div class="inp-grp"><label class="inp-lbl">Kaynak Hesap</label><select id="mp-acc" class="inp"></select></div>
+    <div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;">
+        <label><input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> Erken / İndirimli Ödeme</label>
+        <div id="mp-early-opts" class="d-none" style="margin-top:5px;">
+            <label class="inp-lbl">Gerçek Ödenen</label><input type="number" id="mp-real" class="inp">
+            <small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small>
+        </div>
+    </div>
+    <button class="btn-pri" onclick="confirmPay()">Öde</button>
+    <button class="btn-clo" onclick="closeModal('m-pay')">İptal</button>
+</div></div>
+
+<div class="modal" id="m-close-loan"><div class="modal-box">
+    <h3>Kredi Kapat</h3>
+    <p id="mcl-desc"></p>
+    <div class="inp-grp"><label class="inp-lbl">Kapatma Tutarı</label><input type="number" id="mcl-amt" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Kaynak Hesap</label><select id="mcl-acc" class="inp"></select></div>
+    <button class="btn-pri" style="background:var(--danger)" onclick="doCloseLoan()">Kapat ve Sil</button>
+    <button class="btn-clo" onclick="closeModal('m-close-loan')">İptal</button>
+</div></div>
+
+<div class="modal" id="m-bank-list"><div class="modal-box">
+    <h3>Bankalar</h3>
+    <div style="display:flex; gap:5px;"><input id="ib-new" class="inp"><button class="btn-pri" style="width:auto; margin:0;" onclick="addBank()">Ekle</button></div>
+    <div id="lst-banks" style="margin-top:10px;"></div>
+    <button class="btn-clo" onclick="closeModal('m-bank-list')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-cat-list"><div class="modal-box">
+    <h3>Kategoriler</h3>
+    <select id="ic-type" class="inp" onchange="renderCats()"><option value="expense">Gider</option><option value="income">Gelir</option></select>
+    <div style="display:flex; gap:5px; margin-top:5px;"><input id="ic-new" class="inp"><button class="btn-pri" style="width:auto; margin:0;" onclick="addCat()">Ekle</button></div>
+    <div id="lst-cats" style="margin-top:10px;"></div>
+    <button class="btn-clo" onclick="closeModal('m-cat-list')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-day"><div class="modal-box">
+    <h3 id="md-tit"></h3>
+    <div id="md-list"></div>
+    <button class="btn-clo" onclick="closeModal('m-day')">Kapat</button>
+</div></div>
+
+<div class="modal" id="m-paste"><div class="modal-box">
+    <h3>JSON Yapıştır</h3>
+    <textarea id="paste-txt" class="inp" rows="8"></textarea>
+    <button class="btn-pri" onclick="doPaste()">Yükle</button>
+    <button class="btn-clo" onclick="closeModal('m-paste')">Kapat</button>
+</div></div>
+
+<script>
+// --- SUPABASE AYARLARI ---
+const SUPABASE_URL = 'https://kdycxoweuaxslzbklprh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Tm-hZqU0CN6TPk8hKSfZ1Q_VtiWUqY1';
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// GÜNCELLENMİŞ ŞEMA (ASSETS VE GOALS EKLENDİ)
+let db = { 
+    banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
+    categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
+    accounts: [], 
+    cards: [], 
+    loans: [], 
+    transactions: [], 
+    planned: [], 
+    assets: [], 
+    goals: [] 
+};
+
+let curPro = 'Hane', curDate = new Date(), payId = null, closeId = null;
+
+// --- BAŞLATMA VE BULUTTAN ÇEKME ---
+async function init() {
+    let localDataLoaded = false;
+    try { 
+        const s = localStorage.getItem('hf_cloud'); 
+        if(s) { 
+            const p = JSON.parse(s); 
+            if(p.banks) { 
+                db = p; 
+                // ESKİ VERİLERİ KORU, YENİ ALANLARI EKLE (MIGRATION)
+                db.assets = db.assets || []; 
+                db.goals = db.goals || [];
+                render(); 
+                localDataLoaded = true; 
+            } 
+        } 
+    } catch(e) {}
+
+    if (!localDataLoaded) { render(); }
+
+    try {
+        document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor...";
+        document.getElementById('cloud-status').style.color = "white";
+
+        const { data, error } = await client.from('app_state').select('*').eq('id', 1);
+        
+        if (error) throw error; 
+
+        if (!data || data.length === 0) {
+            document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor...";
+            const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]);
+            if (insertErr) throw insertErr;
+            document.getElementById('cloud-status').innerText = "☁️ Güncel";
+            document.getElementById('cloud-status').style.color = "#10b981";
+        } else {
+            db = data[0].data;
+            // ŞEMA GÜNCELLEMESİ GÜVENCESİ
+            db.assets = db.assets || []; 
+            db.goals = db.goals || [];
+            
+            localStorage.setItem('hf_cloud', JSON.stringify(db));
+            document.getElementById('cloud-status').innerText = "☁️ Güncel";
+            document.getElementById('cloud-status').style.color = "#10b981";
+            render();
+        }
+    } catch(e) {
+        console.error("Bulut çekme hatası:", e);
+        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor");
+        document.getElementById('cloud-status').style.color = "#ef4444";
+        render(); 
+    }
+    
+    const t = new Date().toISOString().split('T')[0];
+    ['il-date', 'it-date'].forEach(i => { 
+        if(document.getElementById(i)) document.getElementById(i).value = t; 
+    });
+}
+
+// --- KAYDETME VE BULUTA GÖNDERME ---
+async function save() { 
+    localStorage.setItem('hf_cloud', JSON.stringify(db)); 
+    render(); 
+    
+    document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor...";
+    document.getElementById('cloud-status').style.color = "white";
+    
+    try {
+        const { error } = await client.from('app_state').upsert({ id: 1, data: db });
+        if(error) throw error;
+        document.getElementById('cloud-status').innerText = "☁️ Güncel";
+        document.getElementById('cloud-status').style.color = "#10b981";
+    } catch (e) {
+        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi");
+        document.getElementById('cloud-status').style.color = "#ef4444";
+    }
+}
+
+function resetApp() { 
+    if(confirm('Tüm veriler cihazdan ve buluttan silinecek! Emin misiniz?')) { 
+        db = { banks:['Ziraat','Garanti','Enpara','Akbank'], categories:{expense:['Market','Fatura','Kira'], income:['Maaş']}, accounts:[], cards:[], loans:[], transactions:[], planned:[], assets:[], goals:[] };
+        save();
+    } 
+}
+
+// UI FONKSİYONLARI
+function switchPage(id) { 
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+    document.getElementById('p-' + id).classList.add('active'); 
+    
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); 
+    const idx = {'home':0, 'assets':1, 'calendar':2, 'debts':3, 'analysis':4, 'analysis-loan':3}[id]; 
+    if (idx !== undefined) document.querySelectorAll('.nav-btn')[idx].classList.add('active'); 
+}
+
+function openModal(id) { 
+    updSel(); 
+    document.getElementById(id).classList.add('show'); 
+    if(id === 'm-banks') renderBanks(); 
+    if(id === 'm-cats') renderCats(); 
+}
+
+function closeModal(id) { 
+    document.getElementById(id).classList.remove('show'); 
+}
+
+function toggle(id, s) { 
+    document.getElementById(id).classList.toggle('d-none', !s); 
+}
+
+function setPro(p) { 
+    curPro = p; 
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
+    document.getElementById('t-' + p).classList.add('active'); 
+    render(); 
+}
+
+function fmt(n) { 
+    return new Intl.NumberFormat('tr-TR', {style:'currency', currency:'TRY'}).format(n); 
+}
+
+function filter(arr) { 
+    return curPro === 'Hane' ? arr : arr.filter(x => x.owner === curPro); 
+}
+
+// YENİ VERİ EKLEME (ASSETS & GOALS)
+function saveAsset() {
+    const a = { 
+        id: Date.now(), 
+        owner: document.getElementById('ias-own').value, 
+        type: document.getElementById('ias-type').value, 
+        name: document.getElementById('ias-name').value, 
+        value: parseFloat(document.getElementById('ias-val').value) || 0 
+    };
+    if(!a.name) return alert('İsim girin');
+    db.assets.push(a); 
+    save(); 
+    closeModal('m-asset');
+}
+
+function saveGoal() {
+    const g = { 
+        id: Date.now(), 
+        owner: 'Hane', 
+        name: document.getElementById('ig-name').value, 
+        target: parseFloat(document.getElementById('ig-target').value) || 0, 
+        current: parseFloat(document.getElementById('ig-current').value) || 0 
+    };
+    if(!g.name || !g.target) return alert('Eksik bilgi');
+    db.goals.push(g); 
+    save(); 
+    closeModal('m-goal');
+}
+
+// ESKİ VERİ EKLEME FONKSİYONLARI (AÇILMIŞ VE DÜZENLİ HALİ)
+function saveAcc() { 
+    const a = { 
+        id: Date.now(), 
+        owner: document.getElementById('ia-own').value, 
+        bank: document.getElementById('ia-bank').value, 
+        name: document.getElementById('ia-name').value, 
+        balance: parseFloat(document.getElementById('ia-bal').value) || 0 
+    }; 
+    if(!a.bank || !a.name) return alert('Eksik'); 
+    db.accounts.push(a); 
+    save(); 
+    closeModal('m-acc'); 
+}
+
+function saveCard() { 
+    db.cards.push({ 
+        id: Date.now(), 
+        owner: 'Hane', 
+        bank: document.getElementById('ic-bank').value, 
+        name: document.getElementById('ic-name').value, 
+        limit: parseFloat(document.getElementById('ic-lim').value) || 0, 
+        debt: parseFloat(document.getElementById('ic-debt').value) || 0, 
+        future: parseFloat(document.getElementById('ic-fut').value) || 0, 
+        cut: document.getElementById('ic-cut').value, 
+        due: document.getElementById('ic-due').value 
+    }); 
+    save(); 
+    closeModal('m-card'); 
+}
+
+function saveLoan() { 
+    const l = { 
+        id: Date.now(), 
+        owner: document.getElementById('il-own').value, 
+        bank: document.getElementById('il-bank').value, 
+        name: document.getElementById('il-name').value, 
+        total: parseFloat(document.getElementById('il-tot').value), 
+        remaining: parseFloat(document.getElementById('il-tot').value), 
+        count: parseInt(document.getElementById('il-cnt').value), 
+        amt1: parseFloat(document.getElementById('il-amt1').value), 
+        amtr: parseFloat(document.getElementById('il-amtr').value) 
+    }; 
+    db.loans.push(l); 
+    
+    let d = new Date(document.getElementById('il-date').value); 
+    for(let i = 0; i < l.count; i++) { 
+        db.planned.push({ 
+            id: Date.now() + i, 
+            type: 'expense', 
+            category: 'Kredi', 
+            title: `${l.name} (${i + 1}/${l.count})`, 
+            amount: i === 0 ? l.amt1 : l.amtr, 
+            date: d.toISOString().split('T')[0], 
+            isPaid: false, 
+            owner: l.owner 
+        }); 
+        d.setMonth(d.getMonth() + 1); 
+    } 
+    save(); 
+    closeModal('m-loan'); 
+}
+
+function openTrans(type) { 
+    document.getElementById('it-type').value = type; 
+    document.getElementById('it-tit').innerText = type; 
+    toggle('it-cat-div', type !== 'transfer'); 
+    toggle('it-to-div', type === 'transfer'); 
+    openModal('m-trans'); 
+}
+
+function saveTrans() { 
+    const type = document.getElementById('it-type').value;
+    const amt = parseFloat(document.getElementById('it-amt').value);
+    const accIdx = document.getElementById('it-acc').value; 
+    const isPlan = document.getElementById('it-plan').checked; 
+    const tDate = document.getElementById('it-date').value; 
+    
+    if(!amt) return alert('Tutar?'); 
+    
+    const acc = db.accounts[accIdx] || {owner: 'Hane'}; 
+    
+    if(type === 'transfer') { 
+        const [tt, ti] = document.getElementById('it-to').value.split('-'); 
+        if(db.accounts[accIdx]) db.accounts[accIdx].balance -= amt; 
+        if(tt === 'acc') db.accounts[ti].balance += amt; 
+        if(tt === 'card') db.cards[ti].debt -= amt; 
+        if(tt === 'loan') db.loans[ti].remaining -= amt; 
+        
+        db.transactions.push({
+            type, 
+            amount: amt, 
+            category: 'Transfer', 
+            date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), 
+            owner: acc.owner
+        }); 
+    } else { 
+        if(isPlan) { 
+            let d = new Date(tDate || new Date().toISOString());
+            let rep = parseInt(document.getElementById('it-rep').value) || 1; 
+            for(let i = 0; i < rep; i++) { 
+                db.planned.push({
+                    id: Date.now() + i, 
+                    type, 
+                    category: document.getElementById('it-cat').value, 
+                    title: document.getElementById('it-cat').value, 
+                    amount: amt, 
+                    date: d.toISOString().split('T')[0], 
+                    isPaid: false, 
+                    owner: acc.owner
+                }); 
+                d.setMonth(d.getMonth() + 1); 
+            } 
+        } else { 
+            if(db.accounts[accIdx]) { 
+                if(type === 'expense') acc.balance -= amt; 
+                else acc.balance += amt; 
+            } 
+            db.transactions.push({
+                type, 
+                amount: amt, 
+                category: document.getElementById('it-cat').value, 
+                date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), 
+                owner: acc.owner
+            }); 
+        } 
+    } 
+    save(); 
+    closeModal('m-trans'); 
+}
+
+// RENDER SİSTEMİ (SAĞLIK SKORU VE PORTFÖY EKLENDİ)
+function render() {
+    const fAcc = filter(db.accounts);
+    const fCards = filter(db.cards);
+    const fLoans = filter(db.loans);
+    const fPlans = filter(db.planned);
+    const fTrans = filter(db.transactions);
+    const fAssets = filter(db.assets || []);
+    
+    // YENİ: Varlıklara artık nakit hesaplar + portföy yatırımları dahil ediliyor
+    const accBalance = fAcc.reduce((a,b) => a + b.balance, 0);
+    const invBalance = fAssets.reduce((a,b) => a + b.value, 0);
+    const ast = accBalance + invBalance; 
+    
+    const dbt = fCards.reduce((a,b) => a + b.debt + b.future, 0) + fLoans.reduce((a,b) => a + b.remaining, 0); 
+    
+    document.getElementById('dash-net').innerText = fmt(ast - dbt);
+    document.getElementById('dash-ast').innerText = fmt(ast);
+    document.getElementById('dash-dbt').innerText = fmt(dbt);
+
+    // FİNANSAL SAĞLIK SKORU HESAPLAMA
+    let score = 0, desc = "Analiz Ediliyor";
+    if(ast === 0 && dbt === 0) { 
+        score = 50; desc = "Yeni Başlangıç"; 
+    }
+    else if(ast > 0 && dbt === 0) { 
+        score = 99; desc = "Mükemmel Durum 🏆"; 
+    }
+    else {
+        score = Math.round((ast / (ast + dbt)) * 100);
+        if(score > 75) desc = "Çok İyi Durum 🌟";
+        else if(score > 50) desc = "Sağlıklı Denge 👍";
+        else if(score > 25) desc = "Dikkatli Olun ⚠️";
+        else desc = "Kritik Seviye 🚨";
+    }
+    document.getElementById('health-score').innerText = score;
+    document.getElementById('health-desc').innerText = desc;
+    
+    // BANKALAR
+    const bl = document.getElementById('list-banks-status'); 
+    bl.innerHTML = '';
+    db.banks.forEach(b => { 
+        let net = 0, has = false; 
+        fAcc.filter(x => x.bank === b).forEach(x => { net += x.balance; has = true; }); 
+        fCards.filter(x => x.bank === b).forEach(x => { net -= (x.debt + x.future); has = true; }); 
+        fLoans.filter(x => x.bank === b).forEach(x => { net -= x.remaining; has = true; }); 
+        if(has) {
+            bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`; 
+        }
+    });
+    
+    // HESAPLAR
+    const al = document.getElementById('list-acc'); 
+    al.innerHTML = '';
+    fAcc.forEach((a,i) => {
+        al.innerHTML += `<div class="item"><span>${a.bank}-${a.name}</span><b>${fmt(a.balance)} <button class="btn-del" onclick="del('accounts',${i})">×</button></b></div>`;
+    });
+    
+    // YATIRIMLAR EKRANA BASILMASI
+    const asl = document.getElementById('list-assets'); 
+    asl.innerHTML = '';
+    fAssets.forEach((a,i) => {
+        asl.innerHTML += `<div class="item"><span><span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> ${a.name}</span><b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b></div>`;
+    });
+    if(fAssets.length === 0) {
+        asl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Henüz yatırım eklenmemiş.</div>';
+    }
+
+    // HEDEFLER EKRANA BASILMASI
+    const gl = document.getElementById('list-goals'); 
+    gl.innerHTML = '';
+    (db.goals || []).forEach((g,i) => {
+        let pct = Math.min(100, Math.round((g.current / g.target) * 100)) || 0;
+        gl.innerHTML += `<div style="padding:15px 0; border-bottom:1px solid #f1f5f9;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span style="font-weight:bold; font-size:0.9rem;">${g.name}</span>
+                <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;">
+                <span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span>
+            </div>
+            <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    });
+    if((db.goals || []).length === 0) {
+        gl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Hedef belirlenmemiş.</div>';
+    }
+
+    // BORÇLAR
+    const dl = document.getElementById('list-debts'); 
+    dl.innerHTML = '';
+    fCards.forEach((c,i) => {
+        dl.innerHTML += `<div class="item"><span>${c.bank}-${c.name} (Kart)</span><div><span class="text-red">-${fmt(c.debt)}</span> <button class="btn-del" onclick="del('cards',${i})">×</button></div></div>`;
+    });
+    fLoans.forEach((l,i) => { 
+        dl.innerHTML += `<div class="item"><span>${l.bank}-${l.name} (Kredi)</span><div><span class="text-red">-${fmt(l.remaining)}</span> <button class="act-btn" style="background:var(--purple); color:white; margin:0 5px;" onclick="openCloseLoan(${i})">Kapat</button><button class="btn-del" onclick="del('loans',${i})">×</button></div></div>`; 
+    });
+
+    renderCal(fPlans, fTrans);
+    renderAnl(fTrans);
+}
+
+// TAKVİM FONKSİYONU
+function renderCal(plans, trans) { 
+    const y = curDate.getFullYear(), m = curDate.getMonth(); 
+    document.getElementById('cal-title').innerText = `${y} / ${m + 1}`; 
+    
+    const grid = document.getElementById('cal-grid'); 
+    grid.innerHTML = ''; 
+    ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].forEach(d => {
+        grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`;
+    }); 
+    
+    const dim = new Date(y, m + 1, 0).getDate();
+    const start = new Date(y, m, 1).getDay() || 7; 
+    
+    for(let i = 1; i < start; i++) {
+        grid.innerHTML += `<div></div>`;
+    }
+        
+    for(let d = 1; d <= dim; d++) { 
+        const ds = `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; 
+        const dayPlans = plans.filter(p => p.date === ds); 
+        const dayTrans = trans.filter(t => (t.date || '').split('T')[0] === ds); 
+        
+        let classes = 'cal-day'; 
+        if(dayPlans.some(p => !p.isPaid)) classes += ' today'; 
+        else if (dayTrans.length > 0 || dayPlans.some(p => p.isPaid)) classes += ' past-act'; 
+        
+        let dots = ''; 
+        if(dayTrans.some(t => t.type === 'income') || dayPlans.some(p => p.type === 'income')) dots += '<span style="color:var(--success)">●</span>'; 
+        if(dayTrans.some(t => t.type === 'expense') || dayPlans.some(p => p.type === 'expense')) dots += '<span style="color:var(--danger)">●</span>'; 
+        
+        grid.innerHTML += `<div class="${classes}" onclick="openDay('${ds}')">${d}<div style="position:absolute; bottom:2px; font-size:0.4rem; display:flex; gap:2px;">${dots}</div></div>`; 
+    } 
+    
+    const pv = document.getElementById('period-view'); 
+    pv.innerHTML = ''; 
+    [{s:1, e:14}, {s:15, e:20}, {s:21, e:31}].forEach(pr => { 
+        let inc = 0, exp = 0; 
+        
+        trans.forEach(t => { 
+            const pd = new Date(t.date); 
+            if(pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e) { 
+                if(t.type === 'income') inc += t.amount; 
+                else if(t.type === 'expense') exp += t.amount; 
+            }
+        }); 
+        
+        plans.forEach(p => { 
+            const pd = new Date(p.date); 
+            if(pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) { 
+                if(p.type === 'income') inc += p.amount; 
+                else if(p.type === 'expense') exp += p.amount; 
+            }
+        }); 
+        
+        pv.innerHTML += `<div class="p-card"><div class="p-head">${pr.s}-${pr.e}</div><div class="text-grn">+${fmt(inc)}</div><div class="text-red">-${fmt(exp)}</div><div class="p-net">${fmt(inc - exp)}</div></div>`; 
+    }); 
+    
+    const ml = document.getElementById('list-plans'); 
+    ml.innerHTML = ''; 
+    let allMonthItems = []; 
+    
+    trans.forEach(t => { 
+        if((t.date || '').startsWith(`${y}-${String(m + 1).padStart(2,'0')}`)) {
+            allMonthItems.push({...t, isReal: true, sortDate: t.date}); 
+        }
+    }); 
+    
+    plans.forEach(p => { 
+        if(p.date.startsWith(`${y}-${String(m + 1).padStart(2,'0')}`)) {
+            allMonthItems.push({...p, isReal: false, sortDate: p.date}); 
+        }
+    }); 
+    
+    allMonthItems.sort((a,b) => new Date(b.sortDate) - new Date(a.sortDate)); 
+    
+    allMonthItems.forEach(item => { 
+        const isInc = item.type === 'income'; 
+        const color = isInc ? 'var(--success)' : 'var(--danger)'; 
+        const sign = isInc ? '+' : '-'; 
+        
+        if(item.isReal) { 
+            ml.innerHTML += `<div class="item"><span>${item.category} <small style="color:#888">${(item.date||'').split('T')[0]}</small><br><small style="color:#aaa">${item.description||'Gerçekleşen İşlem'}</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span></div></div>`; 
+        } else { 
+            ml.innerHTML += `<div class="item" style="opacity:${item.isPaid?0.5:1}"><span>${item.title} <small style="color:#888">${item.date}</small><br><small style="color:#aaa">Planlanan</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> ${!item.isPaid ? `<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay(${item.id})">Öde</button>` : '<span class="badge">✓</span>'}</div></div>`; 
+        } 
+    }); 
+}
+
+// ANALİZ FONKSİYONU
+function renderAnl(trans) { 
+    const tx = trans.filter(t => t.type === 'expense'); 
+    const cats = {}; 
+    let tot = 0; 
+    
+    tx.forEach(t => {
+        cats[t.category] = (cats[t.category] || 0) + t.amount; 
+        tot += t.amount;
+    }); 
+    
+    document.getElementById('anl-total').innerText = fmt(tot); 
+    const leg = document.getElementById('anl-legend'); 
+    leg.innerHTML = ''; 
+    
+    let g = [], c = 0, i = 0; 
+    const cols = ['#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#0ea5e9']; 
+    
+    for(let k in cats) { 
+        let p = (cats[k] / tot) * 360; 
+        g.push(`${cols[i % cols.length]} ${c}deg ${c + p}deg`); 
+        c += p; 
+        leg.innerHTML += `<div class="item"><span><span style="color:${cols[i % cols.length]}">●</span> ${k}</span><span>${fmt(cats[k])}</span></div>`; 
+        i++; 
+    } 
+    document.getElementById('pie-chart').style.background = tot > 0 ? `conic-gradient(${g.join(', ')})` : '#eee'; 
+}
+
+function openDay(d) { 
+    const l = document.getElementById('md-list'); 
+    l.innerHTML = ''; 
+    document.getElementById('md-tit').innerText = d + ' Detayları'; 
+    
+    let dayTrans = filter(db.transactions).filter(t => (t.date || '').split('T')[0] === d); 
+    let dayPlans = filter(db.planned).filter(p => p.date === d); 
+    
+    if(dayTrans.length === 0 && dayPlans.length === 0) { 
+        l.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Bu tarihte işlem bulunmuyor.</div>'; 
+    } 
+    
+    dayTrans.forEach((t, i) => { 
+        const isInc = t.type === 'income'; 
+        l.innerHTML += `<div class="item"><span>${t.category} <br><small>${t.description || 'Tamamlanan İşlem'}</small></span><div><b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(t.amount)}</b> <span style="font-size:0.7rem; color:#888; margin-left:5px;">(Geçmiş)</span></div></div>`; 
+    }); 
+    
+    dayPlans.forEach(p => { 
+        const isInc = p.type === 'income'; 
+        l.innerHTML += `<div class="item"><span>${p.title} <br><small>Planlanan</small></span><div><b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(p.amount)}</b> ${!p.isPaid ? `<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay(${p.id})">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-left:5px;">(Ödendi)</span>'}<button class="btn-del" onclick="delPlan(${p.id})" style="margin-left:5px;">🗑</button></div></div>`; 
+    }); 
+    openModal('m-day'); 
+}
+
+function initPay(id) { 
+    payId = id; 
+    updSel(); 
+    openModal('m-pay'); 
+}
+
+function confirmPay() { 
+    const p = db.planned.find(x => x.id == payId); 
+    const accIdx = document.getElementById('mp-acc').value; 
+    const acc = db.accounts[accIdx]; 
+    let amt = parseFloat(document.getElementById('mp-real').value) || p.amount; 
+    
+    if(document.getElementById('mp-early').checked && p.category === 'Kredi') { 
+        const loan = db.loans.find(l => p.title.includes(l.name)); 
+        if(loan) loan.remaining -= p.amount; 
+    } 
+    
+    if(acc) { 
+        if(p.type === 'expense') acc.balance -= amt; 
+        else acc.balance += amt; 
+    } 
+    
+    p.isPaid = true; 
+    db.transactions.push({
+        type: p.type, 
+        amount: amt, 
+        category: p.category, 
+        date: new Date().toISOString(), 
+        owner: p.owner, 
+        description: p.title
+    }); 
+    
+    save(); 
+    closeModal('m-pay'); 
+    closeModal('m-day'); 
+}
+
+function delPlan(id) { 
+    if(confirm('Sil?')) { 
+        db.planned = db.planned.filter(x => x.id != id); 
+        save(); 
+        closeModal('m-day'); 
+    } 
+}
+
+function openCloseLoan(idx) { 
+    closeId = idx; 
+    updSel(); 
+    openModal('m-close-loan'); 
+}
+
+function doCloseLoan() { 
+    const amt = parseFloat(document.getElementById('mcl-amt').value); 
+    const acc = db.accounts[document.getElementById('mcl-acc').value]; 
+    const loan = db.loans[closeId]; 
+    
+    if(acc) acc.balance -= amt; 
+    
+    db.transactions.push({
+        type: 'expense', 
+        amount: amt, 
+        category: 'Kredi Kapama', 
+        owner: loan.owner, 
+        date: new Date().toISOString()
+    }); 
+    
+    db.planned = db.planned.filter(p => !p.title.includes(loan.name)); 
+    db.loans.splice(closeId, 1); 
+    save(); 
+    closeModal('m-close-loan'); 
+}
+
+function del(type, idx) { 
+    if(confirm("Sil?")) { 
+        if(type === 'loans'){
+            const l = db.loans[idx]; 
+            db.planned = db.planned.filter(p => !p.title.includes(l.name));
+        } 
+        db[type].splice(idx, 1); 
+        save(); 
+    } 
+}
+
+function updSel() { 
+    const accs = document.querySelectorAll('#it-acc, #mp-acc, #mcl-acc'); 
+    accs.forEach(s => {
+        s.innerHTML = ''; 
+        db.accounts.forEach((a,i) => s.add(new Option(a.name, i)));
+    }); 
+    
+    const tgs = document.getElementById('it-target'); 
+    if(tgs) { 
+        tgs.innerHTML = ''; 
+        db.accounts.forEach((a,i) => tgs.add(new Option('H:' + a.name, 'acc-' + i))); 
+        db.cards.forEach((c,i) => tgs.add(new Option('K:' + c.name, 'card-' + i))); 
+        db.loans.forEach((l,i) => tgs.add(new Option('Kr:' + l.name, 'loan-' + i))); 
+    } 
+    
+    const bnks = document.querySelectorAll('#ia-bank, #ic-bank, #il-bank'); 
+    bnks.forEach(s => {
+        s.innerHTML = ''; 
+        db.banks.forEach(b => s.add(new Option(b, b)));
+    }); 
+    
+    const cts = document.getElementById('it-cat'); 
+    if(cts) {
+        cts.innerHTML = ''; 
+        db.categories.expense.forEach(c => cts.add(new Option(c, c)));
+    } 
+}
+
+function renderBanks() { 
+    document.getElementById('lst-banks').innerHTML = db.banks.map((b,i) => `<span class="badge" style="font-size:0.8rem; padding:5px 10px;">${b} <span style="cursor:pointer; margin-left:5px; color:red" onclick="db.banks.splice(${i},1);save();renderBanks()">x</span></span>`).join(''); 
+}
+function addBank() { const v = document.getElementById('ib-new').value; if(v){ db.banks.push(v); save(); renderBanks(); } }
+
+function renderCats() { 
+    const t = document.getElementById('ic-type').value; 
+    document.getElementById('lst-cats').innerHTML = db.categories[t].map((c,i) => `<span class="badge" style="font-size:0.8rem; padding:5px 10px;">${c} <span style="cursor:pointer; margin-left:5px; color:red" onclick="db.categories.${t}.splice(${i},1);save();renderCats()">x</span></span>`).join(''); 
+}
+function addCat() { const t = document.getElementById('ic-type').value, v = document.getElementById('ic-new').value; if(v){ db.categories[t].push(v); save(); renderCats(); } }
+
+function chgMonth(n) { curDate.setMonth(curDate.getMonth() + n); render(); }
+
+function calcLoan() { 
+    const amt = parseFloat(document.getElementById('la-amt').value);
+    const term = parseFloat(document.getElementById('la-term').value);
+    const inst = parseFloat(document.getElementById('la-inst').value); 
+    const res = document.getElementById('loan-compare-res'); 
+    res.innerHTML = ''; 
+    if(amt && term && inst) {
+        res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`; 
+    }
+    db.loans.forEach(l => res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`); 
+}
+
+function triggerExport() { 
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(db)], {type:'application/json'})); 
+    a.download = 'yedek.json'; 
+    a.click(); 
+}
+
+function processImport(el) { 
+    const r = new FileReader(); 
+    r.onload = e => { db = JSON.parse(e.target.result); save(); }; 
+    r.readAsText(el.files[0]); 
+}
+
+function doPaste() { 
+    try { 
+        const j = JSON.parse(document.getElementById('paste-txt').value); 
+        if(j.transactions) db.transactions = db.transactions.concat(j.transactions); 
+        if(j.planned) db.planned = db.planned.concat(j.planned); 
+        if(j.accounts) db.accounts = db.accounts.concat(j.accounts); 
+        if(j.cards) db.cards = db.cards.concat(j.cards); 
+        save(); 
+        closeModal('m-paste'); 
+    } catch(e) { alert('Hata'); } 
+}
+
+// UYGULAMAYI BAŞLAT
+init();
+</script>
+</body>
+</html>
