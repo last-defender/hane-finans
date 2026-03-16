@@ -295,23 +295,34 @@ async function processScan(input) {
                 body: JSON.stringify({
                     contents: [{
                         parts: [
-                            { text: "Bu bir kredi kartı ekstresi, banka dekontu veya fişidir. İçindeki harcama/gider işlemlerini bul. Şu anki yılı 2026 kabul et. Çıktıyı SADECE JSON dizisi (Array) olarak ver. Format şu şekilde olmalıdır: [{\"date\":\"YYYY-MM-DD\", \"description\":\"Firma Adı\", \"amount\":150.50, \"category\":\"Kategori\"}]. Kategori tahmini için mantığını kullan (örn: Migros ise Market, TTNET ise Fatura)." },
+                            { text: "Bu bir banka/kredi kartı işlem listesi ekran görüntüsüdür. Resimdeki tüm işlemleri sırasıyla çıkar. Kurallar: 1. Tutarları (amount) ondalık sayı (float) formatına çevir (Örn: '12.500,00 TL' -> 12500.00, '-18,90 TL' -> -18.90). 2. Tarihleri (date) YYYY-MM-DD formatına çevir (Örn: '16.03.2026' -> '2026-03-16'). 3. Kategori (category) için akıllıca bir tahmin yap (Örn: 'SIGORTA' -> 'Sigorta', 'FLO' -> 'Giyim')." },
                             { inline_data: { mime_type: file.type, data: base64Data } }
                         ]
                     }],
-                    // YENİ EKLENEN KOD: Gemini'yi doğrudan saf JSON formatı vermeye zorluyoruz.
+                    // YENİ: Gemini'yi şablona uymaya ZORLUYORUZ.
                     generationConfig: {
-                        responseMimeType: "application/json"
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    date: { type: "STRING" },
+                                    description: { type: "STRING" },
+                                    amount: { type: "NUMBER" },
+                                    category: { type: "STRING" }
+                                },
+                                required: ["date", "description", "amount", "category"]
+                            }
+                        }
                     }
                 })
             });
 
             const res = await response.json();
             
-            // Eğer Google tarafından bir hata dönerse direkt yakalıyoruz
             if(res.error) throw new Error("API Hatası: " + res.error.message);
 
-            // Gelen veri zaten saf JSON olduğu için temizlemeye gerek kalmadı
             let rawText = res.candidates[0].content.parts[0].text;
             
             try {
@@ -320,11 +331,14 @@ async function processScan(input) {
                 throw new Error("Yapay Zeka JSON formatını bozdu. Lütfen tekrar deneyin.");
             }
             
+            if (scannedItems.length === 0) {
+                throw new Error("Görselde işlem bulunamadı veya tutarlar okunamadı.");
+            }
+
             renderScanModal(scannedItems);
 
         } catch (err) {
             console.error(err);
-            // YENİ EKLENEN KOD: Kullanıcıya hatanın tam olarak ne olduğunu gösteriyoruz
             alert("Okuma İşlemi Başarısız Oldu!\n\nDetay:\n" + err.message + "\n\n(Lütfen API anahtarınızın doğru kopyalandığından ve internet bağlantınızdan emin olun.)");
         }
         
