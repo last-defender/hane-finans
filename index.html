@@ -238,13 +238,33 @@
     <button class="btn-clo" onclick="closeModal('m-scan-res')">İptal Et</button>
 </div></div>
 
-<!-- YENİ: İŞLEM DÜZENLE MODALI -->
+<!-- GELİŞTİRİLMİŞ İŞLEM DÜZENLE MODALI -->
 <div class="modal" id="m-edit-trans"><div class="modal-box">
     <h3>İşlemi Düzenle</h3>
-    <p style="font-size:0.75rem; color:var(--warning); margin-bottom:10px;">Not: Geçmiş işlemlerin tutarını değiştirmek banka bakiyelerini otomatik güncellemez, sadece raporlamayı düzeltir.</p>
+    <p style="font-size:0.75rem; color:var(--warning); margin-bottom:10px;">Not: Tutar veya kaynak değişimi bakiyeleri otomatik güncellemez, sadece raporları ve geçmişi düzeltir.</p>
+    
+    <div class="inp-grp">
+        <label class="inp-lbl">İşlem Tipi</label>
+        <select id="et-type" class="inp">
+            <option value="expense">Gider (-)</option>
+            <option value="income">Gelir (+)</option>
+        </select>
+    </div>
+    
     <div class="inp-grp"><label class="inp-lbl">Tarih</label><input type="date" id="et-date" class="inp"></div>
     <div class="inp-grp"><label class="inp-lbl">Tutar (₺)</label><input type="number" id="et-amt" class="inp" step="0.01"></div>
-    <div class="inp-grp"><label class="inp-lbl">Kategori</label><input type="text" id="et-cat" class="inp" list="edit-cat-list"></div>
+    
+    <div class="inp-grp">
+        <label class="inp-lbl">Kategori</label>
+        <input type="text" id="et-cat" class="inp" list="edit-cat-list" placeholder="Listeden seçin veya yeni yazın...">
+        <datalist id="edit-cat-list"></datalist>
+    </div>
+
+    <div class="inp-grp">
+        <label class="inp-lbl">Hesap / Kaynak</label>
+        <select id="et-acc" class="inp"></select>
+    </div>
+
     <div class="inp-grp"><label class="inp-lbl">Açıklama</label><input type="text" id="et-desc" class="inp"></div>
     <button class="btn-pri" onclick="saveEditTrans()">Değişiklikleri Kaydet</button>
     <button class="btn-clo" onclick="closeModal('m-edit-trans')">İptal</button>
@@ -465,7 +485,7 @@ function saveScannedData() {
 
         if (amt !== 0) { 
             totalDeduction += amt;
-            // YENİ: Otomatik ID Ekleme (Düzenleme/Silme için gerekli)
+            // Kaynak Hesabı da kaydet
             db.transactions.push({
                 id: 't_' + Date.now() + '_' + index,
                 type: amt >= 0 ? 'expense' : 'income',
@@ -473,7 +493,8 @@ function saveScannedData() {
                 category: cat,
                 description: desc,
                 date: finalDate,
-                owner: owner
+                owner: owner,
+                sourceId: targetVal !== 'none' ? targetVal : null
             });
         }
     });
@@ -503,7 +524,6 @@ async function init() {
                 db = p; 
                 db.assets = db.assets || []; 
                 db.goals = db.goals || []; 
-                // YENİ: Geçmiş verilere Düzenle/Sil özelliği için otomatik ID atama
                 if(db.transactions) db.transactions.forEach((t, i) => { if(!t.id) t.id = 'old_t_' + Date.now() + '_' + i; });
                 if(db.planned) db.planned.forEach((p, i) => { if(!p.id) p.id = 'old_p_' + Date.now() + '_' + i; });
                 
@@ -532,7 +552,6 @@ async function init() {
             db.assets = db.assets || []; 
             db.goals = db.goals || []; 
             
-            // YENİ: Geçmiş verilere Düzenle/Sil özelliği için otomatik ID atama
             if(db.transactions) db.transactions.forEach((t, i) => { if(!t.id) t.id = 'old_t_' + Date.now() + '_' + i; });
             if(db.planned) db.planned.forEach((p, i) => { if(!p.id) p.id = 'old_p_' + Date.now() + '_' + i; });
 
@@ -579,6 +598,7 @@ function saveTrans() {
     
     if(!amt) return alert('Tutar?');
     const acc = db.accounts[accIdx] || {owner:'Hane'};
+    let sourceId = 'acc-' + accIdx;
     
     if(type === 'transfer') {
         const [tt,ti] = document.getElementById('it-to').value.split('-');
@@ -586,13 +606,13 @@ function saveTrans() {
         if(tt==='acc') db.accounts[ti].balance += amt;
         if(tt==='card') db.cards[ti].debt -= amt;
         if(tt==='loan') db.loans[ti].remaining -= amt;
-        db.transactions.push({id: 't_' + Date.now(), type, amount:amt, category:'Transfer', date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner});
+        db.transactions.push({id: 't_' + Date.now(), type, amount:amt, category:'Transfer', date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner, sourceId: sourceId});
     } else {
         if(isPlan) {
             let d = new Date(tDate || new Date().toISOString());
             let rep = parseInt(document.getElementById('it-rep').value)||1;
             for(let i=0; i<rep; i++) {
-                db.planned.push({id:'p_' + Date.now() + '_' + i, type, category:document.getElementById('it-cat').value, title:document.getElementById('it-cat').value, amount:amt, date:d.toISOString().split('T')[0], isPaid:false, owner:acc.owner});
+                db.planned.push({id:'p_' + Date.now() + '_' + i, type, category:document.getElementById('it-cat').value, title:document.getElementById('it-cat').value, amount:amt, date:d.toISOString().split('T')[0], isPaid:false, owner:acc.owner, sourceId: sourceId});
                 d.setMonth(d.getMonth()+1);
             }
         } else {
@@ -600,32 +620,42 @@ function saveTrans() {
                 if(type==='expense') acc.balance -= amt;
                 else acc.balance += amt;
             }
-            db.transactions.push({id: 't_' + Date.now(), type, amount:amt, category:document.getElementById('it-cat').value, date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner});
+            db.transactions.push({id: 't_' + Date.now(), type, amount:amt, category:document.getElementById('it-cat').value, date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner, sourceId: sourceId});
         }
     }
     save();
     closeModal('m-trans');
 }
 
-// YENİ: İŞLEM DÜZENLEME EKRANINI AÇ
+// GELİŞTİRİLMİŞ İŞLEM DÜZENLEME
 function openEditTrans(id, isPlan) {
     editTransId = id;
     editIsPlan = isPlan;
     const t = isPlan ? db.planned.find(x => x.id == id) : db.transactions.find(x => x.id == id);
     if(!t) return;
 
+    document.getElementById('et-type').value = t.type || 'expense';
     document.getElementById('et-amt').value = t.amount;
     document.getElementById('et-date').value = (t.date || '').split('T')[0];
     document.getElementById('et-desc').value = t.description || t.title || '';
     document.getElementById('et-cat').value = t.category || '';
 
-    // Kategoriler için dinamik datalist
-    let dl = document.getElementById('edit-cat-list');
-    if(!dl) {
-        dl = document.createElement('datalist');
-        dl.id = 'edit-cat-list';
-        document.body.appendChild(dl);
+    // Kaynak Hesap / Kart Listesi
+    const etAccSelect = document.getElementById('et-acc');
+    etAccSelect.innerHTML = '';
+    etAccSelect.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
+    db.accounts.forEach((a,i)=> etAccSelect.add(new Option('Hesap: ' + a.name, 'acc-'+i)));
+    db.cards.forEach((c,i)=> etAccSelect.add(new Option('Kart: ' + c.name, 'card-'+i)));
+    
+    // Eski işlemin kaynağını seç (Varsa)
+    if(t.sourceId) {
+        etAccSelect.value = t.sourceId;
+    } else {
+        etAccSelect.value = 'none';
     }
+
+    // Sabit Datalist İçini Doldur (Gelir & Gider bir arada)
+    const dl = document.getElementById('edit-cat-list');
     dl.innerHTML = '';
     db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
     db.categories.income.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
@@ -633,11 +663,11 @@ function openEditTrans(id, isPlan) {
     openModal('m-edit-trans');
 }
 
-// YENİ: DÜZENLENEN İŞLEMİ KAYDET
 function saveEditTrans() {
     const t = editIsPlan ? db.planned.find(x => x.id == editTransId) : db.transactions.find(x => x.id == editTransId);
     if(!t) return;
 
+    t.type = document.getElementById('et-type').value;
     t.amount = parseFloat(document.getElementById('et-amt').value) || 0;
     
     let dateVal = document.getElementById('et-date').value;
@@ -649,7 +679,12 @@ function saveEditTrans() {
     if(newCat) {
         t.category = newCat;
         if(!db.categories.expense.includes(newCat) && !db.categories.income.includes(newCat)) {
-            db.categories.expense.push(newCat); // Havuza eklendi
+            // İşlem tipine göre doğru kategori havuzuna ekle
+            if (t.type === 'income') {
+                db.categories.income.push(newCat); 
+            } else {
+                db.categories.expense.push(newCat); 
+            }
         }
     }
 
@@ -657,6 +692,17 @@ function saveEditTrans() {
         t.title = document.getElementById('et-desc').value;
     } else {
         t.description = document.getElementById('et-desc').value;
+    }
+
+    // Yeni Kaynak Seçimini Kaydet
+    const accVal = document.getElementById('et-acc').value;
+    t.sourceId = accVal !== 'none' ? accVal : null;
+
+    // Sahibini de (Owner) seçilen kaynağa göre güncelle
+    if (accVal !== 'none') {
+        const parts = accVal.split('-');
+        if (parts[0] === 'acc' && db.accounts[parts[1]]) t.owner = db.accounts[parts[1]].owner;
+        if (parts[0] === 'card' && db.cards[parts[1]]) t.owner = db.cards[parts[1]].owner;
     }
 
     save();
@@ -669,7 +715,6 @@ function saveEditTrans() {
     }
 }
 
-// YENİ: GEÇMİŞ VEYA PLANLI İŞLEMİ SİL
 function delTrans(id) {
     if(confirm('Bu işlemi silmek istediğinize emin misiniz? (Banka bakiyeniz otomatik etkilenmez)')) {
         db.transactions = db.transactions.filter(x => x.id != id);
@@ -829,7 +874,6 @@ function openDay(d) {
         l.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Bu tarihte işlem bulunmuyor.</div>';
     }
     
-    // GEÇMİŞ İŞLEMLERE DÜZENLE VE SİL EKLENDİ
     dayTrans.forEach((t, i) => {
         const isInc = t.type === 'income';
         l.innerHTML += `
@@ -845,7 +889,6 @@ function openDay(d) {
         </div>`;
     });
     
-    // PLANLANAN İŞLEMLERE DÜZENLE VE SİL EKLENDİ
     dayPlans.forEach(p => {
         const isInc = p.type === 'income';
         l.innerHTML += `
@@ -877,13 +920,14 @@ function confirmPay() {
         if(loan) loan.remaining -= p.amount;
     }
     
+    let sourceId = 'acc-' + accIdx;
     if(acc) {
         if(p.type==='expense') acc.balance-=amt;
         else acc.balance+=amt;
     }
     
     p.isPaid=true;
-    db.transactions.push({id: 't_' + Date.now(), type:p.type, amount:amt, category:p.category, date:new Date().toISOString(), owner:p.owner, description: p.title});
+    db.transactions.push({id: 't_' + Date.now(), type:p.type, amount:amt, category:p.category, date:new Date().toISOString(), owner:p.owner, description: p.title, sourceId: sourceId});
     save(); closeModal('m-pay'); closeModal('m-day');
 }
 
