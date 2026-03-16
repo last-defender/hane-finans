@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hane Finans: AI Vision Master</title>
-    <!-- SUPABASE BAĞLANTISI -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -15,7 +14,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
         body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* HEADER */
         header { background: var(--primary); padding: 15px; padding-top: 20px; color: white; border-radius: 0 0 20px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex-shrink: 0; z-index: 50; }
         .head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .head-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap:8px;}
@@ -23,50 +21,41 @@
         .head-actions { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .act-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
         
-        /* TABS */
         .tabs { display: flex; background: rgba(0,0,0,0.2); padding: 3px; border-radius: 10px; margin-top: 5px; }
         .tab { flex: 1; text-align: center; padding: 8px; font-size: 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.6); cursor: pointer; font-weight: 600; transition: 0.2s; }
         .tab.active { background: white; color: var(--primary); }
 
-        /* MAIN */
         main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; z-index: 1; }
 
-        /* CARDS & STATS */
         .card { background: var(--white); border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .stat-box { background: #f1f5f9; padding: 12px; border-radius: 10px; text-align: center; }
         .stat-lbl { font-size: 0.7rem; font-weight: bold; color: var(--light); text-transform: uppercase; }
         .stat-val { font-size: 1.1rem; font-weight: 800; margin-top: 4px; }
         
-        /* HEALTH SCORE CARD */
         .health-card { background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
         .score-circle { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; border: 3px solid white; }
 
-        /* PROGRESS BAR */
         .prog-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .prog-fill { height: 100%; background: var(--success); border-radius: 4px; transition: 0.3s; }
 
-        /* LISTS */
         .item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
         .item:last-child { border-bottom: none; }
         .i-tit { font-weight: 600; font-size: 0.9rem; }
         .i-sub { font-size: 0.75rem; color: var(--light); }
         .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: #e0e7ff; color: var(--primary); margin-left: 5px; font-weight: bold; }
 
-        /* CALENDAR */
         .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .cal-day { height: 38px; border: 1px solid #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; position: relative; }
         .cal-day.today { background: #eef2ff; border-color: var(--primary); color: var(--primary); font-weight: bold; }
         .cal-day.past-act { background: #f8fafc; border-color: #cbd5e1; font-weight: bold; }
 
-        /* PERIODS */
         .p-row { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
         .p-card { flex: 0 0 140px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
         .p-head { font-size: 0.8rem; font-weight: bold; color: var(--light); margin-bottom: 5px; }
         .p-net { font-weight: 800; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; text-align: center; }
 
-        /* NAV & FAB */
         nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #e2e8f0; display: flex; height: calc(60px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); z-index: 100; }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light); font-size: 0.7rem; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
@@ -75,7 +64,6 @@
         .fabs { position: fixed; bottom: calc(75px + var(--safe-bottom)); right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 90; }
         .fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
         
-        /* MODALS */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 2000; pointer-events: none; }
         .modal.show { display: flex; pointer-events: auto; }
         .modal-box { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(30px + var(--safe-bottom)); max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s; }
@@ -97,7 +85,6 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* YENİ AI TABLO STİLLERİ */
         .ai-table-row { display: grid; grid-template-columns: 2fr 2fr 1.5fr; gap: 5px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; align-items: center; }
         .ai-inp { padding: 6px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.8rem; width:100%; background:#fff; }
     </style>
@@ -110,7 +97,6 @@
         <button class="act-btn" style="background:#64748b; border:none;" onclick="openModal('m-settings')">⚙️ Ayarlar</button>
     </div>
     <div class="head-actions">
-        <!-- YAPAY ZEKA TARAMA BUTONU -->
         <button class="act-btn" style="background:var(--success); border:none; font-weight:bold;" onclick="document.getElementById('scan-in').click()">📸 Ekstre Tara (AI)</button>
         <input type="file" id="scan-in" accept="image/*" hidden onchange="processScan(this)">
         
@@ -264,7 +250,6 @@
 <div class="modal" id="m-paste"><div class="modal-box"><h3>JSON Yapıştır</h3><textarea id="paste-txt" class="inp" rows="8"></textarea><button class="btn-pri" onclick="doPaste()">Yükle</button><button class="btn-clo" onclick="closeModal('m-paste')">Kapat</button></div></div>
 
 <script>
-// --- SUPABASE AYARLARI ---
 const SUPABASE_URL = 'https://kdycxoweuaxslzbklprh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Tm-hZqU0CN6TPk8hKSfZ1Q_VtiWUqY1';
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -284,7 +269,7 @@ function saveSettings() {
     closeModal('m-settings');
 }
 
-// --- YAPAY ZEKA (VISION AI) OKUMA SÜRECİ ---
+// --- YAPAY ZEKA (VISION AI) OKUMA SÜRECİ (GÜNCELLENDİ: KESİN JSON) ---
 async function processScan(input) {
     const apiKey = localStorage.getItem('hf_gemini_key');
     if(!apiKey) {
@@ -304,50 +289,56 @@ async function processScan(input) {
         const base64Data = e.target.result.split(',')[1];
         
         try {
-            // Gemini Modeline İstek Atıyoruz
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     contents: [{
                         parts: [
-                            { text: "Bu bir kredi kartı ekstresi, banka dekontu veya fişidir. İçindeki harcama/gider işlemlerini bul. Şu anki yılı 2026 kabul et. Çıktıyı SADECE geçerli bir JSON dizisi (Array) olarak ver. JSON formatı şudur: [{'date':'YYYY-MM-DD', 'description':'Firma/İşlem Adı', 'amount':150.50, 'category':'Market'}]. Başında veya sonunda markdown işaretleri OLMASIN. Kategori tahmini için mantığını kullan (örn: Migros ise Market, TTNET ise Fatura)." },
+                            { text: "Bu bir kredi kartı ekstresi, banka dekontu veya fişidir. İçindeki harcama/gider işlemlerini bul. Şu anki yılı 2026 kabul et. Çıktıyı SADECE JSON dizisi (Array) olarak ver. Format şu şekilde olmalıdır: [{\"date\":\"YYYY-MM-DD\", \"description\":\"Firma Adı\", \"amount\":150.50, \"category\":\"Kategori\"}]. Kategori tahmini için mantığını kullan (örn: Migros ise Market, TTNET ise Fatura)." },
                             { inline_data: { mime_type: file.type, data: base64Data } }
                         ]
-                    }]
+                    }],
+                    // YENİ EKLENEN KOD: Gemini'yi doğrudan saf JSON formatı vermeye zorluyoruz.
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
                 })
             });
 
             const res = await response.json();
             
-            if(res.error) throw new Error(res.error.message);
+            // Eğer Google tarafından bir hata dönerse direkt yakalıyoruz
+            if(res.error) throw new Error("API Hatası: " + res.error.message);
 
-            // Gelen metni temizle ve JSON'a çevir
+            // Gelen veri zaten saf JSON olduğu için temizlemeye gerek kalmadı
             let rawText = res.candidates[0].content.parts[0].text;
-            rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
             
-            scannedItems = JSON.parse(rawText);
+            try {
+                scannedItems = JSON.parse(rawText);
+            } catch (parseError) {
+                throw new Error("Yapay Zeka JSON formatını bozdu. Lütfen tekrar deneyin.");
+            }
             
-            // Tabloyu Ekrana Çiz
             renderScanModal(scannedItems);
 
         } catch (err) {
             console.error(err);
-            alert("Okuma hatası! Lütfen net bir fotoğraf yükleyin veya API anahtarınızı kontrol edin.");
+            // YENİ EKLENEN KOD: Kullanıcıya hatanın tam olarak ne olduğunu gösteriyoruz
+            alert("Okuma İşlemi Başarısız Oldu!\n\nDetay:\n" + err.message + "\n\n(Lütfen API anahtarınızın doğru kopyalandığından ve internet bağlantınızdan emin olun.)");
         }
         
         document.getElementById('cloud-status').innerText = "☁️ Güncel";
         document.getElementById('cloud-status').style.color = "var(--success)";
-        input.value = ""; // Inputu sıfırla ki aynı dosyayı tekrar seçebilelim
+        input.value = ""; 
     };
     reader.readAsDataURL(file);
 }
 
 // AI SONUÇLARINI ONAY EKRANINA BASMA
 function renderScanModal(items) {
-    updSel(); // Banka hesaplarını güncelle
+    updSel(); 
     
-    // AI Modalındaki Hesap Seçiciyi Doldur
     const aiAccSelect = document.getElementById('ai-acc');
     aiAccSelect.innerHTML = '';
     db.accounts.forEach((a,i)=> aiAccSelect.add(new Option(a.name, i)));
@@ -355,7 +346,6 @@ function renderScanModal(items) {
     const list = document.getElementById('ai-results-list');
     list.innerHTML = '';
 
-    // Tüm kategorileri hazırlayalım (Kullanıcı AI'nin tahminini değiştirebilsin diye)
     let catOptions = '';
     db.categories.expense.forEach(c => catOptions += `<option value="${c}">${c}</option>`);
     
@@ -405,7 +395,6 @@ function saveScannedData() {
         }
     });
 
-    // Ana hesaptan toplam tutarı düş
     if(db.accounts[accIdx]) {
         db.accounts[accIdx].balance -= totalDeduction;
     }
@@ -416,75 +405,9 @@ function saveScannedData() {
 }
 
 // --- STANDART BAŞLATMA VE VERİ İŞLEMLERİ ---
-async function init() {
-    let localDataLoaded = false;
-    try {
-        const s = localStorage.getItem('hf_cloud');
-        if(s) {
-            const p = JSON.parse(s);
-            if(p.banks) {
-                db = p;
-                db.assets = db.assets || [];
-                db.goals = db.goals || [];
-                render();
-                localDataLoaded = true;
-            }
-        }
-    } catch(e){}
+async function init() { let localDataLoaded = false; try { const s = localStorage.getItem('hf_cloud'); if(s) { const p = JSON.parse(s); if(p.banks) { db = p; db.assets = db.assets || []; db.goals = db.goals || []; render(); localDataLoaded = true; } } } catch(e){} if (!localDataLoaded) { render(); } try { document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor..."; document.getElementById('cloud-status').style.color = "white"; const { data, error } = await client.from('app_state').select('*').eq('id', 1); if (error) throw error; if (!data || data.length === 0) { document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor..."; const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]); if (insertErr) throw insertErr; document.getElementById('cloud-status').innerText = "☁️ Güncel"; document.getElementById('cloud-status').style.color = "#10b981"; } else { db = data[0].data; db.assets = db.assets || []; db.goals = db.goals || []; localStorage.setItem('hf_cloud', JSON.stringify(db)); document.getElementById('cloud-status').innerText = "☁️ Güncel"; document.getElementById('cloud-status').style.color = "#10b981"; render(); } } catch(e) { document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor"); document.getElementById('cloud-status').style.color = "#ef4444"; render(); } const t = new Date().toISOString().split('T')[0]; ['il-date','it-date'].forEach(i=>{ if(document.getElementById(i)) document.getElementById(i).value=t; }); loadSettings(); }
+async function save() { localStorage.setItem('hf_cloud', JSON.stringify(db)); render(); document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor..."; document.getElementById('cloud-status').style.color = "white"; try { const { error } = await client.from('app_state').upsert({ id: 1, data: db }); if(error) throw error; document.getElementById('cloud-status').innerText = "☁️ Güncel"; document.getElementById('cloud-status').style.color = "#10b981"; } catch (e) { document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi"); document.getElementById('cloud-status').style.color = "#ef4444"; } }
 
-    if (!localDataLoaded) { render(); }
-
-    try {
-        document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor...";
-        document.getElementById('cloud-status').style.color = "white";
-
-        const { data, error } = await client.from('app_state').select('*').eq('id', 1);
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor...";
-            const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]);
-            if (insertErr) throw insertErr;
-            document.getElementById('cloud-status').innerText = "☁️ Güncel";
-            document.getElementById('cloud-status').style.color = "#10b981";
-        } else {
-            db = data[0].data;
-            db.assets = db.assets || [];
-            db.goals = db.goals || [];
-            localStorage.setItem('hf_cloud', JSON.stringify(db));
-            document.getElementById('cloud-status').innerText = "☁️ Güncel";
-            document.getElementById('cloud-status').style.color = "#10b981";
-            render();
-        }
-    } catch(e) {
-        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor");
-        document.getElementById('cloud-status').style.color = "#ef4444";
-        render();
-    }
-    
-    const t = new Date().toISOString().split('T')[0];
-    ['il-date','it-date'].forEach(i=>{ if(document.getElementById(i)) document.getElementById(i).value=t; });
-    
-    loadSettings();
-}
-
-async function save() {
-    localStorage.setItem('hf_cloud', JSON.stringify(db));
-    render();
-    document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor...";
-    document.getElementById('cloud-status').style.color = "white";
-    try {
-        const { error } = await client.from('app_state').upsert({ id: 1, data: db });
-        if(error) throw error;
-        document.getElementById('cloud-status').innerText = "☁️ Güncel";
-        document.getElementById('cloud-status').style.color = "#10b981";
-    } catch (e) {
-        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi");
-        document.getElementById('cloud-status').style.color = "#ef4444";
-    }
-}
-
-// --- ARAYÜZ VE STANDART CRUD İŞLEMLERİ ---
 function resetApp() { if(confirm('Tüm veriler cihazdan ve buluttan silinecek! Emin misiniz?')) { db = { banks:['Ziraat','Garanti','Enpara','Akbank'], categories:{expense:['Market','Fatura','Kira'], income:['Maaş']}, accounts:[], cards:[], loans:[], transactions:[], planned:[], assets:[], goals:[] }; save(); } }
 function switchPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('p-' + id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); const idx = {'home':0, 'assets':1, 'calendar':2, 'debts':3, 'analysis':4, 'analysis-loan':3}[id]; if (idx !== undefined) document.querySelectorAll('.nav-btn')[idx].classList.add('active'); }
 function openModal(id) { updSel(); document.getElementById(id).classList.add('show'); if(id==='m-banks') renderBanks(); if(id==='m-cats') renderCats(); }
@@ -507,10 +430,8 @@ function saveTrans() {
     const accIdx = document.getElementById('it-acc').value;
     const isPlan = document.getElementById('it-plan').checked;
     const tDate = document.getElementById('it-date').value;
-
     if(!amt) return alert('Tutar?');
     const acc = db.accounts[accIdx] || {owner:'Hane'};
-
     if(type === 'transfer') {
         const [tt,ti] = document.getElementById('it-to').value.split('-');
         if(db.accounts[accIdx]) db.accounts[accIdx].balance -= amt;
@@ -540,7 +461,6 @@ function saveTrans() {
 
 function render() {
     const fAcc=filter(db.accounts), fCards=filter(db.cards), fLoans=filter(db.loans), fPlans=filter(db.planned), fTrans=filter(db.transactions), fAssets=filter(db.assets||[]);
-    
     const accBalance = fAcc.reduce((a,b)=>a+b.balance,0);
     const invBalance = fAssets.reduce((a,b)=>a+b.value,0);
     const ast = accBalance + invBalance;
@@ -582,16 +502,7 @@ function render() {
     const gl=document.getElementById('list-goals'); gl.innerHTML='';
     (db.goals||[]).forEach((g,i)=>{
         let pct = Math.min(100, Math.round((g.current / g.target) * 100)) || 0;
-        gl.innerHTML+=`<div style="padding:15px 0; border-bottom:1px solid #f1f5f9;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span style="font-weight:bold; font-size:0.9rem;">${g.name}</span>
-                <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;">
-                <span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span>
-            </div>
-            <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
-        </div>`;
+        gl.innerHTML+=`<div style="padding:15px 0; border-bottom:1px solid #f1f5f9;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; font-size:0.9rem;">${g.name}</span><span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span></div><div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;"><span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div></div>`;
     });
     if((db.goals||[]).length===0) gl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Hedef belirlenmemiş.</div>';
     
@@ -782,7 +693,6 @@ function triggerExport() { const a=document.createElement('a'); a.href=URL.creat
 function processImport(el) { const r=new FileReader(); r.onload=e=>{db=JSON.parse(e.target.result); save();}; r.readAsText(el.files[0]); }
 function doPaste() { try { const j=JSON.parse(document.getElementById('paste-txt').value); if(j.transactions) db.transactions=db.transactions.concat(j.transactions); if(j.planned) db.planned=db.planned.concat(j.planned); if(j.accounts) db.accounts=db.accounts.concat(j.accounts); if(j.cards) db.cards=db.cards.concat(j.cards); save(); closeModal('m-paste'); } catch(e){alert('Hata');} }
 
-// Başlat
 init();
 </script>
 </body>
