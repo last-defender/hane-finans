@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hane Finans: AI Vision Master</title>
+    <title>Hane Finans: Kurumsal Analiz Paneli</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -93,15 +93,22 @@
         .ai-row-bot { display:flex; gap:8px; align-items:center; }
         .ai-inp { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.85rem; width:100%; background:#f8fafc; }
         
-        /* ANALİZ KARTLARI İÇİN ÖZEL STİLLER */
         .insight-card { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 15px; }
         .insight-title { font-size: 0.75rem; font-weight: bold; color: #166534; display: flex; align-items: center; gap: 5px; text-transform: uppercase; margin-bottom: 5px; }
-        .chart-container { position: relative; width: 100%; height: 220px; display: flex; justify-content: center; align-items: center; }
+        .chart-container { position: relative; width: 100%; height: 240px; display: flex; justify-content: center; align-items: center; }
 
-        /* GELİŞMİŞ UI KART STİLLERİ */
         .acc-card { border-left: 4px solid var(--success); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
         .cc-card { border-left: 4px solid var(--purple); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
         .loan-card { border-left: 4px solid #f59e0b; padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+
+        /* PİVOT TABLO TASARIMI */
+        .pivot-container { width: 100%; overflow-x: auto; background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .pivot-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 500px; }
+        .pivot-table th, .pivot-table td { padding: 8px; border: 1px solid #e2e8f0; text-align: right; }
+        .pivot-table th { background: #f8fafc; font-weight: bold; color: var(--text); text-align: center; }
+        .pivot-table .row-group { background: #e0e7ff; font-weight: bold; text-align: left; }
+        .pivot-table .row-sub { text-align: left; padding-left: 20px; }
+        .pivot-table .grand-total { background: #1e293b; color: white; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -114,7 +121,6 @@
     <div class="head-actions">
         <button class="act-btn" style="background:var(--success); border:none; font-weight:bold;" onclick="document.getElementById('scan-in').click()">📸 Ekstre Tara (AI)</button>
         <input type="file" id="scan-in" accept="image/*" hidden onchange="processScan(this)">
-        
         <button class="act-btn" onclick="openModal('m-paste')">JSON Ekle</button>
         <button class="act-btn" onclick="triggerExport()">Yedekle</button>
         <button class="act-btn" onclick="document.getElementById('f-in').click()">Yükle</button>
@@ -136,7 +142,6 @@
             </div>
             <div class="score-circle" id="health-score">0</div>
         </div>
-
         <div class="card" style="text-align:center;">
             <div style="color:var(--light); font-size:0.85rem;">Net Durum (Portföy + Hesaplar - Borçlar)</div>
             <h1 id="dash-net" style="margin:5px 0">0.00 ₺</h1>
@@ -145,14 +150,8 @@
                 <div class="stat-box"><div class="stat-lbl">BORÇLAR</div><div class="stat-val text-red" id="dash-dbt">0</div></div>
             </div>
         </div>
-        <div class="card">
-            <div class="stat-lbl" style="margin-bottom:10px;">BANKA DURUMU</div>
-            <div id="list-banks-status"></div>
-        </div>
-        <div class="card">
-            <div class="stat-lbl" style="margin-bottom:10px;">YAKLAŞAN (7 GÜN)</div>
-            <div id="list-upcoming"></div>
-        </div>
+        <div class="card"><div class="stat-lbl" style="margin-bottom:10px;">BANKA DURUMU</div><div id="list-banks-status"></div></div>
+        <div class="card"><div class="stat-lbl" style="margin-bottom:10px;">YAKLAŞAN (7 GÜN)</div><div id="list-upcoming"></div></div>
     </div>
 
     <div id="p-assets" class="page">
@@ -164,13 +163,11 @@
             </div>
         </div>
         <div id="list-acc"></div>
-
         <div class="head-row" style="margin-top:20px;">
             <h3>Yatırımlar / Varlıklar</h3>
             <button class="act-btn" style="background:var(--success)" onclick="openModal('m-asset')">+ Ekle</button>
         </div>
         <div class="card" id="list-assets"></div>
-
         <div class="head-row" style="margin-top:20px;">
             <h3>Birikim Hedefleri</h3>
             <button class="act-btn" style="background:var(--info)" onclick="openModal('m-goal')">+ Hedef</button>
@@ -220,23 +217,50 @@
 
     <div id="p-analysis" class="page">
         <div class="head-row" style="margin-bottom:5px;">
-            <h3>Detaylı Analiz</h3>
+            <h3>Kurumsal Analiz Paneli</h3>
             <div style="display:flex; gap:5px;">
                 <button class="act-btn" style="background:#64748b" onclick="openModal('m-cat-list')">Kategoriler</button>
                 <button class="act-btn" style="background:var(--primary)" onclick="openModal('m-limits')">Limit Belirle</button>
             </div>
         </div>
         
-        <select id="anl-period" class="inp" style="margin-bottom:15px; background:#fff; font-weight:bold; border:2px solid var(--primary); color:var(--primary);" onchange="renderAnl()">
-            <option value="all">Tüm Zamanlar</option>
-            <option value="year">Bu Yıl</option>
-            <option value="month" selected>Bu Ay</option>
-            <option value="week">Son 7 Gün</option>
-        </select>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="anl-period" class="inp" style="flex:1; background:#fff; font-weight:bold; border:2px solid var(--primary); color:var(--primary);" onchange="renderAnl()">
+                <option value="all">Tüm Zamanlar</option>
+                <option value="year">Bu Yıl</option>
+                <option value="month" selected>Bu Ay</option>
+                <option value="week">Son 7 Gün</option>
+            </select>
+            <select id="anl-cat-filter" class="inp" style="flex:1; background:#fff; font-weight:bold; border:2px solid var(--light);" onchange="renderAnl()">
+                <option value="all">Tüm Kategoriler</option>
+            </select>
+        </div>
+
+        <div class="stat-grid" style="margin-bottom: 15px;">
+            <div class="stat-box" style="background:#fef2f2; border:1px solid #fca5a5;">
+                <div class="stat-lbl" style="color:#b91c1c;">Toplam Çıkış</div>
+                <div class="stat-val text-red" id="kpi-total">0</div>
+            </div>
+            <div class="stat-box" style="background:#eff6ff; border:1px solid #bfdbfe;">
+                <div class="stat-lbl" style="color:#1d4ed8;">Plana Dahil (Bütçe)</div>
+                <div class="stat-val" style="color:#1e40af;" id="kpi-planned">0</div>
+            </div>
+            <div class="stat-box" style="background:#fff7ed; border:1px solid #fed7aa; grid-column: span 2;">
+                <div class="stat-lbl" style="color:#c2410c;">Kapsam Dışı / Plansız</div>
+                <div class="stat-val" style="color:#c2410c;" id="kpi-unplanned">0</div>
+            </div>
+        </div>
 
         <div class="insight-card" id="anl-insight-card">
-            <div class="insight-title">💡 Akıllı Finansal İçgörü</div>
+            <div class="insight-title">💡 Akıllı Bütçe İçgörüsü</div>
             <div id="anl-insight-text" style="font-size:0.9rem; color:#1e293b; line-height:1.4;">Veriler analiz ediliyor...</div>
+        </div>
+
+        <div class="card">
+            <h4 style="margin:0 0 10px 0; text-align:center;">Para Nereye Gitti? (Plan Durumu)</h4>
+            <div class="chart-container" style="height: 200px;">
+                <canvas id="planStatusChart"></canvas>
+            </div>
         </div>
 
         <div class="card">
@@ -245,17 +269,26 @@
         </div>
 
         <div class="card">
-            <h4 style="margin:0 0 10px 0; text-align:center;">Harcama Dağılımı</h4>
+            <h4 style="margin:0 0 10px 0; text-align:center;">Asıl Bütçe Dağılımı (Sadece Plana Dahil)</h4>
             <div class="chart-container" style="height: 240px;">
                 <canvas id="categoryDoughnutChart"></canvas>
             </div>
         </div>
 
-        <div class="card" id="anl-trend-container" style="display:none;">
-            <h4 style="margin:0 0 10px 0; text-align:center;">Aylık Kategori Trendi</h4>
-            <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Aydan aya hangi kategoriye ne kadar harcadığınızı gösterir.</p>
+        <div class="card" id="anl-trend-container">
+            <h4 style="margin:0 0 10px 0; text-align:center;" id="trend-title">Aylık Kategori Trendi</h4>
+            <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Aydan aya değişimi gösterir.</p>
             <div class="chart-container" style="height: 260px;">
                 <canvas id="monthlyTrendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card" id="pivot-container" style="display:none; padding:10px;">
+            <h4 style="margin:0 0 10px 0; text-align:center;">Detaylı Veri Dökümü (Matrix)</h4>
+            <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Aylar ve plan durumuna göre kategori kırılımları. (Tabloyu sağa kaydırabilirsiniz)</p>
+            <div class="pivot-container">
+                <table class="pivot-table" id="pivot-table-elem">
+                    </table>
             </div>
         </div>
     </div>
@@ -274,125 +307,6 @@
     <div class="nav-btn" onclick="switchPage('debts')"><div class="nav-icon">📉</div>Borç</div>
     <div class="nav-btn" onclick="switchPage('analysis')"><div class="nav-icon">📊</div>Analiz</div>
 </nav>
-
-<div class="modal" id="m-acc">
-    <div class="modal-box">
-        <h3 id="acc-modal-title">Hesap Ekle</h3>
-        <div class="inp-grp">
-            <label class="inp-lbl">Sahip</label>
-            <select id="ia-own" class="inp">
-                <option>Baba</option>
-                <option>Anne</option>
-            </select>
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Banka</label>
-            <select id="ia-bank" class="inp"></select>
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Hesap Adı</label>
-            <input id="ia-name" class="inp" placeholder="Örn: Maaş Hesabı">
-        </div>
-        <div style="display:flex; gap:10px;">
-            <div class="inp-grp" style="flex:1;">
-                <label class="inp-lbl">Mevcut Bakiye (₺)</label>
-                <input type="number" id="ia-bal" class="inp" step="0.01">
-            </div>
-            <div class="inp-grp" style="flex:1;">
-                <label class="inp-lbl">Esnek Hesap Limiti</label>
-                <input type="number" id="ia-overdraft" class="inp" step="0.01" placeholder="Eksi Bakiye Limiti">
-            </div>
-        </div>
-        <button class="btn-pri" onclick="saveAcc()">Kaydet</button>
-        <button class="btn-clo" onclick="closeModal('m-acc')">İptal</button>
-    </div>
-</div>
-
-<div class="modal" id="m-card">
-    <div class="modal-box">
-        <h3 id="card-modal-title">Kart Ekle</h3>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;">
-                <label class="inp-lbl">Sahip</label>
-                <select id="ic-own" class="inp"><option>Baba</option><option>Anne</option></select>
-            </div>
-            <div style="flex:1;">
-                <label class="inp-lbl">Banka</label>
-                <select id="ic-bank" class="inp"></select>
-            </div>
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Kart Adı</label>
-            <input id="ic-name" class="inp" placeholder="Örn: Gold Kredi Kartı">
-        </div>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;">
-                <label class="inp-lbl">Toplam Limit (₺)</label>
-                <input type="number" id="ic-lim" class="inp" step="0.01">
-            </div>
-            <div style="flex:1;">
-                <label class="inp-lbl">Dönem Borcu (₺)</label>
-                <input type="number" id="ic-debt" class="inp" step="0.01">
-            </div>
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Gelecek Taksitlerin Toplamı (₺)</label>
-            <input type="number" id="ic-fut" class="inp" step="0.01">
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Kesim / Son Ödeme Günü</label>
-            <div style="display:flex; gap:10px">
-                <input type="number" id="ic-cut" class="inp" placeholder="Kesim (Örn: 15)">
-                <input type="number" id="ic-due" class="inp" placeholder="Son Ö. (Örn: 25)">
-            </div>
-        </div>
-        <button class="btn-pri" onclick="saveCard()">Kaydet</button>
-        <button class="btn-clo" onclick="closeModal('m-card')">İptal</button>
-    </div>
-</div>
-
-<div class="modal" id="m-loan">
-    <div class="modal-box">
-        <h3 id="loan-modal-title">Kredi Ekle</h3>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;">
-                <label class="inp-lbl">Sahip</label>
-                <select id="il-own" class="inp"><option>Baba</option><option>Anne</option></select>
-            </div>
-            <div style="flex:1;">
-                <label class="inp-lbl">Banka</label>
-                <select id="il-bank" class="inp"></select>
-            </div>
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Kredi Adı</label>
-            <input id="il-name" class="inp" placeholder="Örn: İhtiyaç Kredisi">
-        </div>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;">
-                <label class="inp-lbl">Kalan Toplam Borç</label>
-                <input type="number" id="il-tot" class="inp" step="0.01">
-            </div>
-            <div style="flex:1;">
-                <label class="inp-lbl">Kalan Taksit Sayısı</label>
-                <input type="number" id="il-cnt" class="inp">
-            </div>
-        </div>
-        <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px;">
-            <label class="inp-lbl">Sıradaki (1.) Taksit</label>
-            <div style="display:flex; gap:10px;">
-                <input type="date" id="il-date" class="inp">
-                <input type="number" id="il-amt1" class="inp" placeholder="Tutar" step="0.01">
-            </div>
-        </div>
-        <div class="inp-grp">
-            <label class="inp-lbl">Diğer (Sonraki) Aylık Taksitler</label>
-            <input type="number" id="il-amtr" class="inp" step="0.01">
-        </div>
-        <button class="btn-pri" onclick="saveLoan()">Kaydet</button>
-        <button class="btn-clo" onclick="closeModal('m-loan')">İptal</button>
-    </div>
-</div>
 
 <div class="modal" id="m-limits">
     <div class="modal-box">
@@ -418,7 +332,6 @@
 <div class="modal" id="m-settings">
     <div class="modal-box">
         <h3>Sistem Ayarları</h3>
-        <p style="font-size:0.8rem; color:#666;">Yapay zeka (AI) ile ekstre tarama özelliğini kullanmak için Google Gemini API anahtarınızı aşağıya girin.</p>
         <div class="inp-grp">
             <label class="inp-lbl">Gemini API Key</label>
             <input type="password" id="set-api-key" class="inp" placeholder="AIzaSy...">
@@ -467,9 +380,8 @@
 <div class="modal" id="m-scan-res">
     <div class="modal-box">
         <h3>AI Analiz Sonucu</h3>
-        <p style="font-size:0.75rem; color:#666; margin-bottom:15px;">İşlemleri kontrol edin. Hatalı olanları silebilir, sahibini ve plan durumunu değiştirebilirsiniz.</p>
         <div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;">
-            <label class="inp-lbl" style="margin:0 0 5px 0;">Varsayılan Kaynak/Hesap (İsteğe Bağlı)</label>
+            <label class="inp-lbl" style="margin:0 0 5px 0;">Varsayılan Kaynak/Hesap</label>
             <select id="ai-acc" class="inp" style="background:#fff;"></select>
         </div>
         <div id="ai-results-list" style="max-height:50vh; overflow-y:auto; margin-bottom:15px;"></div>
@@ -481,7 +393,6 @@
 <div class="modal" id="m-edit-trans">
     <div class="modal-box">
         <h3>İşlemi Düzenle</h3>
-        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Yapılan tutar veya kaynak değişimi seçilen hesaba otomatik yansıyacaktır.</p>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <div style="flex:1;">
                 <label class="inp-lbl">İşlem Tipi</label>
@@ -591,7 +502,7 @@
     <div class="modal-box">
         <h3>Yatırım / Varlık Ekle</h3>
         <div class="inp-grp">
-            <label class="inp-lbl">Sahip (Sadece Birey)</label>
+            <label class="inp-lbl">Sahip</label>
             <select id="ias-own" class="inp">
                 <option>Baba</option>
                 <option>Anne</option>
@@ -600,8 +511,7 @@
         <div class="inp-grp">
             <label class="inp-lbl">Tür</label>
             <select id="ias-type" class="inp">
-                <option>Altın</option><option>Döviz</option><option>Kripto</option>
-                <option>Gayrimenkul</option><option>Araç</option><option>Diğer</option>
+                <option>Altın</option><option>Döviz</option><option>Kripto</option><option>Gayrimenkul</option><option>Araç</option><option>Diğer</option>
             </select>
         </div>
         <div class="inp-grp">
@@ -609,7 +519,7 @@
             <input id="ias-name" class="inp">
         </div>
         <div class="inp-grp">
-            <label class="inp-lbl">Güncel Toplam Değeri (TL)</label>
+            <label class="inp-lbl">Güncel Değer (TL)</label>
             <input type="number" id="ias-val" class="inp" step="0.01">
         </div>
         <button class="btn-pri" onclick="saveAsset()">Kaydet</button>
@@ -621,7 +531,7 @@
     <div class="modal-box">
         <h3>Birikim Hedefi Ekle</h3>
         <div class="inp-grp">
-            <label class="inp-lbl">Sahip (Sadece Birey)</label>
+            <label class="inp-lbl">Sahip</label>
             <select id="ig-own" class="inp">
                 <option>Baba</option>
                 <option>Anne</option>
@@ -639,8 +549,133 @@
             <label class="inp-lbl">Şu An Biriken</label>
             <input type="number" id="ig-current" class="inp" step="0.01">
         </div>
-        <button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Hedefi Başlat</button>
+        <button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Kaydet</button>
         <button class="btn-clo" onclick="closeModal('m-goal')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-acc">
+    <div class="modal-box">
+        <h3 id="acc-modal-title">Hesap Ekle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Sahip</label>
+            <select id="ia-own" class="inp">
+                <option>Baba</option>
+                <option>Anne</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Banka</label>
+            <select id="ia-bank" class="inp"></select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Hesap Adı</label>
+            <input id="ia-name" class="inp">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <div class="inp-grp" style="flex:1;">
+                <label class="inp-lbl">Mevcut Bakiye</label>
+                <input type="number" id="ia-bal" class="inp" step="0.01">
+            </div>
+            <div class="inp-grp" style="flex:1;">
+                <label class="inp-lbl">Esnek Limit</label>
+                <input type="number" id="ia-overdraft" class="inp" step="0.01">
+            </div>
+        </div>
+        <button class="btn-pri" onclick="saveAcc()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-acc')">İptal</button>
+    </div>
+</div>
+
+<div class="modal" id="m-card">
+    <div class="modal-box">
+        <h3 id="card-modal-title">Kart Ekle</h3>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">Sahip</label>
+                <select id="ic-own" class="inp">
+                    <option>Baba</option>
+                    <option>Anne</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Banka</label>
+                <select id="ic-bank" class="inp"></select>
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kart Adı</label>
+            <input id="ic-name" class="inp">
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">Toplam Limit</label>
+                <input type="number" id="ic-lim" class="inp" step="0.01">
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Dönem Borcu</label>
+                <input type="number" id="ic-debt" class="inp" step="0.01">
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Gelecek Taksitler</label>
+            <input type="number" id="ic-fut" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kesim/Son Ödeme</label>
+            <div style="display:flex; gap:10px">
+                <input type="number" id="ic-cut" class="inp">
+                <input type="number" id="ic-due" class="inp">
+            </div>
+        </div>
+        <button class="btn-pri" onclick="saveCard()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-card')">İptal</button>
+    </div>
+</div>
+
+<div class="modal" id="m-loan">
+    <div class="modal-box">
+        <h3 id="loan-modal-title">Kredi Ekle</h3>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">Sahip</label>
+                <select id="il-own" class="inp">
+                    <option>Baba</option>
+                    <option>Anne</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Banka</label>
+                <select id="il-bank" class="inp"></select>
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kredi Adı</label>
+            <input id="il-name" class="inp">
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">Kalan Borç</label>
+                <input type="number" id="il-tot" class="inp" step="0.01">
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Kalan Taksit</label>
+                <input type="number" id="il-cnt" class="inp">
+            </div>
+        </div>
+        <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <label class="inp-lbl">1. Taksit</label>
+            <div style="display:flex; gap:10px;">
+                <input type="date" id="il-date" class="inp">
+                <input type="number" id="il-amt1" class="inp" step="0.01">
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Diğer Taksitler</label>
+            <input type="number" id="il-amtr" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveLoan()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-loan')">İptal</button>
     </div>
 </div>
 
@@ -651,17 +686,6 @@
         <div class="inp-grp">
             <label class="inp-lbl">Kaynak Hesap</label>
             <select id="mp-acc" class="inp"></select>
-        </div>
-        <div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;">
-            <label>
-                <input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> 
-                Erken / İndirimli Ödeme
-            </label>
-            <div id="mp-early-opts" class="d-none" style="margin-top:5px;">
-                <label class="inp-lbl">Gerçek Ödenen</label>
-                <input type="number" id="mp-real" class="inp" step="0.01">
-                <small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small>
-            </div>
         </div>
         <button class="btn-pri" onclick="confirmPay()">Öde</button>
         <button class="btn-clo" onclick="closeModal('m-pay')">İptal</button>
@@ -731,570 +755,382 @@
 </div>
 
 <script>
+// Supabase Yapılandırması
 const SUPABASE_URL = 'https://kdycxoweuaxslzbklprh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Tm-hZqU0CN6TPk8hKSfZ1Q_VtiWUqY1';
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let db = {
-    banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'],
-    categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] },
-    accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [],
-    limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 }
+// Ana Veritabanı Değişkeni
+let db = { 
+    banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
+    categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
+    accounts: [], 
+    cards: [], 
+    loans: [], 
+    transactions: [], 
+    planned: [], 
+    assets: [], 
+    goals: [], 
+    limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } 
 };
 
-let curPro = 'Hane', curDate = new Date(), payId = null, closeId = null;
+// Global Durum Değişkenleri
+let curPro = 'Hane';
+let curDate = new Date();
+let payId = null;
+let closeId = null;
 let scannedItems = [];
-let editTransId = null; let editIsPlan = false;
-let editAccIdx = null; let editCardIdx = null; let editLoanIdx = null;
 
+// Düzenleme (Edit) Modal Değişkenleri
+let editTransId = null;
+let editIsPlan = false;
+let editAccIdx = null;
+let editCardIdx = null;
+let editLoanIdx = null;
+
+// Chart.js Instance Değişkenleri
 let catChartInstance = null;
 let monthlyTrendChartInstance = null;
+let planStatusChartInstance = null;
 
-// --- YARDIMCI FONKSİYONLAR ---
-function loadSettings() {
-    const key = localStorage.getItem('hf_gemini_key');
-    if (key) document.getElementById('set-api-key').value = key;
-}
+// --- AYARLAR VE SİSTEM FONKSİYONLARI ---
 
-function saveSettings() {
-    localStorage.setItem('hf_gemini_key', document.getElementById('set-api-key').value);
-    alert('Ayarlar kaydedildi.');
-    closeModal('m-settings');
-}
-
-function fmt(n) {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n);
-}
-
-function filter(arr) {
-    return curPro === 'Hane' ? arr : arr.filter(x => x.owner === curPro);
-}
-
-function toggle(id, s) {
-    document.getElementById(id).classList.toggle('d-none', !s);
-}
-
-function chgMonth(n) {
-    curDate.setMonth(curDate.getMonth() + n);
-    render();
-}
-
-function openModal(id) {
-    updSel();
-    document.getElementById(id).classList.add('show');
-    if (id === 'm-banks') renderBanks();
-    if (id === 'm-cats') renderCats();
-    if (id === 'm-limits') openLimits();
-}
-
-function closeModal(id) {
-    document.getElementById(id).classList.remove('show');
-}
-
-function switchPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('p-' + id).classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    
-    const idx = { 'home': 0, 'assets': 1, 'calendar': 2, 'debts': 3, 'analysis': 4, 'analysis-loan': 3 }[id];
-    if (idx !== undefined) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-    
-    if (id === 'analysis') renderAnl();
-}
-
-function setPro(p) {
-    curPro = p;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('t-' + p).classList.add('active');
-    render();
-    if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
-}
-
-// --- MANUEL BAKİYE DÜZENLEME (TAM KAPSAMLI) ---
-function openAddAcc() {
-    editAccIdx = null;
-    document.getElementById('acc-modal-title').innerText = 'Hesap Ekle';
-    document.getElementById('ia-own').value = 'Baba';
-    document.getElementById('ia-name').value = '';
-    document.getElementById('ia-bal').value = '';
-    document.getElementById('ia-overdraft').value = '0';
-    openModal('m-acc');
-}
-
-function openEditAcc(idx) {
-    editAccIdx = idx;
-    const a = db.accounts[idx];
-    document.getElementById('acc-modal-title').innerText = 'Hesap Düzenle';
-    document.getElementById('ia-own').value = a.owner || 'Baba';
-    document.getElementById('ia-bank').value = a.bank || '';
-    document.getElementById('ia-name').value = a.name || '';
-    document.getElementById('ia-bal').value = a.balance || 0;
-    document.getElementById('ia-overdraft').value = a.overdraft || 0;
-    openModal('m-acc');
-}
-
-function saveAcc() {
-    const accData = {
-        owner: document.getElementById('ia-own').value,
-        bank: document.getElementById('ia-bank').value,
-        name: document.getElementById('ia-name').value,
-        balance: parseFloat(document.getElementById('ia-bal').value) || 0,
-        overdraft: parseFloat(document.getElementById('ia-overdraft').value) || 0
-    };
-    if (!accData.bank || !accData.name) return alert('Eksik bilgi girdiniz.');
-
-    if (editAccIdx !== null) {
-        accData.id = db.accounts[editAccIdx].id;
-        db.accounts[editAccIdx] = accData;
-    } else {
-        accData.id = Date.now();
-        db.accounts.push(accData);
+function loadSettings() { 
+    const key = localStorage.getItem('hf_gemini_key'); 
+    if (key) {
+        document.getElementById('set-api-key').value = key; 
     }
-    save();
-    closeModal('m-acc');
 }
 
-function openAddCard() {
-    editCardIdx = null;
-    document.getElementById('card-modal-title').innerText = 'Kart Ekle';
-    document.getElementById('ic-own').value = 'Baba';
-    document.getElementById('ic-name').value = '';
-    document.getElementById('ic-lim').value = '';
-    document.getElementById('ic-debt').value = '';
-    document.getElementById('ic-fut').value = '';
-    document.getElementById('ic-cut').value = '';
-    document.getElementById('ic-due').value = '';
-    openModal('m-card');
+function saveSettings() { 
+    localStorage.setItem('hf_gemini_key', document.getElementById('set-api-key').value); 
+    alert('Ayarlar kaydedildi.'); 
+    closeModal('m-settings'); 
 }
 
-function openEditCard(idx) {
-    editCardIdx = idx;
-    const c = db.cards[idx];
-    document.getElementById('card-modal-title').innerText = 'Kart Düzenle';
-    document.getElementById('ic-own').value = c.owner || 'Baba';
-    document.getElementById('ic-bank').value = c.bank || '';
-    document.getElementById('ic-name').value = c.name || '';
-    document.getElementById('ic-lim').value = c.limit || 0;
-    document.getElementById('ic-debt').value = c.debt || 0;
-    document.getElementById('ic-fut').value = c.future || 0;
-    document.getElementById('ic-cut').value = c.cut || '';
-    document.getElementById('ic-due').value = c.due || '';
-    openModal('m-card');
+function fmt(n) { 
+    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n); 
 }
 
-function saveCard() {
-    const cardData = {
-        owner: document.getElementById('ic-own').value,
-        bank: document.getElementById('ic-bank').value,
-        name: document.getElementById('ic-name').value,
-        limit: parseFloat(document.getElementById('ic-lim').value) || 0,
-        debt: parseFloat(document.getElementById('ic-debt').value) || 0,
-        future: parseFloat(document.getElementById('ic-fut').value) || 0,
-        cut: document.getElementById('ic-cut').value,
-        due: document.getElementById('ic-due').value
-    };
-    if (!cardData.bank || !cardData.name) return alert('Eksik bilgi girdiniz.');
-
-    if (editCardIdx !== null) {
-        cardData.id = db.cards[editCardIdx].id;
-        db.cards[editCardIdx] = cardData;
+function filter(arr) { 
+    if (curPro === 'Hane') {
+        return arr;
     } else {
-        cardData.id = Date.now();
-        db.cards.push(cardData);
+        return arr.filter(x => x.owner === curPro); 
     }
-    save();
-    closeModal('m-card');
 }
 
-function openAddLoan() {
-    editLoanIdx = null;
-    document.getElementById('loan-modal-title').innerText = 'Kredi Ekle';
-    document.getElementById('il-own').value = 'Baba';
-    document.getElementById('il-name').value = '';
-    document.getElementById('il-tot').value = '';
-    document.getElementById('il-cnt').value = '';
-    document.getElementById('il-amt1').value = '';
-    document.getElementById('il-amtr').value = '';
-    openModal('m-loan');
+function toggle(id, s) { 
+    document.getElementById(id).classList.toggle('d-none', !s); 
 }
 
-function openEditLoan(idx) {
-    editLoanIdx = idx;
-    const l = db.loans[idx];
-    document.getElementById('loan-modal-title').innerText = 'Kredi Düzenle (Kalan Borç Tutarını Günceller)';
-    document.getElementById('il-own').value = l.owner || 'Baba';
-    document.getElementById('il-bank').value = l.bank || '';
-    document.getElementById('il-name').value = l.name || '';
-    document.getElementById('il-tot').value = l.remaining || l.total || 0;
-    document.getElementById('il-cnt').value = l.count || 0;
-    document.getElementById('il-amt1').value = l.amt1 || 0;
-    document.getElementById('il-amtr').value = l.amtr || 0;
-    openModal('m-loan');
+function chgMonth(n) { 
+    curDate.setMonth(curDate.getMonth() + n); 
+    render(); 
 }
 
-function saveLoan() {
-    const loanData = {
-        owner: document.getElementById('il-own').value,
-        bank: document.getElementById('il-bank').value,
-        name: document.getElementById('il-name').value,
-        total: parseFloat(document.getElementById('il-tot').value) || 0,
-        remaining: parseFloat(document.getElementById('il-tot').value) || 0,
-        count: parseInt(document.getElementById('il-cnt').value) || 0,
-        amt1: parseFloat(document.getElementById('il-amt1').value) || 0,
-        amtr: parseFloat(document.getElementById('il-amtr').value) || 0
-    };
+function openModal(id) { 
+    updSel(); 
+    document.getElementById(id).classList.add('show'); 
+    if (id === 'm-banks') renderBanks(); 
+    if (id === 'm-cats') renderCats(); 
+    if (id === 'm-limits') openLimits(); 
+}
+
+function closeModal(id) { 
+    document.getElementById(id).classList.remove('show'); 
+}
+
+function switchPage(id) { 
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+    document.getElementById('p-' + id).classList.add('active'); 
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); 
     
-    if (!loanData.name) return alert('Eksik bilgi girdiniz.');
-
-    if (editLoanIdx !== null) {
-        loanData.id = db.loans[editLoanIdx].id;
-        db.loans[editLoanIdx] = loanData;
-    } else {
-        loanData.id = Date.now();
-        db.loans.push(loanData);
-        let d = new Date(document.getElementById('il-date').value);
-        for (let i = 0; i < loanData.count; i++) {
-            db.planned.push({
-                id: 'p_' + Date.now() + '_' + i,
-                type: 'expense',
-                category: 'Kredi',
-                title: `${loanData.name} (${i + 1}/${loanData.count})`,
-                amount: i === 0 ? loanData.amt1 : loanData.amtr,
-                date: d.toISOString().split('T')[0],
-                isPaid: false,
-                owner: loanData.owner,
-                planStatus: 'dahil'
-            });
-            d.setMonth(d.getMonth() + 1);
-        }
+    const idx = { 'home': 0, 'assets': 1, 'calendar': 2, 'debts': 3, 'analysis': 4, 'analysis-loan': 3 }[id]; 
+    if (idx !== undefined) {
+        document.querySelectorAll('.nav-btn')[idx].classList.add('active'); 
     }
-    save();
-    closeModal('m-loan');
-}
-
-// --- LİMİT AYARLARI ---
-function openLimits() {
-    document.getElementById('lim-dahil').value = db.limits.planDahil || '';
-    document.getElementById('lim-dahilDegil').value = db.limits.planDahilDegil || '';
-    document.getElementById('lim-kapsamDisi').value = db.limits.kapsamDisi || '';
-    openModal('m-limits');
-}
-
-function saveLimits() {
-    db.limits.planDahil = parseFloat(document.getElementById('lim-dahil').value) || 0;
-    db.limits.planDahilDegil = parseFloat(document.getElementById('lim-dahilDegil').value) || 0;
-    db.limits.kapsamDisi = parseFloat(document.getElementById('lim-kapsamDisi').value) || 0;
-    save();
-    closeModal('m-limits');
-    if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
-}
-
-// --- OTOMATİK BAKİYE ETKİLEŞİMİ (MUHASEBE MANTIĞI) ---
-function applyBalanceEffect(sourceId, type, amount, reverse = false) {
-    if (!sourceId || sourceId === 'none') return;
     
-    const parts = sourceId.split('-');
-    const sType = parts[0];
-    const sIdx = parts[1];
+    if (id === 'analysis') {
+        renderAnl(); 
+    }
+}
+
+function setPro(p) { 
+    curPro = p; 
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
+    document.getElementById('t-' + p).classList.add('active'); 
+    render(); 
+    
+    if (document.getElementById('p-analysis').classList.contains('active')) {
+        renderAnl(); 
+    }
+}
+
+// --- HESAP, KART VE KREDİ DÜZENLEME (CRUD) KISMI ---
+
+function openAddAcc() { 
+    editAccIdx = null; 
+    document.getElementById('acc-modal-title').innerText = 'Hesap Ekle'; 
+    document.getElementById('ia-own').value = 'Baba'; 
+    document.getElementById('ia-name').value = ''; 
+    document.getElementById('ia-bal').value = ''; 
+    document.getElementById('ia-overdraft').value = '0'; 
+    openModal('m-acc'); 
+}
+
+function openEditAcc(idx) { 
+    editAccIdx = idx; 
+    const a = db.accounts[idx]; 
+    document.getElementById('acc-modal-title').innerText = 'Hesap Düzenle'; 
+    document.getElementById('ia-own').value = a.owner || 'Baba'; 
+    document.getElementById('ia-bank').value = a.bank || ''; 
+    document.getElementById('ia-name').value = a.name || ''; 
+    document.getElementById('ia-bal').value = a.balance || 0; 
+    document.getElementById('ia-overdraft').value = a.overdraft || 0; 
+    openModal('m-acc'); 
+}
+
+function saveAcc() { 
+    const accData = { 
+        owner: document.getElementById('ia-own').value, 
+        bank: document.getElementById('ia-bank').value, 
+        name: document.getElementById('ia-name').value, 
+        balance: parseFloat(document.getElementById('ia-bal').value) || 0, 
+        overdraft: parseFloat(document.getElementById('ia-overdraft').value) || 0 
+    }; 
+    
+    if (!accData.bank || !accData.name) {
+        return alert('Eksik bilgi.'); 
+    }
+    
+    if (editAccIdx !== null) { 
+        accData.id = db.accounts[editAccIdx].id; 
+        db.accounts[editAccIdx] = accData; 
+    } else { 
+        accData.id = Date.now(); 
+        db.accounts.push(accData); 
+    } 
+    
+    save(); 
+    closeModal('m-acc'); 
+}
+
+function openAddCard() { 
+    editCardIdx = null; 
+    document.getElementById('card-modal-title').innerText = 'Kart Ekle'; 
+    document.getElementById('ic-own').value = 'Baba'; 
+    document.getElementById('ic-name').value = ''; 
+    document.getElementById('ic-lim').value = ''; 
+    document.getElementById('ic-debt').value = ''; 
+    document.getElementById('ic-fut').value = ''; 
+    openModal('m-card'); 
+}
+
+function openEditCard(idx) { 
+    editCardIdx = idx; 
+    const c = db.cards[idx]; 
+    document.getElementById('card-modal-title').innerText = 'Kart Düzenle'; 
+    document.getElementById('ic-own').value = c.owner || 'Baba'; 
+    document.getElementById('ic-bank').value = c.bank || ''; 
+    document.getElementById('ic-name').value = c.name || ''; 
+    document.getElementById('ic-lim').value = c.limit || 0; 
+    document.getElementById('ic-debt').value = c.debt || 0; 
+    document.getElementById('ic-fut').value = c.future || 0; 
+    document.getElementById('ic-cut').value = c.cut || ''; 
+    document.getElementById('ic-due').value = c.due || ''; 
+    openModal('m-card'); 
+}
+
+function saveCard() { 
+    const cardData = { 
+        owner: document.getElementById('ic-own').value, 
+        bank: document.getElementById('ic-bank').value, 
+        name: document.getElementById('ic-name').value, 
+        limit: parseFloat(document.getElementById('ic-lim').value) || 0, 
+        debt: parseFloat(document.getElementById('ic-debt').value) || 0, 
+        future: parseFloat(document.getElementById('ic-fut').value) || 0, 
+        cut: document.getElementById('ic-cut').value, 
+        due: document.getElementById('ic-due').value 
+    }; 
+    
+    if (!cardData.bank || !cardData.name) {
+        return alert('Eksik bilgi.'); 
+    }
+    
+    if (editCardIdx !== null) { 
+        cardData.id = db.cards[editCardIdx].id; 
+        db.cards[editCardIdx] = cardData; 
+    } else { 
+        cardData.id = Date.now(); 
+        db.cards.push(cardData); 
+    } 
+    
+    save(); 
+    closeModal('m-card'); 
+}
+
+function openAddLoan() { 
+    editLoanIdx = null; 
+    document.getElementById('loan-modal-title').innerText = 'Kredi Ekle'; 
+    document.getElementById('il-own').value = 'Baba'; 
+    document.getElementById('il-name').value = ''; 
+    document.getElementById('il-tot').value = ''; 
+    document.getElementById('il-cnt').value = ''; 
+    document.getElementById('il-amt1').value = ''; 
+    document.getElementById('il-amtr').value = ''; 
+    openModal('m-loan'); 
+}
+
+function openEditLoan(idx) { 
+    editLoanIdx = idx; 
+    const l = db.loans[idx]; 
+    document.getElementById('loan-modal-title').innerText = 'Kredi Düzenle'; 
+    document.getElementById('il-own').value = l.owner || 'Baba'; 
+    document.getElementById('il-bank').value = l.bank || ''; 
+    document.getElementById('il-name').value = l.name || ''; 
+    document.getElementById('il-tot').value = l.remaining || l.total || 0; 
+    document.getElementById('il-cnt').value = l.count || 0; 
+    document.getElementById('il-amt1').value = l.amt1 || 0; 
+    document.getElementById('il-amtr').value = l.amtr || 0; 
+    openModal('m-loan'); 
+}
+
+function saveLoan() { 
+    const loanData = { 
+        owner: document.getElementById('il-own').value, 
+        bank: document.getElementById('il-bank').value, 
+        name: document.getElementById('il-name').value, 
+        total: parseFloat(document.getElementById('il-tot').value) || 0, 
+        remaining: parseFloat(document.getElementById('il-tot').value) || 0, 
+        count: parseInt(document.getElementById('il-cnt').value) || 0, 
+        amt1: parseFloat(document.getElementById('il-amt1').value) || 0, 
+        amtr: parseFloat(document.getElementById('il-amtr').value) || 0 
+    }; 
+    
+    if (!loanData.name) {
+        return alert('Eksik bilgi.'); 
+    }
+    
+    if (editLoanIdx !== null) { 
+        loanData.id = db.loans[editLoanIdx].id; 
+        db.loans[editLoanIdx] = loanData; 
+    } else { 
+        loanData.id = Date.now(); 
+        db.loans.push(loanData); 
+        
+        let d = new Date(document.getElementById('il-date').value); 
+        for (let i = 0; i < loanData.count; i++) { 
+            db.planned.push({ 
+                id: 'p_' + Date.now() + '_' + i, 
+                type: 'expense', 
+                category: 'Kredi', 
+                title: `${loanData.name} (${i + 1}/${loanData.count})`, 
+                amount: i === 0 ? loanData.amt1 : loanData.amtr, 
+                date: d.toISOString().split('T')[0], 
+                isPaid: false, 
+                owner: loanData.owner, 
+                planStatus: 'dahil' 
+            }); 
+            d.setMonth(d.getMonth() + 1); 
+        } 
+    } 
+    save(); 
+    closeModal('m-loan'); 
+}
+
+function openEditAccBal(idx) { 
+    editAccBalIdx = idx; 
+    document.getElementById('eab-val').value = db.accounts[idx].balance; 
+    openModal('m-edit-acc-bal'); 
+}
+
+function saveEditAccBal() { 
+    if(editAccBalIdx !== null) { 
+        db.accounts[editAccBalIdx].balance = parseFloat(document.getElementById('eab-val').value) || 0; 
+        save(); 
+        closeModal('m-edit-acc-bal'); 
+    } 
+}
+
+function openEditCardDebt(idx) { 
+    editCardDebtIdx = idx; 
+    document.getElementById('ecd-val').value = db.cards[idx].debt; 
+    openModal('m-edit-card-debt'); 
+}
+
+function saveEditCardDebt() { 
+    if(editCardDebtIdx !== null) { 
+        db.cards[editCardDebtIdx].debt = parseFloat(document.getElementById('ecd-val').value) || 0; 
+        save(); 
+        closeModal('m-edit-card-debt'); 
+    } 
+}
+
+function openEditLoanDebt(idx) { 
+    editLoanDebtIdx = idx; 
+    document.getElementById('eld-val').value = db.loans[idx].remaining; 
+    openModal('m-edit-loan-debt'); 
+}
+
+function saveEditLoanDebt() { 
+    if(editLoanDebtIdx !== null) { 
+        db.loans[editLoanDebtIdx].remaining = parseFloat(document.getElementById('eld-val').value) || 0; 
+        save(); 
+        closeModal('m-edit-loan-debt'); 
+    } 
+}
+
+function openLimits() { 
+    document.getElementById('lim-dahil').value = db.limits.planDahil || ''; 
+    document.getElementById('lim-dahilDegil').value = db.limits.planDahilDegil || ''; 
+    document.getElementById('lim-kapsamDisi').value = db.limits.kapsamDisi || ''; 
+    openModal('m-limits'); 
+}
+
+function saveLimits() { 
+    db.limits.planDahil = parseFloat(document.getElementById('lim-dahil').value) || 0; 
+    db.limits.planDahilDegil = parseFloat(document.getElementById('lim-dahilDegil').value) || 0; 
+    db.limits.kapsamDisi = parseFloat(document.getElementById('lim-kapsamDisi').value) || 0; 
+    save(); 
+    closeModal('m-limits'); 
+    
+    if (document.getElementById('p-analysis').classList.contains('active')) {
+        renderAnl(); 
+    }
+}
+
+// --- BAKİYE ETKİLEME (ÇİFT TARAFLI MUHASEBE) ---
+function applyBalanceEffect(sourceId, type, amount, reverse = false) { 
+    if (!sourceId || sourceId === 'none') return; 
+    
+    const parts = sourceId.split('-'); 
+    const sType = parts[0]; 
+    const sIdx = parts[1]; 
     
     let sign = (type === 'expense') ? -1 : 1; 
     if (reverse) sign *= -1; 
-
-    if (sType === 'acc' && db.accounts[sIdx]) {
-        db.accounts[sIdx].balance += (sign * amount);
-    } else if (sType === 'card' && db.cards[sIdx]) {
-        if (!reverse) {
-            if (type === 'expense') db.cards[sIdx].debt += amount;
-            else db.cards[sIdx].debt -= amount;
-        } else {
-            if (type === 'expense') db.cards[sIdx].debt -= amount;
-            else db.cards[sIdx].debt += amount;
-        }
-    }
-}
-
-// --- YAPAY ZEKA (VISION AI) OKUMA SÜRECİ ---
-async function processScan(input) {
-    const apiKey = localStorage.getItem('hf_gemini_key');
-    if (!apiKey) {
-        alert("Önce Ayarlar bölümünden Gemini API Anahtarınızı giriniz!");
-        openModal('m-settings');
-        return;
-    }
-
-    const file = input.files[0];
-    if (!file) return;
-
-    document.getElementById('cloud-status').innerText = "⏳ AI Okuyor...";
-    document.getElementById('cloud-status').style.color = "var(--warning)";
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        const base64Data = e.target.result.split(',')[1];
-        try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { text: "Bu bir banka/kredi kartı işlem listesi ekran görüntüsüdür. Resimdeki tüm işlemleri sırasıyla çıkar. Kurallar: 1. Tutarları (amount) ondalık sayı (float) formatına çevir. 2. Tarihleri (date) YYYY-MM-DD formatına çevir. 3. Kategori (category) için akıllıca bir tahmin yap." },
-                            { inline_data: { mime_type: file.type, data: base64Data } }
-                        ]
-                    }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "ARRAY",
-                            items: {
-                                type: "OBJECT",
-                                properties: {
-                                    date: { type: "STRING" },
-                                    description: { type: "STRING" },
-                                    amount: { type: "NUMBER" },
-                                    category: { type: "STRING" }
-                                },
-                                required: ["date", "description", "amount", "category"]
-                            }
-                        }
-                    }
-                })
-            });
-            const res = await response.json();
-            if (res.error) throw new Error("API Hatası: " + res.error.message);
-            
-            try {
-                scannedItems = JSON.parse(res.candidates[0].content.parts[0].text);
-            } catch (parseError) {
-                throw new Error("Yapay Zeka JSON formatını bozdu. Lütfen tekrar deneyin.");
+    
+    if (sType === 'acc' && db.accounts[sIdx]) { 
+        db.accounts[sIdx].balance += (sign * amount); 
+    } else if (sType === 'card' && db.cards[sIdx]) { 
+        if (!reverse) { 
+            if (type === 'expense') {
+                db.cards[sIdx].debt += amount; 
+            } else {
+                db.cards[sIdx].debt -= amount; 
             }
-            
-            if (scannedItems.length === 0) throw new Error("Görselde işlem bulunamadı veya tutarlar okunamadı.");
-            renderScanModal(scannedItems);
-
-        } catch (err) {
-            console.error(err);
-            alert("Okuma İşlemi Başarısız Oldu!\n\nDetay:\n" + err.message);
-        }
-        
-        document.getElementById('cloud-status').innerText = "☁️ Güncel";
-        document.getElementById('cloud-status').style.color = "var(--success)";
-        input.value = "";
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeScannedItem(idx) {
-    scannedItems.forEach((item, i) => {
-        const descEl = document.getElementById(`ai-desc-${i}`);
-        if (descEl) {
-            item.description = descEl.value;
-            item.date = document.getElementById(`ai-date-${i}`).value;
-            item.amount = parseFloat(document.getElementById(`ai-amt-${i}`).value) || 0;
-            item.category = document.getElementById(`ai-cat-${i}`).value;
-        }
-    });
-    
-    scannedItems.splice(idx, 1);
-    
-    if (scannedItems.length === 0) {
-        closeModal('m-scan-res');
-        alert("Tüm işlemler listeden silindi.");
-    } else {
-        renderScanModal(scannedItems);
-    }
-}
-
-function renderScanModal(items) {
-    const aiAccSelect = document.getElementById('ai-acc');
-    aiAccSelect.innerHTML = '';
-    aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
-    
-    // YENİ: AI Modalındaki genel hesaba isim eklendi
-    db.accounts.forEach((a, i) => aiAccSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
-    db.cards.forEach((c, i) => aiAccSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
-    
-    let dl = document.getElementById('cat-list-options');
-    if (!dl) {
-        dl = document.createElement('datalist');
-        dl.id = 'cat-list-options';
-        document.body.appendChild(dl);
-    }
-    dl.innerHTML = '';
-    db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
-    
-    const list = document.getElementById('ai-results-list');
-    list.innerHTML = '';
-    
-    items.forEach((item, index) => {
-        list.innerHTML += `
-            <div class="ai-row-box">
-                <div class="ai-row-top">
-                    <input type="text" class="ai-inp" style="flex:2;" id="ai-desc-${index}" value="${item.description}">
-                    <input type="number" class="ai-inp" style="flex:1;" id="ai-amt-${index}" value="${item.amount}" step="0.01">
-                    <button class="btn-del" onclick="removeScannedItem(${index})" style="color:var(--danger); padding:0 5px; font-size:1.2rem;">×</button>
-                </div>
-                <div class="ai-row-bot">
-                    <input type="date" class="ai-inp" style="flex:1.2;" id="ai-date-${index}" value="${item.date}">
-                    <input type="text" class="ai-inp" style="flex:1.5;" id="ai-cat-${index}" value="${item.category}" list="cat-list-options" placeholder="Kategori">
-                    <select class="ai-inp" style="flex:1;" id="ai-own-${index}">
-                        <option value="Baba">Baba</option>
-                        <option value="Anne">Anne</option>
-                    </select>
-                    <select class="ai-inp" style="flex:1;" id="ai-plan-${index}">
-                        <option value="dahil">Dahil</option>
-                        <option value="dahil_degil">D.Değil</option>
-                        <option value="kapsam_disi">Kapsam D.</option>
-                    </select>
-                </div>
-            </div>`;
-    });
-    openModal('m-scan-res');
-}
-
-function saveScannedData() {
-    const targetVal = document.getElementById('ai-acc').value;
-    
-    scannedItems.forEach((item, index) => {
-        const descEl = document.getElementById(`ai-desc-${index}`);
-        if (!descEl) return;
-        
-        const desc = descEl.value;
-        const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
-        
-        let dateVal = document.getElementById(`ai-date-${index}`).value;
-        let finalDate = new Date().toISOString();
-        if (dateVal && dateVal.length === 10) finalDate = `${dateVal}T12:00:00.000Z`;
-        else if (dateVal) finalDate = new Date(dateVal).toISOString();
-
-        let cat = document.getElementById(`ai-cat-${index}`).value.trim() || 'Diğer';
-        let own = document.getElementById(`ai-own-${index}`).value;
-        let planStat = document.getElementById(`ai-plan-${index}`).value;
-
-        if (!db.categories.expense.includes(cat) && !db.categories.income.includes(cat)) {
-            db.categories.expense.push(cat);
-        }
-
-        if (amt !== 0) {
-            let parsedType = amt >= 0 ? 'expense' : 'income';
-            let parsedAmt = Math.abs(amt);
-            
-            db.transactions.push({
-                id: 't_' + Date.now() + '_' + index,
-                type: parsedType,
-                amount: parsedAmt,
-                category: cat,
-                description: desc,
-                date: finalDate,
-                owner: own,
-                planStatus: planStat,
-                sourceId: targetVal !== 'none' ? targetVal : null
-            });
-            
-            // Otomatik Bakiye Etkileme
-            applyBalanceEffect(targetVal, parsedType, parsedAmt, false);
-        }
-    });
-    
-    save();
-    closeModal('m-scan-res');
-    alert(`${scannedItems.length} işlem başarıyla buluta kaydedildi!`);
-}
-
-// --- BAŞLATMA VE BULUT SENKRONİZASYONU ---
-async function init() {
-    let localDataLoaded = false;
-    try {
-        const s = localStorage.getItem('hf_cloud');
-        if (s) {
-            const p = JSON.parse(s);
-            if (p.banks) {
-                db = p;
-                db.assets = db.assets || [];
-                db.goals = db.goals || [];
-                db.limits = db.limits || { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 };
-                
-                if (db.transactions) db.transactions.forEach((t, i) => { if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; if (!t.planStatus) t.planStatus = 'dahil'; });
-                if (db.planned) db.planned.forEach((p, i) => { if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; if (!p.planStatus) p.planStatus = 'dahil'; });
-                
-                render();
-                localDataLoaded = true;
+        } else { 
+            if (type === 'expense') {
+                db.cards[sIdx].debt -= amount; 
+            } else {
+                db.cards[sIdx].debt += amount; 
             }
-        }
-    } catch (e) { }
-
-    if (!localDataLoaded) { render(); }
-
-    try {
-        document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor...";
-        document.getElementById('cloud-status').style.color = "white";
-        
-        const { data, error } = await client.from('app_state').select('*').eq('id', 1);
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor...";
-            const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]);
-            if (insertErr) throw insertErr;
-            
-            document.getElementById('cloud-status').innerText = "☁️ Güncel";
-            document.getElementById('cloud-status').style.color = "#10b981";
-        } else {
-            db = data[0].data;
-            db.assets = db.assets || [];
-            db.goals = db.goals || [];
-            db.limits = db.limits || { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 };
-            
-            if (db.transactions) db.transactions.forEach((t, i) => { if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; if (!t.planStatus) t.planStatus = 'dahil'; });
-            if (db.planned) db.planned.forEach((p, i) => { if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; if (!p.planStatus) p.planStatus = 'dahil'; });
-            
-            localStorage.setItem('hf_cloud', JSON.stringify(db));
-            document.getElementById('cloud-status').innerText = "☁️ Güncel";
-            document.getElementById('cloud-status').style.color = "#10b981";
-            render();
-        }
-    } catch (e) {
-        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor");
-        document.getElementById('cloud-status').style.color = "#ef4444";
-        render();
-    }
-    
-    const t = new Date().toISOString().split('T')[0];
-    ['il-date', 'it-date'].forEach(i => { if (document.getElementById(i)) document.getElementById(i).value = t; });
-    
-    loadSettings();
+        } 
+    } 
 }
 
-async function save() {
-    localStorage.setItem('hf_cloud', JSON.stringify(db));
-    render();
-    document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor...";
-    document.getElementById('cloud-status').style.color = "white";
-    
-    try {
-        const { error } = await client.from('app_state').upsert({ id: 1, data: db });
-        if (error) throw error;
-        document.getElementById('cloud-status').innerText = "☁️ Güncel";
-        document.getElementById('cloud-status').style.color = "#10b981";
-    } catch (e) {
-        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi");
-        document.getElementById('cloud-status').style.color = "#ef4444";
-    }
-}
-
-function resetApp() {
-    if (confirm('Tüm veriler silinecek! Emin misiniz?')) {
-        db = {
-            banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'],
-            categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] },
-            accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [],
-            limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 }
-        };
-        save();
-    }
-}
-
-// YENİ: DİNAMİK KAYNAK FİLTRELEME MOTORU
+// --- DİNAMİK FİLTRE VE İŞLEM YÖNETİMİ ---
 function updateAccListByOwner(prefix, selectedVal = null) {
     const owner = document.getElementById(prefix + '-own').value;
     const accSelect = document.getElementById(prefix + '-acc');
@@ -1302,27 +1138,30 @@ function updateAccListByOwner(prefix, selectedVal = null) {
     if(!accSelect) return;
     
     const currentSelection = selectedVal || accSelect.value; 
-
     accSelect.innerHTML = '';
+    
     if (prefix === 'it' || prefix === 'et') {
         accSelect.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
     }
-
+    
     db.accounts.forEach((a, i) => {
-        if (a.owner === owner) accSelect.add(new Option('Hesap: ' + a.name + ' (' + a.bank + ')', 'acc-' + i));
+        if (a.owner === owner) {
+            accSelect.add(new Option('Hesap: ' + a.name + ' (' + a.bank + ')', 'acc-' + i));
+        }
     });
-
+    
     db.cards.forEach((c, i) => {
-        if (c.owner === owner) accSelect.add(new Option('Kart: ' + c.name + ' (' + c.bank + ')', 'card-' + i));
+        if (c.owner === owner) {
+            accSelect.add(new Option('Kart: ' + c.name + ' (' + c.bank + ')', 'card-' + i));
+        }
     });
-
+    
     if (currentSelection && Array.from(accSelect.options).some(opt => opt.value === currentSelection)) {
         accSelect.value = currentSelection;
     } else {
         accSelect.value = 'none';
     }
     
-    // Transfer alıcısı (it-to) tüm profillerin hesaplarını görebilsin ama ismen etiketlensin
     if (prefix === 'it') {
         const toSelect = document.getElementById('it-to');
         if(toSelect) {
@@ -1331,449 +1170,614 @@ function updateAccListByOwner(prefix, selectedVal = null) {
             db.accounts.forEach((a, i) => toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
             db.cards.forEach((c, i) => toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
             db.loans.forEach((l, i) => toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i)));
-            if (currentTo && Array.from(toSelect.options).some(opt => opt.value === currentTo)) toSelect.value = currentTo;
-        }
-    }
-}
-
-function openTrans(type) {
-    document.getElementById('it-type').value = type;
-    document.getElementById('it-tit').innerText = type;
-    toggle('it-cat-div', type !== 'transfer');
-    toggle('it-planStatus-div', type !== 'transfer');
-    toggle('it-to-div', type === 'transfer');
-    openModal('m-trans');
-    updateEditCatList('it');
-    
-    // YENİ: Modal açıldığında dinamik listeyi tetikle
-    updateAccListByOwner('it');
-}
-
-function saveTrans() {
-    const type = document.getElementById('it-type').value;
-    const amt = parseFloat(document.getElementById('it-amt').value);
-    const isPlan = document.getElementById('it-plan').checked;
-    const tDate = document.getElementById('it-date').value;
-    const owner = document.getElementById('it-own').value;
-    const planStatus = type === 'transfer' ? 'kapsam_disi' : document.getElementById('it-planStatus').value;
-    
-    if (!amt) return alert('Tutar?');
-    
-    let sourceId = document.getElementById('it-acc').value !== 'none' ? document.getElementById('it-acc').value : null;
-
-    if (type === 'transfer') {
-        let toIdVal = document.getElementById('it-to').value;
-        
-        applyBalanceEffect(sourceId, 'expense', amt, false);
-        applyBalanceEffect(toIdVal, 'income', amt, false);
-        
-        db.transactions.push({
-            id: 't_' + Date.now(),
-            type,
-            amount: amt,
-            category: 'Transfer',
-            date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(),
-            owner: owner,
-            sourceId: sourceId,
-            toId: toIdVal,
-            planStatus: planStatus
-        });
-    } else {
-        if (isPlan) {
-            let d = new Date(tDate || new Date().toISOString());
-            let rep = parseInt(document.getElementById('it-rep').value) || 1;
-            for (let i = 0; i < rep; i++) {
-                db.planned.push({
-                    id: 'p_' + Date.now() + '_' + i,
-                    type,
-                    category: document.getElementById('it-cat').value,
-                    title: document.getElementById('it-cat').value,
-                    amount: amt,
-                    date: d.toISOString().split('T')[0],
-                    isPaid: false,
-                    owner: owner,
-                    sourceId: sourceId,
-                    planStatus: planStatus
-                });
-                d.setMonth(d.getMonth() + 1);
-            }
-        } else {
-            applyBalanceEffect(sourceId, type, amt, false);
             
-            db.transactions.push({
-                id: 't_' + Date.now(),
-                type,
-                amount: amt,
-                category: document.getElementById('it-cat').value,
-                date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(),
-                owner: owner,
-                sourceId: sourceId,
-                planStatus: planStatus
-            });
-        }
-    }
-    save();
-    closeModal('m-trans');
-}
-
-function updateEditCatList(prefix = 'et') {
-    const type = document.getElementById(prefix + '-type').value;
-    const catSelect = document.getElementById(prefix + '-cat');
-    if (!catSelect) return;
-    
-    catSelect.innerHTML = '';
-    if (db.categories[type]) {
-        db.categories[type].forEach(c => catSelect.add(new Option(c, c)));
-    }
-}
-
-function openEditTrans(id, isPlan) {
-    editTransId = id;
-    editIsPlan = isPlan;
-    const t = isPlan ? db.planned.find(x => x.id == id) : db.transactions.find(x => x.id == id);
-    if (!t) return;
-
-    document.getElementById('et-type').value = t.type || 'expense';
-    document.getElementById('et-own').value = t.owner || 'Baba';
-    document.getElementById('et-planStatus').value = t.planStatus || 'dahil';
-    document.getElementById('et-amt').value = t.amount;
-    document.getElementById('et-date').value = (t.date || '').split('T')[0];
-    document.getElementById('et-desc').value = t.description || t.title || '';
-    
-    updateEditCatList('et');
-    document.getElementById('et-cat').value = t.category || '';
-    
-    openModal('m-edit-trans');
-    
-    // YENİ: Modal açıldığında dinamik listeyi tetikle ve eski kaynağı seçili hale getir
-    updateAccListByOwner('et', t.sourceId);
-}
-
-function saveEditTrans() {
-    const t = editIsPlan ? db.planned.find(x => x.id == editTransId) : db.transactions.find(x => x.id == editTransId);
-    if (!t) return;
-
-    if (!editIsPlan) {
-        if (t.type === 'transfer' && t.toId) {
-            applyBalanceEffect(t.sourceId, 'expense', t.amount, true);
-            applyBalanceEffect(t.toId, 'income', t.amount, true);
-        } else {
-            applyBalanceEffect(t.sourceId, t.type, t.amount, true);
-        }
-    }
-
-    t.type = document.getElementById('et-type').value;
-    t.owner = document.getElementById('et-own').value;
-    t.planStatus = document.getElementById('et-planStatus').value;
-    t.amount = parseFloat(document.getElementById('et-amt').value) || 0;
-    
-    let dateVal = document.getElementById('et-date').value;
-    if (dateVal) {
-        t.date = `${dateVal}T12:00:00.000Z`;
-    }
-
-    t.category = document.getElementById('et-cat').value;
-    
-    if (editIsPlan) {
-        t.title = document.getElementById('et-desc').value;
-    } else {
-        t.description = document.getElementById('et-desc').value;
-    }
-
-    const accVal = document.getElementById('et-acc').value;
-    t.sourceId = accVal !== 'none' ? accVal : null;
-
-    if (!editIsPlan) {
-        if (t.type === 'transfer' && t.toId) {
-            applyBalanceEffect(t.sourceId, 'expense', t.amount, false);
-            applyBalanceEffect(t.toId, 'income', t.amount, false);
-        } else {
-            applyBalanceEffect(t.sourceId, t.type, t.amount, false);
-        }
-    }
-
-    save();
-    closeModal('m-edit-trans');
-    
-    if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
-    
-    const mdTit = document.getElementById('md-tit').innerText;
-    if (mdTit && mdTit.includes('Detayları')) {
-        openDay(mdTit.replace(' Detayları', '').trim());
-    }
-}
-
-function delTrans(id) {
-    if (confirm('Bu işlemi silmek istediğinize emin misiniz?')) {
-        const t = db.transactions.find(x => x.id == id);
-        if (t) {
-            if (t.type === 'transfer' && t.toId) {
-                applyBalanceEffect(t.sourceId, 'expense', t.amount, true);
-                applyBalanceEffect(t.toId, 'income', t.amount, true);
-            } else {
-                applyBalanceEffect(t.sourceId, t.type, t.amount, true);
+            if (currentTo && Array.from(toSelect.options).some(opt => opt.value === currentTo)) {
+                toSelect.value = currentTo;
             }
         }
-        
-        db.transactions = db.transactions.filter(x => x.id != id);
-        save();
-        
-        const mdTit = document.getElementById('md-tit').innerText;
-        if (mdTit && mdTit.includes('Detayları')) {
-            openDay(mdTit.replace(' Detayları', '').trim());
-        }
-        
-        if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
     }
 }
 
-// --- RENDER SİSTEMİ (ÖZET & ASSETS) ---
+function openTrans(type) { 
+    document.getElementById('it-type').value = type; 
+    document.getElementById('it-tit').innerText = type; 
+    toggle('it-cat-div', type !== 'transfer'); 
+    toggle('it-planStatus-div', type !== 'transfer'); 
+    toggle('it-to-div', type === 'transfer'); 
+    openModal('m-trans'); 
+    updateEditCatList('it'); 
+    updateAccListByOwner('it'); 
+}
+
+function saveTrans() { 
+    const type = document.getElementById('it-type').value; 
+    const amt = parseFloat(document.getElementById('it-amt').value); 
+    const isPlan = document.getElementById('it-plan').checked; 
+    const tDate = document.getElementById('it-date').value; 
+    const owner = document.getElementById('it-own').value; 
+    const planStatus = type === 'transfer' ? 'kapsam_disi' : document.getElementById('it-planStatus').value; 
+    
+    if (!amt) return alert('Tutar?'); 
+    
+    let sourceId = document.getElementById('it-acc').value !== 'none' ? document.getElementById('it-acc').value : null; 
+    
+    if (type === 'transfer') { 
+        let toIdVal = document.getElementById('it-to').value; 
+        applyBalanceEffect(sourceId, 'expense', amt, false); 
+        applyBalanceEffect(toIdVal, 'income', amt, false); 
+        db.transactions.push({ 
+            id: 't_' + Date.now(), 
+            type: type, 
+            amount: amt, 
+            category: 'Transfer', 
+            date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), 
+            owner: owner, 
+            sourceId: sourceId, 
+            toId: toIdVal, 
+            planStatus: planStatus 
+        }); 
+    } else { 
+        if (isPlan) { 
+            let d = new Date(tDate || new Date().toISOString()); 
+            let rep = parseInt(document.getElementById('it-rep').value) || 1; 
+            for (let i = 0; i < rep; i++) { 
+                db.planned.push({ 
+                    id: 'p_' + Date.now() + '_' + i, 
+                    type: type, 
+                    category: document.getElementById('it-cat').value, 
+                    title: document.getElementById('it-cat').value, 
+                    amount: amt, 
+                    date: d.toISOString().split('T')[0], 
+                    isPaid: false, 
+                    owner: owner, 
+                    sourceId: sourceId, 
+                    planStatus: planStatus 
+                }); 
+                d.setMonth(d.getMonth() + 1); 
+            } 
+        } else { 
+            applyBalanceEffect(sourceId, type, amt, false); 
+            db.transactions.push({ 
+                id: 't_' + Date.now(), 
+                type: type, 
+                amount: amt, 
+                category: document.getElementById('it-cat').value, 
+                date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), 
+                owner: owner, 
+                sourceId: sourceId, 
+                planStatus: planStatus 
+            }); 
+        } 
+    } 
+    save(); 
+    closeModal('m-trans'); 
+}
+
+function updateEditCatList(prefix = 'et') { 
+    const type = document.getElementById(prefix + '-type').value; 
+    const catSelect = document.getElementById(prefix + '-cat'); 
+    if (!catSelect) return; 
+    
+    catSelect.innerHTML = ''; 
+    if (db.categories[type]) { 
+        db.categories[type].forEach(c => catSelect.add(new Option(c, c))); 
+    } 
+}
+
+function openEditTrans(id, isPlan) { 
+    editTransId = id; 
+    editIsPlan = isPlan; 
+    const t = isPlan ? db.planned.find(x => x.id == id) : db.transactions.find(x => x.id == id); 
+    if (!t) return; 
+    
+    document.getElementById('et-type').value = t.type || 'expense'; 
+    document.getElementById('et-own').value = t.owner || 'Baba'; 
+    document.getElementById('et-planStatus').value = t.planStatus || 'dahil'; 
+    document.getElementById('et-amt').value = t.amount; 
+    document.getElementById('et-date').value = (t.date || '').split('T')[0]; 
+    document.getElementById('et-desc').value = t.description || t.title || ''; 
+    
+    updateEditCatList('et'); 
+    document.getElementById('et-cat').value = t.category || ''; 
+    
+    openModal('m-edit-trans'); 
+    updateAccListByOwner('et', t.sourceId); 
+}
+
+function saveEditTrans() { 
+    const t = editIsPlan ? db.planned.find(x => x.id == editTransId) : db.transactions.find(x => x.id == editTransId); 
+    if (!t) return; 
+    
+    // Eski işlemi geri al
+    if (!editIsPlan) { 
+        if (t.type === 'transfer' && t.toId) { 
+            applyBalanceEffect(t.sourceId, 'expense', t.amount, true); 
+            applyBalanceEffect(t.toId, 'income', t.amount, true); 
+        } else { 
+            applyBalanceEffect(t.sourceId, t.type, t.amount, true); 
+        } 
+    } 
+    
+    // Yeni değerleri ata
+    t.type = document.getElementById('et-type').value; 
+    t.owner = document.getElementById('et-own').value; 
+    t.planStatus = document.getElementById('et-planStatus').value; 
+    t.amount = parseFloat(document.getElementById('et-amt').value) || 0; 
+    
+    let dateVal = document.getElementById('et-date').value; 
+    if (dateVal) { 
+        t.date = `${dateVal}T12:00:00.000Z`; 
+    } 
+    
+    t.category = document.getElementById('et-cat').value; 
+    
+    if (editIsPlan) { 
+        t.title = document.getElementById('et-desc').value; 
+    } else { 
+        t.description = document.getElementById('et-desc').value; 
+    } 
+    
+    const accVal = document.getElementById('et-acc').value; 
+    t.sourceId = accVal !== 'none' ? accVal : null; 
+    
+    // Yeni durumu banka bakiyesine uygula
+    if (!editIsPlan) { 
+        if (t.type === 'transfer' && t.toId) { 
+            applyBalanceEffect(t.sourceId, 'expense', t.amount, false); 
+            applyBalanceEffect(t.toId, 'income', t.amount, false); 
+        } else { 
+            applyBalanceEffect(t.sourceId, t.type, t.amount, false); 
+        } 
+    } 
+    
+    save(); 
+    closeModal('m-edit-trans'); 
+    
+    if (document.getElementById('p-analysis').classList.contains('active')) {
+        renderAnl(); 
+    }
+    
+    const mdTit = document.getElementById('md-tit').innerText; 
+    if (mdTit && mdTit.includes('Detayları')) { 
+        openDay(mdTit.replace(' Detayları', '').trim()); 
+    } 
+}
+
+function delTrans(id) { 
+    if (confirm('Bu işlemi silmek istediğinize emin misiniz?')) { 
+        const t = db.transactions.find(x => x.id == id); 
+        if (t) { 
+            if (t.type === 'transfer' && t.toId) { 
+                applyBalanceEffect(t.sourceId, 'expense', t.amount, true); 
+                applyBalanceEffect(t.toId, 'income', t.amount, true); 
+            } else { 
+                applyBalanceEffect(t.sourceId, t.type, t.amount, true); 
+            } 
+        } 
+        db.transactions = db.transactions.filter(x => x.id != id); 
+        save(); 
+        
+        const mdTit = document.getElementById('md-tit').innerText; 
+        if (mdTit && mdTit.includes('Detayları')) { 
+            openDay(mdTit.replace(' Detayları', '').trim()); 
+        } 
+        if (document.getElementById('p-analysis').classList.contains('active')) {
+            renderAnl(); 
+        }
+    } 
+}
+
+function saveAsset() { 
+    const a = { 
+        id: Date.now(), 
+        owner: document.getElementById('ias-own').value, 
+        type: document.getElementById('ias-type').value, 
+        name: document.getElementById('ias-name').value, 
+        value: parseFloat(document.getElementById('ias-val').value) || 0 
+    }; 
+    if (!a.name) return alert('İsim girin'); 
+    db.assets.push(a); 
+    save(); 
+    closeModal('m-asset'); 
+}
+
+function saveGoal() { 
+    const g = { 
+        id: Date.now(), 
+        owner: document.getElementById('ig-own').value, 
+        name: document.getElementById('ig-name').value, 
+        target: parseFloat(document.getElementById('ig-target').value) || 0, 
+        current: parseFloat(document.getElementById('ig-current').value) || 0 
+    }; 
+    if (!g.name || !g.target) return alert('Eksik bilgi'); 
+    db.goals.push(g); 
+    save(); 
+    closeModal('m-goal'); 
+}
+
+function updSel() { 
+    const bnks = document.querySelectorAll('#ia-bank, #ic-bank, #il-bank'); 
+    bnks.forEach(s => { 
+        s.innerHTML = ''; 
+        db.banks.forEach(b => s.add(new Option(b, b))); 
+    }); 
+    
+    const cts = document.querySelectorAll('#it-cat'); 
+    cts.forEach(s => { 
+        s.innerHTML = ''; 
+        db.categories.expense.forEach(c => s.add(new Option(c, c))); 
+    }); 
+    
+    updateAccListByOwner('et'); 
+    updateAccListByOwner('it'); 
+}
+
+function renderBanks() { 
+    document.getElementById('lst-banks').innerHTML = db.banks.map((b, i) => `<span class="badge" style="font-size:0.8rem; padding:5px 10px;">${b} <span style="cursor:pointer; margin-left:5px; color:red" onclick="db.banks.splice(${i},1);save();renderBanks()">x</span></span>`).join(''); 
+}
+
+function addBank() { 
+    const v = document.getElementById('ib-new').value; 
+    if (v) { 
+        db.banks.push(v); 
+        save(); 
+        renderBanks(); 
+    } 
+}
+
+function renderCats() { 
+    const t = document.getElementById('ic-type').value; 
+    document.getElementById('lst-cats').innerHTML = db.categories[t].map((c, i) => `<span class="badge" style="font-size:0.8rem; padding:5px 10px;">${c} <span style="cursor:pointer; margin-left:5px; color:red" onclick="db.categories.${t}.splice(${i},1);save();renderCats()">x</span></span>`).join(''); 
+}
+
+function addCat() { 
+    const t = document.getElementById('ic-type').value; 
+    const v = document.getElementById('ic-new').value; 
+    if (v) { 
+        db.categories[t].push(v); 
+        save(); 
+        renderCats(); 
+    } 
+}
+
+function calcLoan() { 
+    const amt = parseFloat(document.getElementById('la-amt').value); 
+    const term = parseFloat(document.getElementById('la-term').value); 
+    const inst = parseFloat(document.getElementById('la-inst').value); 
+    const res = document.getElementById('loan-compare-res'); 
+    res.innerHTML = ''; 
+    if (amt && term && inst) { 
+        res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`; 
+    } 
+    db.loans.forEach(l => res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`); 
+}
+
+function triggerExport() { 
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(db)], { type: 'application/json' })); 
+    a.download = 'yedek.json'; 
+    a.click(); 
+}
+
+function processImport(el) { 
+    const r = new FileReader(); 
+    r.onload = e => { 
+        db = JSON.parse(e.target.result); 
+        save(); 
+    }; 
+    r.readAsText(el.files[0]); 
+}
+
+function doPaste() { 
+    try { 
+        const j = JSON.parse(document.getElementById('paste-txt').value); 
+        if (j.transactions) db.transactions = db.transactions.concat(j.transactions); 
+        if (j.planned) db.planned = db.planned.concat(j.planned); 
+        if (j.accounts) db.accounts = db.accounts.concat(j.accounts); 
+        if (j.cards) db.cards = db.cards.concat(j.cards); 
+        save(); 
+        closeModal('m-paste'); 
+    } catch (e) { 
+        alert('Hata'); 
+    } 
+}
+
+function resetApp() { 
+    if (confirm('Tüm veriler silinecek! Emin misiniz?')) { 
+        db = { banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [], limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } }; 
+        save(); 
+    } 
+}
+
+// --- BAŞLATMA VE VERİTABANI İŞLEMLERİ ---
+
+async function init() {
+    let localDataLoaded = false;
+    try { 
+        const s = localStorage.getItem('hf_cloud'); 
+        if (s) { 
+            const p = JSON.parse(s); 
+            if (p.banks) { 
+                db = p; 
+                db.assets = db.assets || []; 
+                db.goals = db.goals || []; 
+                db.limits = db.limits || { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 }; 
+                if (db.transactions) {
+                    db.transactions.forEach((t, i) => { 
+                        if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; 
+                        if (!t.planStatus) t.planStatus = 'dahil'; 
+                    }); 
+                }
+                if (db.planned) {
+                    db.planned.forEach((p, i) => { 
+                        if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; 
+                        if (!p.planStatus) p.planStatus = 'dahil'; 
+                    }); 
+                }
+                render(); 
+                localDataLoaded = true; 
+            } 
+        } 
+    } catch (e) { }
+    
+    if (!localDataLoaded) { 
+        render(); 
+    }
+    
+    try {
+        document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor..."; 
+        document.getElementById('cloud-status').style.color = "white";
+        const { data, error } = await client.from('app_state').select('*').eq('id', 1);
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+            document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor..."; 
+            const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]); 
+            if (insertErr) throw insertErr;
+            document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
+            document.getElementById('cloud-status').style.color = "#10b981";
+        } else {
+            db = data[0].data; 
+            db.assets = db.assets || []; 
+            db.goals = db.goals || []; 
+            db.limits = db.limits || { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 };
+            
+            if (db.transactions) {
+                db.transactions.forEach((t, i) => { 
+                    if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; 
+                    if (!t.planStatus) t.planStatus = 'dahil'; 
+                });
+            }
+            if (db.planned) {
+                db.planned.forEach((p, i) => { 
+                    if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; 
+                    if (!p.planStatus) p.planStatus = 'dahil'; 
+                });
+            }
+            localStorage.setItem('hf_cloud', JSON.stringify(db)); 
+            document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
+            document.getElementById('cloud-status').style.color = "#10b981"; 
+            render();
+        }
+    } catch (e) { 
+        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor"); 
+        document.getElementById('cloud-status').style.color = "#ef4444"; 
+        render(); 
+    }
+    
+    const t = new Date().toISOString().split('T')[0]; 
+    ['il-date', 'it-date'].forEach(i => { 
+        if (document.getElementById(i)) document.getElementById(i).value = t; 
+    }); 
+    
+    loadSettings();
+    updateCatFilterOptions();
+}
+
+async function save() {
+    localStorage.setItem('hf_cloud', JSON.stringify(db)); 
+    render(); 
+    document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor..."; 
+    document.getElementById('cloud-status').style.color = "white";
+    try { 
+        const { error } = await client.from('app_state').upsert({ id: 1, data: db }); 
+        if (error) throw error; 
+        document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
+        document.getElementById('cloud-status').style.color = "#10b981"; 
+    } catch (e) { 
+        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi"); 
+        document.getElementById('cloud-status').style.color = "#ef4444"; 
+    }
+    updateCatFilterOptions();
+}
+
+// --- RENDER (EKRAN ÇİZİM) FONKSİYONLARI ---
+
 function render() {
-    const fAcc = filter(db.accounts);
-    const fCards = filter(db.cards);
-    const fLoans = filter(db.loans);
-    const fPlans = filter(db.planned);
-    const fTrans = filter(db.transactions);
+    const fAcc = filter(db.accounts); 
+    const fCards = filter(db.cards); 
+    const fLoans = filter(db.loans); 
+    const fPlans = filter(db.planned); 
+    const fTrans = filter(db.transactions); 
     const fAssets = filter(db.assets || []);
-
-    const accBalance = fAcc.reduce((a, b) => a + b.balance, 0);
-    const invBalance = fAssets.reduce((a, b) => a + b.value, 0);
-    const ast = accBalance + invBalance;
+    
+    const accBalance = fAcc.reduce((a, b) => a + b.balance, 0); 
+    const invBalance = fAssets.reduce((a, b) => a + b.value, 0); 
+    const ast = accBalance + invBalance; 
     const dbt = fCards.reduce((a, b) => a + b.debt + b.future, 0) + fLoans.reduce((a, b) => a + b.remaining, 0);
-
-    document.getElementById('dash-net').innerText = fmt(ast - dbt);
-    document.getElementById('dash-ast').innerText = fmt(ast);
+    
+    document.getElementById('dash-net').innerText = fmt(ast - dbt); 
+    document.getElementById('dash-ast').innerText = fmt(ast); 
     document.getElementById('dash-dbt').innerText = fmt(dbt);
 
     let score = 0, desc = "Analiz Ediliyor";
-    if (ast === 0 && dbt === 0) {
-        score = 50;
-        desc = "Yeni Başlangıç";
-    } else if (ast > 0 && dbt === 0) {
-        score = 99;
-        desc = "Mükemmel Durum 🏆";
-    } else {
-        score = Math.round((ast / (ast + dbt)) * 100);
-        if (score > 75) desc = "Çok İyi Durum 🌟";
-        else if (score > 50) desc = "Sağlıklı Denge 👍";
-        else if (score > 25) desc = "Dikkatli Olun ⚠️";
-        else desc = "Kritik Seviye 🚨";
+    if (ast === 0 && dbt === 0) { 
+        score = 50; desc = "Yeni Başlangıç"; 
+    } else if (ast > 0 && dbt === 0) { 
+        score = 99; desc = "Mükemmel Durum 🏆"; 
+    } else { 
+        score = Math.round((ast / (ast + dbt)) * 100); 
+        if (score > 75) desc = "Çok İyi Durum 🌟"; 
+        else if (score > 50) desc = "Sağlıklı Denge 👍"; 
+        else if (score > 25) desc = "Dikkatli Olun ⚠️"; 
+        else desc = "Kritik Seviye 🚨"; 
     }
     
-    document.getElementById('health-score').innerText = score;
+    document.getElementById('health-score').innerText = score; 
     document.getElementById('health-desc').innerText = desc;
 
-    const bl = document.getElementById('list-banks-status');
+    const bl = document.getElementById('list-banks-status'); 
     bl.innerHTML = '';
     db.banks.forEach(b => {
-        let net = 0, has = false;
-        fAcc.filter(x => x.bank === b).forEach(x => { net += x.balance; has = true; });
-        fCards.filter(x => x.bank === b).forEach(x => { net -= (x.debt + x.future); has = true; });
+        let net = 0, has = false; 
+        fAcc.filter(x => x.bank === b).forEach(x => { net += x.balance; has = true; }); 
+        fCards.filter(x => x.bank === b).forEach(x => { net -= (x.debt + x.future); has = true; }); 
         fLoans.filter(x => x.bank === b).forEach(x => { net -= x.remaining; has = true; });
-        
         if (has) {
             bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`;
         }
     });
 
-    const al = document.getElementById('list-acc');
+    const al = document.getElementById('list-acc'); 
     al.innerHTML = '';
-    fAcc.forEach((a, i) => {
-        const overdraft = a.overdraft || 0;
+    fAcc.forEach((a, i) => { 
+        const overdraft = a.overdraft || 0; 
         const available = a.balance + overdraft;
         al.innerHTML += `
             <div class="acc-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div>
-                        <span class="badge" style="margin-left:0; margin-right:5px;">${a.owner}</span>
-                        <span style="font-weight:bold; font-size:0.95rem;">${a.bank} - ${a.name}</span>
-                    </div>
-                    <div>
-                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditAcc(${i})">✏️</button>
-                        <button class="btn-del" onclick="del('accounts',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
-                    </div>
+                    <div><span class="badge" style="margin-left:0; margin-right:5px;">${a.owner}</span><span style="font-weight:bold; font-size:0.95rem;">${a.bank} - ${a.name}</span></div>
+                    <div><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditAcc(${i})">✏️</button><button class="btn-del" onclick="del('accounts',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--light);">
                     <span>Mevcut Bakiye: <b style="color:${a.balance < 0 ? 'var(--danger)' : 'var(--text)'}">${fmt(a.balance)}</b></span>
                     <span>Kullanılabilir: <b style="color:var(--success)">${fmt(available)}</b></span>
                 </div>
                 ${overdraft > 0 ? `<div style="font-size:0.7rem; color:var(--light); margin-top:3px;">Esnek Hesap Limiti: ${fmt(overdraft)}</div>` : ''}
-            </div>
-        `;
+            </div>`;
     });
 
-    const asl = document.getElementById('list-assets');
+    const asl = document.getElementById('list-assets'); 
     asl.innerHTML = '';
-    fAssets.forEach((a, i) => {
-        asl.innerHTML += `<div class="item"><span><span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> ${a.name}</span><b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b></div>`;
+    fAssets.forEach((a, i) => { 
+        asl.innerHTML += `<div class="item"><span><span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> ${a.name}</span><b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b></div>`; 
     });
-    
     if (fAssets.length === 0) {
         asl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Henüz yatırım eklenmemiş.</div>';
     }
 
-    const gl = document.getElementById('list-goals');
+    const gl = document.getElementById('list-goals'); 
     gl.innerHTML = '';
-    (db.goals || []).forEach((g, i) => {
-        let pct = Math.min(100, Math.round((g.current / g.target) * 100)) || 0;
-        gl.innerHTML += `
-            <div style="padding:15px 0; border-bottom:1px solid #f1f5f9;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span style="font-weight:bold; font-size:0.9rem;">${g.name}</span>
-                    <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;">
-                    <span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span>
-                </div>
-                <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
-            </div>`;
+    (db.goals || []).forEach((g, i) => { 
+        let pct = Math.min(100, Math.round((g.current / g.target) * 100)) || 0; 
+        gl.innerHTML += `<div style="padding:15px 0; border-bottom:1px solid #f1f5f9;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; font-size:0.9rem;">${g.name}</span><span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span></div><div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;"><span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div></div>`; 
     });
-    
     if ((db.goals || []).length === 0) {
         gl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Hedef belirlenmemiş.</div>';
     }
 
-    const dl = document.getElementById('list-debts');
+    const dl = document.getElementById('list-debts'); 
     dl.innerHTML = '';
     fCards.forEach((c, i) => {
-        const limit = c.limit || 0;
-        const debt = c.debt || 0;
-        const future = c.future || 0;
-        const totalDebt = debt + future;
-        const available = Math.max(0, limit - totalDebt);
+        const limit = c.limit || 0; 
+        const debt = c.debt || 0; 
+        const future = c.future || 0; 
+        const totalDebt = debt + future; 
+        const available = Math.max(0, limit - totalDebt); 
         const pct = limit > 0 ? Math.min(100, (totalDebt / limit) * 100) : 0;
-        
         dl.innerHTML += `
             <div class="cc-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div>
-                        <span class="badge" style="margin-left:0; margin-right:5px;">${c.owner}</span>
-                        <span style="font-weight:bold; font-size:0.95rem;">${c.bank} - ${c.name}</span>
-                    </div>
-                    <div>
-                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditCard(${i})">✏️</button>
-                        <button class="btn-del" onclick="del('cards',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
-                    </div>
+                    <div><span class="badge" style="margin-left:0; margin-right:5px;">${c.owner}</span><span style="font-weight:bold; font-size:0.95rem;">${c.bank} - ${c.name}</span></div>
+                    <div><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditCard(${i})">✏️</button><button class="btn-del" onclick="del('cards',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; font-size:0.8rem; margin-bottom:8px;">
-                    <div>Dönem Borcu: <b class="text-red">-${fmt(debt)}</b></div>
-                    <div style="text-align:right;">Gelecek Taksitler: <b class="text-warning">-${fmt(future)}</b></div>
+                    <div>Dönem Borcu: <b class="text-red">-${fmt(debt)}</b></div><div style="text-align:right;">Gelecek Taksitler: <b class="text-warning">-${fmt(future)}</b></div>
                 </div>
-                <div class="prog-bg" style="height:6px; margin-bottom:5px;">
-                    <div class="prog-fill ${pct>80 ? 'danger' : 'warning'}" style="width:${pct}%; background:var(--purple);"></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--light);">
-                    <span>Kullanılabilir: <b style="color:var(--success)">${fmt(available)}</b></span>
-                    <span>Limit: ${fmt(limit)}</span>
-                </div>
-                <div style="font-size:0.7rem; color:#888; margin-top:8px; border-top:1px dashed #eee; padding-top:5px;">
-                    Kesim: ${c.cut || '-'} | Son Ödeme: ${c.due || '-'}
-                </div>
-            </div>
-        `;
+                <div class="prog-bg" style="height:6px; margin-bottom:5px;"><div class="prog-fill ${pct>80 ? 'danger' : 'warning'}" style="width:${pct}%; background:var(--purple);"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--light);"><span>Kullanılabilir: <b style="color:var(--success)">${fmt(available)}</b></span><span>Limit: ${fmt(limit)}</span></div>
+                <div style="font-size:0.7rem; color:#888; margin-top:8px; border-top:1px dashed #eee; padding-top:5px;">Kesim: ${c.cut || '-'} | Son Ödeme: ${c.due || '-'}</div>
+            </div>`;
     });
     
     fLoans.forEach((l, i) => {
-        dl.innerHTML += `
-            <div class="loan-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div>
-                        <span class="badge" style="margin-left:0; margin-right:5px;">${l.owner}</span>
-                        <span style="font-weight:bold; font-size:0.95rem;">${l.bank} - ${l.name}</span>
-                    </div>
-                    <div>
-                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditLoan(${i})">✏️</button>
-                        <button class="act-btn" style="background:var(--danger); color:white; padding:4px 8px; margin-left:5px;" onclick="openCloseLoan(${i})">Kapat</button>
-                        <button class="btn-del" onclick="del('loans',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
-                    </div>
-                </div>
-                <div style="font-size:0.8rem;">
-                    Kalan Borç: <b class="text-red">-${fmt(l.remaining)}</b>
-                </div>
-            </div>`;
+        dl.innerHTML += `<div class="loan-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><div><span class="badge" style="margin-left:0; margin-right:5px;">${l.owner}</span><span style="font-weight:bold; font-size:0.95rem;">${l.bank} - ${l.name}</span></div><div><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditLoan(${i})">✏️</button><button class="act-btn" style="background:var(--danger); color:white; padding:4px 8px; margin-left:5px;" onclick="openCloseLoan(${i})">Kapat</button><button class="btn-del" onclick="del('loans',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div></div><div style="font-size:0.8rem;">Kalan Borç: <b class="text-red">-${fmt(l.remaining)}</b></div></div>`;
     });
 
     renderCal(fPlans, fTrans);
 }
 
-// --- RENDER TAKVİM ---
 function renderCal(plans, trans) {
-    const y = curDate.getFullYear(), m = curDate.getMonth();
+    const y = curDate.getFullYear(), m = curDate.getMonth(); 
     document.getElementById('cal-title').innerText = `${y} / ${m + 1}`;
-
-    const grid = document.getElementById('cal-grid');
-    grid.innerHTML = '';
-    ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].forEach(d => grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`);
-
-    const dim = new Date(y, m + 1, 0).getDate();
-    const start = new Date(y, m, 1).getDay() || 7;
     
+    const grid = document.getElementById('cal-grid'); 
+    grid.innerHTML = ''; 
+    ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].forEach(d => grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`);
+    
+    const dim = new Date(y, m + 1, 0).getDate(); 
+    const start = new Date(y, m, 1).getDay() || 7;
     for (let i = 1; i < start; i++) {
         grid.innerHTML += `<div></div>`;
     }
-
+    
     for (let d = 1; d <= dim; d++) {
         const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const dayPlans = plans.filter(p => p.date === ds);
+        const dayPlans = plans.filter(p => p.date === ds); 
         const dayTrans = trans.filter(t => (t.date || '').split('T')[0] === ds);
-
-        let classes = 'cal-day';
-        if (dayPlans.some(p => !p.isPaid)) classes += ' today';
+        
+        let classes = 'cal-day'; 
+        if (dayPlans.some(p => !p.isPaid)) classes += ' today'; 
         else if (dayTrans.length > 0 || dayPlans.some(p => p.isPaid)) classes += ' past-act';
-
-        let dots = '';
-        if (dayTrans.some(t => t.type === 'income') || dayPlans.some(p => p.type === 'income')) dots += '<span style="color:var(--success)">●</span>';
+        
+        let dots = ''; 
+        if (dayTrans.some(t => t.type === 'income') || dayPlans.some(p => p.type === 'income')) dots += '<span style="color:var(--success)">●</span>'; 
         if (dayTrans.some(t => t.type === 'expense') || dayPlans.some(p => p.type === 'expense')) dots += '<span style="color:var(--danger)">●</span>';
-
+        
         grid.innerHTML += `<div class="${classes}" onclick="openDay('${ds}')">${d}<div style="position:absolute; bottom:2px; font-size:0.4rem; display:flex; gap:2px;">${dots}</div></div>`;
     }
 
-    const pv = document.getElementById('period-view');
+    const pv = document.getElementById('period-view'); 
     pv.innerHTML = '';
     [{ s: 1, e: 14 }, { s: 15, e: 20 }, { s: 21, e: 31 }].forEach(pr => {
         let inc = 0, exp = 0;
-        trans.forEach(t => {
-            const pd = new Date(t.date);
-            if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e) {
-                if (t.type === 'income') inc += t.amount;
-                else if (t.type === 'expense') exp += t.amount;
-            }
+        trans.forEach(t => { 
+            const pd = new Date(t.date); 
+            if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e) { 
+                if (t.type === 'income') inc += t.amount; 
+                else if (t.type === 'expense') exp += t.amount; 
+            } 
         });
-        
-        plans.forEach(p => {
-            const pd = new Date(p.date);
-            if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) {
-                if (p.type === 'income') inc += p.amount;
-                else if (p.type === 'expense') exp += p.amount;
-            }
+        plans.forEach(p => { 
+            const pd = new Date(p.date); 
+            if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) { 
+                if (p.type === 'income') inc += p.amount; 
+                else if (p.type === 'expense') exp += p.amount; 
+            } 
         });
-        
         pv.innerHTML += `<div class="p-card"><div class="p-head">${pr.s}-${pr.e}</div><div class="text-grn">+${fmt(inc)}</div><div class="text-red">-${fmt(exp)}</div><div class="p-net">${fmt(inc - exp)}</div></div>`;
     });
 
-    const ml = document.getElementById('list-plans');
+    const ml = document.getElementById('list-plans'); 
     ml.innerHTML = '';
-    
     let allMonthItems = [];
-    trans.forEach(t => {
+    trans.forEach(t => { 
         if ((t.date || '').startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
-            allMonthItems.push({ ...t, isReal: true, sortDate: t.date });
+            allMonthItems.push({ ...t, isReal: true, sortDate: t.date }); 
         }
     });
-    
-    plans.forEach(p => {
+    plans.forEach(p => { 
         if (p.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
-            allMonthItems.push({ ...p, isReal: false, sortDate: p.date });
+            allMonthItems.push({ ...p, isReal: false, sortDate: p.date }); 
         }
     });
     
     allMonthItems.sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
 
     allMonthItems.forEach(item => {
-        const isInc = item.type === 'income';
-        const color = isInc ? 'var(--success)' : 'var(--danger)';
+        const isInc = item.type === 'income'; 
+        const color = isInc ? 'var(--success)' : 'var(--danger)'; 
         const sign = isInc ? '+' : '-';
-        
         if (item.isReal) {
             ml.innerHTML += `<div class="item"><span>${item.category} <small style="color:#888">${(item.date || '').split('T')[0]}</small><br><small style="color:#aaa">${item.description || 'Gerçekleşen İşlem'}</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span></div></div>`;
         } else {
@@ -1783,248 +1787,74 @@ function renderCal(plans, trans) {
 }
 
 function openDay(d) {
-    const l = document.getElementById('md-list');
-    l.innerHTML = '';
+    const l = document.getElementById('md-list'); 
+    l.innerHTML = ''; 
     document.getElementById('md-tit').innerText = d + ' Detayları';
-
-    let dayTrans = filter(db.transactions).filter(t => (t.date || '').split('T')[0] === d);
+    
+    let dayTrans = filter(db.transactions).filter(t => (t.date || '').split('T')[0] === d); 
     let dayPlans = filter(db.planned).filter(p => p.date === d);
-
+    
     if (dayTrans.length === 0 && dayPlans.length === 0) {
         l.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Bu tarihte işlem bulunmuyor.</div>';
     }
-
+    
     dayTrans.forEach((t, i) => {
-        const isInc = t.type === 'income';
+        const isInc = t.type === 'income'; 
         const planBdg = t.planStatus === 'dahil' ? '<span class="badge-plan" style="color:var(--success)">Dahil</span>' : (t.planStatus === 'kapsam_disi' ? '<span class="badge-plan">Kapsam Dışı</span>' : '<span class="badge-plan" style="color:var(--warning)">Dahil Değil</span>');
         l.innerHTML += `
             <div class="item" style="align-items:flex-start;">
-                <span>
-                    <span class="badge" style="margin:0 5px 0 0;">${t.owner}</span>${t.category} ${planBdg}<br>
-                    <small>${t.description || 'Tamamlanan İşlem'}</small>
-                </span>
+                <span><span class="badge" style="margin:0 5px 0 0;">${t.owner}</span>${t.category} ${planBdg}<br><small>${t.description || 'Tamamlanan İşlem'}</small></span>
                 <div style="text-align:right;">
                     <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(t.amount)}</b><br>
-                    <div style="margin-top:5px;">
-                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditTrans('${t.id}', false)">✏️</button>
-                        <button class="btn-del" onclick="delTrans('${t.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
-                    </div>
+                    <div style="margin-top:5px;"><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditTrans('${t.id}', false)">✏️</button><button class="btn-del" onclick="delTrans('${t.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
                 </div>
             </div>`;
     });
-
+    
     dayPlans.forEach(p => {
-        const isInc = p.type === 'income';
+        const isInc = p.type === 'income'; 
         const planBdg = p.planStatus === 'dahil' ? '<span class="badge-plan" style="color:var(--success)">Dahil</span>' : (p.planStatus === 'kapsam_disi' ? '<span class="badge-plan">Kapsam Dışı</span>' : '<span class="badge-plan" style="color:var(--warning)">Dahil Değil</span>');
         l.innerHTML += `
             <div class="item" style="align-items:flex-start;">
-                <span>
-                    <span class="badge" style="margin:0 5px 0 0;">${p.owner}</span>${p.title} ${planBdg}<br>
-                    <small>Planlanan</small>
-                </span>
+                <span><span class="badge" style="margin:0 5px 0 0;">${p.owner}</span>${p.title} ${planBdg}<br><small>Planlanan</small></span>
                 <div style="text-align:right;">
                     <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(p.amount)}</b><br>
-                    <div style="margin-top:5px; display:flex; align-items:center; justify-content:flex-end;">
-                        ${!p.isPaid ? `<button class="act-btn" style="background:var(--primary);" onclick="initPay('${p.id}')">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-right:5px;">(Ödendi)</span>'}
-                        <button class="act-btn" style="background:#64748b; margin-left:5px; padding:4px 8px;" onclick="openEditTrans('${p.id}', true)">✏️</button>
-                        <button class="btn-del" onclick="delPlan('${p.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
-                    </div>
+                    <div style="margin-top:5px; display:flex; align-items:center; justify-content:flex-end;">${!p.isPaid ? `<button class="act-btn" style="background:var(--primary);" onclick="initPay('${p.id}')">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-right:5px;">(Ödendi)</span>'}<button class="act-btn" style="background:#64748b; margin-left:5px; padding:4px 8px;" onclick="openEditTrans('${p.id}', true)">✏️</button><button class="btn-del" onclick="delPlan('${p.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
                 </div>
             </div>`;
     });
-    
     openModal('m-day');
 }
 
-function initPay(id) {
-    payId = id;
-    
-    const mpAccSelect = document.getElementById('mp-acc');
-    mpAccSelect.innerHTML = '';
-    db.accounts.forEach((a, i) => mpAccSelect.add(new Option(`${a.owner} - ${a.name}`, i)));
-
-    openModal('m-pay');
-}
-
-function confirmPay() {
-    const p = db.planned.find(x => x.id == payId);
-    const accIdx = document.getElementById('mp-acc').value;
-    
-    let amt = parseFloat(document.getElementById('mp-real').value) || p.amount;
-
-    if (document.getElementById('mp-early').checked && p.category === 'Kredi') {
-        const loan = db.loans.find(l => p.title.includes(l.name));
-        if (loan) loan.remaining -= p.amount;
-    }
-
-    let sourceId = accIdx !== 'none' ? 'acc-' + accIdx : null;
-    
-    applyBalanceEffect(sourceId, p.type, amt, false);
-
-    p.isPaid = true;
-    db.transactions.push({
-        id: 't_' + Date.now(),
-        type: p.type,
-        amount: amt,
-        category: p.category,
-        date: new Date().toISOString(),
-        owner: p.owner,
-        description: p.title,
-        sourceId: sourceId,
-        planStatus: p.planStatus
-    });
-    
-    save();
-    closeModal('m-pay');
-    closeModal('m-day');
-}
-
-function delPlan(id) {
-    if (confirm('Bu planlı işlemi silmek istediğinize emin misiniz?')) {
-        db.planned = db.planned.filter(x => x.id != id);
-        save();
-        closeModal('m-day');
-    }
-}
-
-function openCloseLoan(idx) {
-    closeId = idx;
-    
-    const mclAccSelect = document.getElementById('mcl-acc');
-    mclAccSelect.innerHTML = '';
-    db.accounts.forEach((a, i) => mclAccSelect.add(new Option(`${a.owner} - ${a.name}`, i)));
-
-    openModal('m-close-loan');
-}
-
-function doCloseLoan() {
-    const amt = parseFloat(document.getElementById('mcl-amt').value);
-    const accIdx = document.getElementById('mcl-acc').value;
-    const loan = db.loans[closeId];
-    
-    applyBalanceEffect('acc-'+accIdx, 'expense', amt, false);
-
-    db.transactions.push({
-        id: 't_' + Date.now(),
-        type: 'expense',
-        amount: amt,
-        category: 'Kredi Kapama',
-        owner: loan.owner,
-        date: new Date().toISOString(),
-        planStatus: 'kapsam_disi',
-        sourceId: 'acc-'+accIdx
-    });
-    
-    db.planned = db.planned.filter(p => !p.title.includes(loan.name));
-    db.loans.splice(closeId, 1);
-    
-    save();
-    closeModal('m-close-loan');
-}
-
-function del(type, idx) {
-    if (confirm("Sil?")) {
-        if (type === 'loans') {
-            const l = db.loans[idx];
-            db.planned = db.planned.filter(p => !p.title.includes(l.name));
-        }
-        db[type].splice(idx, 1);
-        save();
-    }
-}
-
-function updSel() {
-    const bnks = document.querySelectorAll('#ia-bank, #ic-bank, #il-bank');
-    bnks.forEach(s => {
-        s.innerHTML = '';
-        db.banks.forEach(b => s.add(new Option(b, b)));
-    });
-
-    const cts = document.querySelectorAll('#it-cat');
-    cts.forEach(s => {
-        s.innerHTML = '';
-        db.categories.expense.forEach(c => s.add(new Option(c, c)));
-    });
-}
-
-function renderBanks() {
-    document.getElementById('lst-banks').innerHTML = db.banks.map((b, i) => `<span class="badge" style="font-size:0.8rem; padding:5px 10px;">${b} <span style="cursor:pointer; margin-left:5px; color:red" onclick="db.banks.splice(${i},1);save();renderBanks()">x</span></span>`).join('');
-}
-
-function addBank() {
-    const v = document.getElementById('ib-new').value;
-    if (v) { db.banks.push(v); save(); renderBanks(); }
-}
-
-function renderCats() {
-    const t = document.getElementById('ic-type').value;
-    document.getElementById('lst-cats').innerHTML = db.categories[t].map((c, i) => `<span class="badge" style="font-size:0.8rem; padding:5px 10px;">${c} <span style="cursor:pointer; margin-left:5px; color:red" onclick="db.categories.${t}.splice(${i},1);save();renderCats()">x</span></span>`).join('');
-}
-
-function addCat() {
-    const t = document.getElementById('ic-type').value;
-    const v = document.getElementById('ic-new').value;
-    if (v) { db.categories[t].push(v); save(); renderCats(); }
-}
-
-function calcLoan() {
-    const amt = parseFloat(document.getElementById('la-amt').value);
-    const term = parseFloat(document.getElementById('la-term').value);
-    const inst = parseFloat(document.getElementById('la-inst').value);
-    const res = document.getElementById('loan-compare-res');
-    
-    res.innerHTML = '';
-    
-    if (amt && term && inst) {
-        res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`;
-    }
-    
-    db.loans.forEach(l => res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`);
-}
-
-function triggerExport() {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(db)], { type: 'application/json' }));
-    a.download = 'yedek.json';
-    a.click();
-}
-
-function processImport(el) {
-    const r = new FileReader();
-    r.onload = e => { db = JSON.parse(e.target.result); save(); };
-    r.readAsText(el.files[0]);
-}
-
-function doPaste() {
-    try {
-        const j = JSON.parse(document.getElementById('paste-txt').value);
-        if (j.transactions) db.transactions = db.transactions.concat(j.transactions);
-        if (j.planned) db.planned = db.planned.concat(j.planned);
-        if (j.accounts) db.accounts = db.accounts.concat(j.accounts);
-        if (j.cards) db.cards = db.cards.concat(j.cards);
-        
-        save();
-        closeModal('m-paste');
-    } catch (e) {
-        alert('Hata');
-    }
-}
-
 // ----------------------------------------------------
-// CHART.JS ANALİZ MOTORU (GELİŞMİŞ)
+// KURUMSAL ANALİZ PANELI VE CHART.JS MOTORU 
 // ----------------------------------------------------
-const CHART_COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899', '#14b8a6', '#f97316', '#64748b'];
+const CHART_COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899', '#14b8a6', '#f97316', '#64748b', '#334155', '#be123c', '#fb923c'];
+
+function updateCatFilterOptions() {
+    const catSelect = document.getElementById('anl-cat-filter');
+    const currentVal = catSelect.value;
+    catSelect.innerHTML = '<option value="all">Tüm Kategoriler</option>';
+    db.categories.expense.forEach(c => {
+        catSelect.add(new Option(c, c));
+    });
+    if (Array.from(catSelect.options).some(opt => opt.value === currentVal)) {
+        catSelect.value = currentVal;
+    }
+}
 
 function renderAnl() {
     const period = document.getElementById('anl-period').value;
+    const catFilter = document.getElementById('anl-cat-filter').value;
     const now = new Date();
     
+    // Temel Filtreleme: Giderler ve Profil Sahibi
     let filteredTx = filter(db.transactions).filter(t => t.type === 'expense');
     
+    // Tarih Filtresi
     filteredTx = filteredTx.filter(t => {
         if (!t.date) return false;
         const d = new Date(t.date);
-        
         if (period === 'all') return true;
         if (period === 'year') return d.getFullYear() === now.getFullYear();
         if (period === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
@@ -2035,157 +1865,198 @@ function renderAnl() {
         return true;
     });
 
-    const cats = {};
-    let totExpense = 0;
+    // --- KPI KARTLARI HESAPLAMASI ---
+    let totalExpense = 0, plannedExpense = 0, unplannedExpense = 0;
     
     filteredTx.forEach(t => {
-        cats[t.category] = (cats[t.category] || 0) + t.amount;
-        totExpense += t.amount;
-    });
-    
-    let maxCat = '-';
-    let maxCatAmt = 0;
-    
-    for (let k in cats) {
-        if (cats[k] > maxCatAmt) {
-            maxCatAmt = cats[k];
-            maxCat = k;
+        if (catFilter === 'all' || t.category === catFilter) {
+            totalExpense += t.amount;
+            if (t.planStatus === 'dahil') plannedExpense += t.amount;
+            else unplannedExpense += t.amount; // Dahil Değil + Kapsam Dışı
         }
-    }
+    });
 
+    document.getElementById('kpi-total').innerText = fmt(totalExpense);
+    document.getElementById('kpi-planned').innerText = fmt(plannedExpense);
+    document.getElementById('kpi-unplanned').innerText = fmt(unplannedExpense);
+
+    // İÇGÖRÜ YAZISI
     const insightText = document.getElementById('anl-insight-text');
-    if (totExpense > 0) {
-        insightText.innerHTML = `Seçili dönemde toplam <b>${fmt(totExpense)}</b> gideriniz oldu. En büyük bütçe sızıntısı <b>${fmt(maxCatAmt)}</b> ile <b>"${maxCat}"</b> kategorisinde gerçekleşti.`;
+    if (totalExpense > 0) {
+        if (catFilter !== 'all') {
+            insightText.innerHTML = `Seçili dönemde <b>${catFilter}</b> kategorisine toplam <b>${fmt(totalExpense)}</b> harcadınız. Bunun <b>${fmt(plannedExpense)}</b>'si bütçeye dahil edilmiştir.`;
+        } else {
+            insightText.innerHTML = `Seçili dönemde toplam çıkış <b>${fmt(totalExpense)}</b> oldu. Ancak asıl bütçenizi ilgilendiren rakam <b>${fmt(plannedExpense)}</b> (Plana Dahil). Kalanı istisnai veya yatırım amaçlı çıkışlardır.`;
+        }
     } else {
-        insightText.innerHTML = `Seçili dönem için henüz bir gider kaydı bulunmuyor.`;
+        insightText.innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor.`;
     }
 
-    const catLabels = Object.keys(cats).sort((a, b) => cats[b] - cats[a]);
-    const catData = catLabels.map(k => cats[k]);
+    // YALNIZCA SEÇİLİ KATEGORİYE/FİLTREYE UYANLARI AYIRALIM (Grafikler İçin)
+    let chartTx = filteredTx;
+    if (catFilter !== 'all') {
+        chartTx = filteredTx.filter(t => t.category === catFilter);
+    }
+
+    // --- GRAFİK 1: PLAN DURUMU DAĞILIMI ---
+    let planData = { 'Plana Dahil': 0, 'Dahil Değil': 0, 'Kapsam Dışı': 0 };
+    chartTx.forEach(t => {
+        if (t.planStatus === 'dahil') planData['Plana Dahil'] += t.amount;
+        else if (t.planStatus === 'dahil_degil') planData['Dahil Değil'] += t.amount;
+        else if (t.planStatus === 'kapsam_disi') planData['Kapsam Dışı'] += t.amount;
+        else planData['Plana Dahil'] += t.amount; 
+    });
+
+    const ctxPlan = document.getElementById('planStatusChart').getContext('2d');
+    if (planStatusChartInstance) planStatusChartInstance.destroy();
     
-    const ctxCat = document.getElementById('categoryDoughnutChart').getContext('2d');
-    
-    if (catChartInstance) catChartInstance.destroy();
-    
-    catChartInstance = new Chart(ctxCat, {
-        type: 'doughnut',
+    planStatusChartInstance = new Chart(ctxPlan, {
+        type: 'pie',
         data: {
-            labels: catLabels,
+            labels: Object.keys(planData),
             datasets: [{
-                data: catData,
-                backgroundColor: CHART_COLORS,
-                borderWidth: 2,
-                borderColor: '#ffffff'
+                data: Object.values(planData),
+                backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
+                borderWidth: 2, borderColor: '#ffffff'
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
+            responsive: true, maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
+                legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
                 tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
             }
         }
     });
 
-    const limDahil = db.limits.planDahil || 0;
-    const limDahilDegil = db.limits.planDahilDegil || 0;
-    const limKapsamDisi = db.limits.kapsamDisi || 0;
-    
-    let totDahil = 0, totDahilDegil = 0, totKapsamDisi = 0;
-    
-    filteredTx.forEach(t => {
-        if (t.planStatus === 'dahil') totDahil += t.amount;
-        else if (t.planStatus === 'dahil_degil') totDahilDegil += t.amount;
-        else if (t.planStatus === 'kapsam_disi') totKapsamDisi += t.amount;
-        else totDahil += t.amount;
+    // --- GRAFİK 2: SADECE PLANA DAHİL KATEGORİ DAĞILIMI ---
+    const plannedCats = {};
+    let totalPlannedForChart = 0;
+    chartTx.filter(t => t.planStatus === 'dahil').forEach(t => {
+        plannedCats[t.category] = (plannedCats[t.category] || 0) + t.amount;
+        totalPlannedForChart += t.amount;
     });
 
-    const barsContainer = document.getElementById('anl-limits-bars');
-    barsContainer.innerHTML = '';
-    
-    const renderBar = (title, spent, limit) => {
-        let pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
-        let limitText = limit > 0 ? fmt(limit) : 'Limitsiz';
-        let barClass = 'prog-fill';
-        
-        if (limit > 0 && spent > limit) barClass += ' danger';
-        else if (limit > 0 && spent > (limit * 0.8)) barClass += ' warning';
-        
-        return `<div style="margin-bottom:15px;">
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
-                <span style="font-weight:bold;">${title}</span>
-                <span>${fmt(spent)} / ${limitText}</span>
-            </div>
-            <div class="prog-bg"><div class="${barClass}" style="width:${limit > 0 ? pct : 100}%"></div></div>
-        </div>`;
-    };
-    
-    barsContainer.innerHTML += renderBar('Plana Dahil Giderler', totDahil, limDahil);
-    barsContainer.innerHTML += renderBar('Plana Dahil Olmayan Giderler', totDahilDegil, limDahilDegil);
-    barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım)', totKapsamDisi, limKapsamDisi);
+    const pCatLabels = Object.keys(plannedCats).sort((a, b) => plannedCats[b] - plannedCats[a]);
+    const pCatData = pCatLabels.map(k => plannedCats[k]);
 
+    const ctxCat = document.getElementById('categoryDoughnutChart').getContext('2d');
+    if (catChartInstance) catChartInstance.destroy();
+    
+    if (totalPlannedForChart > 0) {
+        catChartInstance = new Chart(ctxCat, {
+            type: 'doughnut',
+            data: { labels: pCatLabels, datasets: [{ data: pCatData, backgroundColor: CHART_COLORS, borderWidth: 2, borderColor: '#ffffff' }] },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '60%',
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
+                }
+            }
+        });
+    }
+
+    // --- LİMİT ÇUBUKLARI ---
+    const limDahil = db.limits.planDahil || 0; const limDahilDegil = db.limits.planDahilDegil || 0; const limKapsamDisi = db.limits.kapsamDisi || 0;
+    const barsContainer = document.getElementById('anl-limits-bars'); barsContainer.innerHTML = '';
+    const renderBar = (title, spent, limit) => {
+        let pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0; let limitText = limit > 0 ? fmt(limit) : 'Limitsiz'; let barClass = 'prog-fill';
+        if (limit > 0 && spent > limit) barClass += ' danger'; else if (limit > 0 && spent > (limit * 0.8)) barClass += ' warning';
+        return `<div style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span style="font-weight:bold;">${title}</span><span>${fmt(spent)} / ${limitText}</span></div><div class="prog-bg"><div class="${barClass}" style="width:${limit > 0 ? pct : 100}%"></div></div></div>`;
+    };
+    barsContainer.innerHTML += renderBar('Plana Dahil Giderler', planData['Plana Dahil'], limDahil);
+    barsContainer.innerHTML += renderBar('Plana Dahil Olmayan Giderler', planData['Dahil Değil'], limDahilDegil);
+    barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım vs.)', planData['Kapsam Dışı'], limKapsamDisi);
+
+    // --- AYLIK TREND VE PİVOT TABLO (SADECE YIL VE TÜM ZAMANLAR İÇİN) ---
     const trendContainer = document.getElementById('anl-trend-container');
+    const pivotContainer = document.getElementById('pivot-container');
+    const pivotTable = document.getElementById('pivot-table-elem');
     
     if (period === 'year' || period === 'all') {
         trendContainer.style.display = 'block';
+        pivotContainer.style.display = 'block';
+        document.getElementById('trend-title').innerText = catFilter === 'all' ? 'Aylık Tüm Gider Trendi' : `Aylık "${catFilter}" Trendi`;
         
-        let monthGroups = {};
+        let monthGroups = {}; 
         
-        filteredTx.forEach(t => {
+        chartTx.forEach(t => {
             let d = new Date(t.date);
             let mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (!monthGroups[mKey]) monthGroups[mKey] = {};
-            monthGroups[mKey][t.category] = (monthGroups[mKey][t.category] || 0) + t.amount;
+            if (!monthGroups[mKey]) monthGroups[mKey] = { 'dahil': {}, 'kapsam_disi': {} };
+            
+            let pStatus = (t.planStatus === 'kapsam_disi' || t.planStatus === 'dahil_degil') ? 'kapsam_disi' : 'dahil';
+            monthGroups[mKey][pStatus][t.category] = (monthGroups[mKey][pStatus][t.category] || 0) + t.amount;
         });
 
         let monthLabels = Object.keys(monthGroups).sort();
-        let top6Cats = catLabels.slice(0, 6);
         
-        let trendDatasets = top6Cats.map((c, i) => {
-            return {
-                label: c,
-                data: monthLabels.map(m => monthGroups[m][c] || 0),
-                backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
-                stack: 'Stack 0'
-            };
+        // 1. TREND GRAFİĞİNİ ÇİZ
+        let trendDahil = monthLabels.map(m => {
+            let sum = 0; for(let c in monthGroups[m]['dahil']) sum += monthGroups[m]['dahil'][c]; return sum;
+        });
+        let trendKapsamDisi = monthLabels.map(m => {
+            let sum = 0; for(let c in monthGroups[m]['kapsam_disi']) sum += monthGroups[m]['kapsam_disi'][c]; return sum;
         });
 
-        if (catLabels.length > 6) {
-            let otherData = monthLabels.map(m => {
-                let mTotal = 0;
-                for (let c in monthGroups[m]) {
-                    if (!top6Cats.includes(c)) mTotal += monthGroups[m][c];
-                }
-                return mTotal;
-            });
-            trendDatasets.push({ label: 'Diğer', data: otherData, backgroundColor: '#cbd5e1', stack: 'Stack 0' });
-        }
-
         const ctxTrend = document.getElementById('monthlyTrendChart').getContext('2d');
-        
         if (monthlyTrendChartInstance) monthlyTrendChartInstance.destroy();
         
         monthlyTrendChartInstance = new Chart(ctxTrend, {
             type: 'bar',
-            data: { labels: monthLabels, datasets: trendDatasets },
+            data: { 
+                labels: monthLabels, 
+                datasets: [
+                    { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0' },
+                    { label: 'Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0' }
+                ] 
+            },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { stacked: true, grid: { display: false } },
-                    y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } }
-                }
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } },
+                plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } }
             }
         });
 
+        // 2. EXCEL BENZERİ PİVOT TABLOYU OLUŞTUR
+        let allUniqueCats = new Set();
+        chartTx.forEach(t => allUniqueCats.add(t.category));
+        let columns = Array.from(allUniqueCats).sort();
+
+        let tableHTML = `<tr><th style="text-align:left;">Aylar / Durum</th><th>Genel Toplam</th>`;
+        columns.forEach(c => tableHTML += `<th>${c}</th>`);
+        tableHTML += `</tr>`;
+
+        monthLabels.forEach(m => {
+            let mTotal = trendDahil[monthLabels.indexOf(m)] + trendKapsamDisi[monthLabels.indexOf(m)];
+            tableHTML += `<tr class="row-group"><td>📅 ${m}</td><td>${fmt(mTotal)}</td>`;
+            columns.forEach(c => {
+                let catSum = (monthGroups[m]['dahil'][c] || 0) + (monthGroups[m]['kapsam_disi'][c] || 0);
+                tableHTML += `<td>${catSum > 0 ? fmt(catSum) : '-'}</td>`;
+            });
+            tableHTML += `</tr>`;
+
+            let mKapsamDisi = trendKapsamDisi[monthLabels.indexOf(m)];
+            if (mKapsamDisi > 0) {
+                tableHTML += `<tr><td class="row-sub">└ Kapsam Dışı</td><td>${fmt(mKapsamDisi)}</td>`;
+                columns.forEach(c => tableHTML += `<td>${monthGroups[m]['kapsam_disi'][c] > 0 ? fmt(monthGroups[m]['kapsam_disi'][c]) : '-'}</td>`);
+                tableHTML += `</tr>`;
+            }
+
+            let mDahil = trendDahil[monthLabels.indexOf(m)];
+            if (mDahil > 0) {
+                tableHTML += `<tr><td class="row-sub" style="color:var(--success);">└ Plana Dahil</td><td style="color:var(--success);">${fmt(mDahil)}</td>`;
+                columns.forEach(c => tableHTML += `<td style="color:var(--success);">${monthGroups[m]['dahil'][c] > 0 ? fmt(monthGroups[m]['dahil'][c]) : '-'}</td>`);
+                tableHTML += `</tr>`;
+            }
+        });
+
+        pivotTable.innerHTML = tableHTML;
+
     } else {
         trendContainer.style.display = 'none';
+        pivotContainer.style.display = 'none';
     }
 }
 
