@@ -8,34 +8,185 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #4f46e5; --bg: #f8fafc; --white: #ffffff; --text: #1e293b; --light: #64748b;
-            --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --purple: #8b5cf6; --info: #0ea5e9;
+            --primary: #4f46e5; 
+            --bg: #f8fafc; 
+            --white: #ffffff; 
+            --text: #1e293b; 
+            --light: #64748b;
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --warning: #f59e0b; 
+            --purple: #8b5cf6; 
+            --info: #0ea5e9;
             --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-        header { background: var(--primary); padding: 15px; padding-top: 20px; color: white; border-radius: 0 0 20px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex-shrink: 0; z-index: 50; }
-        .head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .head-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap:8px;}
-        .cloud-icon { font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; font-weight:normal; }
-        .head-actions { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .act-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
         
-        .tabs { display: flex; background: rgba(0,0,0,0.2); padding: 3px; border-radius: 10px; margin-top: 5px; }
-        .tab { flex: 1; text-align: center; padding: 8px; font-size: 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.6); cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .tab.active { background: white; color: var(--primary); }
-
-        main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; z-index: 1; }
-
-        .card { background: var(--white); border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .stat-box { background: #f1f5f9; padding: 12px; border-radius: 10px; text-align: center; }
-        .stat-lbl { font-size: 0.7rem; font-weight: bold; color: var(--light); text-transform: uppercase; }
-        .stat-val { font-size: 1.1rem; font-weight: 800; margin-top: 4px; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none; 
+            user-select: none; 
+        }
         
-        .health-card { background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
-        .score-circle { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; border: 3px solid white; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+
+        /* HEADER TASARIMI */
+        header { 
+            background: var(--primary); 
+            padding: 15px; 
+            padding-top: 20px; 
+            color: white; 
+            border-radius: 0 0 20px 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            z-index: 50; 
+        }
+        
+        .head-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+        }
+        
+        .head-title { 
+            font-weight: 900; 
+            font-size: 1.3rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        
+        .cloud-icon { 
+            font-size: 0.8rem; 
+            background: rgba(0,0,0,0.3); 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-weight: normal; 
+        }
+        
+        .head-actions { 
+            display: flex; 
+            gap: 8px; 
+            overflow-x: auto; 
+            padding-bottom: 5px; 
+        }
+        
+        .act-btn { 
+            background: rgba(255,255,255,0.2); 
+            border: 1px solid rgba(255,255,255,0.3); 
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 8px; 
+            font-size: 0.75rem; 
+            cursor: pointer; 
+            white-space: nowrap; 
+        }
+        
+        .tabs { 
+            display: flex; 
+            background: rgba(0,0,0,0.2); 
+            padding: 3px; 
+            border-radius: 10px; 
+            margin-top: 5px; 
+        }
+        
+        .tab { 
+            flex: 1; 
+            text-align: center; 
+            padding: 8px; 
+            font-size: 0.8rem; 
+            border-radius: 8px; 
+            color: rgba(255,255,255,0.6); 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: 0.2s; 
+        }
+        
+        .tab.active { 
+            background: white; 
+            color: var(--primary); 
+        }
+
+        main { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            padding-bottom: 100px; 
+            z-index: 1; 
+        }
+
+        /* KART VE İSTATİSTİK TASARIMLARI */
+        .card { 
+            background: var(--white); 
+            border-radius: 16px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        .stat-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-top: 10px; 
+        }
+        
+        .stat-box { 
+            background: #f1f5f9; 
+            padding: 12px; 
+            border-radius: 10px; 
+            text-align: center; 
+        }
+        
+        .stat-lbl { 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            color: var(--light); 
+            text-transform: uppercase; 
+        }
+        
+        .stat-val { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            margin-top: 4px; 
+        }
+        
+        .health-card { 
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6); 
+            color: white; 
+            border-radius: 16px; 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); 
+        }
+        
+        .score-circle { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.2); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            border: 3px solid white; 
+        }
 
         .prog-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .prog-fill { height: 100%; background: var(--success); border-radius: 4px; transition: 0.3s; }
@@ -47,19 +198,22 @@
         .i-tit { font-weight: 600; font-size: 0.9rem; }
         .i-sub { font-size: 0.75rem; color: var(--light); }
         .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: #e0e7ff; color: var(--primary); margin-left: 5px; font-weight: bold; }
-        .badge-plan { font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; background: #f1f5f9; color: #64748b; margin-left:5px; }
+        .badge-plan { font-size: 0.6rem; padding: 2px 5px; border-radius: 4px; background: #f1f5f9; color: #64748b; margin-left: 5px; }
 
+        /* TAKVİM TASARIMI */
         .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .cal-day { height: 38px; border: 1px solid #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; position: relative; }
         .cal-day.today { background: #eef2ff; border-color: var(--primary); color: var(--primary); font-weight: bold; }
         .cal-day.past-act { background: #f8fafc; border-color: #cbd5e1; font-weight: bold; }
 
+        /* PERİYOT KARTLARI */
         .p-row { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
         .p-card { flex: 0 0 140px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
         .p-head { font-size: 0.8rem; font-weight: bold; color: var(--light); margin-bottom: 5px; }
         .p-net { font-weight: 800; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; text-align: center; }
 
+        /* ALT MENÜ VE BUTONLAR */
         nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #e2e8f0; display: flex; height: calc(60px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); z-index: 100; }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light); font-size: 0.7rem; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
@@ -68,6 +222,7 @@
         .fabs { position: fixed; bottom: calc(75px + var(--safe-bottom)); right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 90; }
         .fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
         
+        /* MODAL (AÇILIR PENCERE) TASARIMLARI */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 2000; pointer-events: none; }
         .modal.show { display: flex; pointer-events: auto; }
         .modal-box { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(30px + var(--safe-bottom)); max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s; }
@@ -82,21 +237,25 @@
         .btn-clo { background: transparent; color: var(--light); }
         .btn-del { background: none; border: none; color: var(--light); font-size: 1.2rem; cursor:pointer;}
         .d-none { display: none !important; }
-        .text-grn { color: var(--success); } .text-red { color: var(--danger); }
+        .text-grn { color: var(--success); } 
+        .text-red { color: var(--danger); }
         
         .page { display: none; animation: fadeIn 0.3s; } 
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* AI SATIR KARTLARI */
         .ai-row-box { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:10px; box-shadow:0 2px 4px rgba(0,0,0,0.02); }
         .ai-row-top { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
         .ai-row-bot { display:flex; gap:8px; align-items:center; }
         .ai-inp { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.85rem; width:100%; background:#f8fafc; }
         
+        /* ANALİZ KARTLARI */
         .insight-card { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 15px; }
         .insight-title { font-size: 0.75rem; font-weight: bold; color: #166534; display: flex; align-items: center; gap: 5px; text-transform: uppercase; margin-bottom: 5px; }
         .chart-container { position: relative; width: 100%; height: 240px; display: flex; justify-content: center; align-items: center; }
 
+        /* HESAP / KART GÖRÜNÜMLERİ */
         .acc-card { border-left: 4px solid var(--success); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
         .cc-card { border-left: 4px solid var(--purple); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
         .loan-card { border-left: 4px solid #f59e0b; padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
@@ -109,9 +268,46 @@
         .pivot-table .row-group { background: #e0e7ff; font-weight: bold; text-align: left; }
         .pivot-table .row-sub { text-align: left; padding-left: 20px; }
         .pivot-table .grand-total { background: #1e293b; color: white; font-weight: bold; }
+
+        /* YENİ: YÜKLENİYOR (LOADING) EKRANI */
+        #ai-loading-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(15, 23, 42, 0.9); 
+            z-index: 9999; 
+            color: white; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--success);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+
+<div id="ai-loading-overlay">
+    <div class="spinner"></div>
+    <h2 style="margin: 0 0 10px 0;">Yapay Zeka Fişi Okuyor...</h2>
+    <p style="font-size: 0.9rem; opacity: 0.8; margin: 0; padding: 0 20px;">Bu işlem resminizin boyutuna göre 5 ila 15 saniye sürebilir.<br>Lütfen bekleyin.</p>
+</div>
 
 <header>
     <div class="head-row">
@@ -121,6 +317,7 @@
     <div class="head-actions">
         <button class="act-btn" style="background:var(--success); border:none; font-weight:bold;" onclick="document.getElementById('scan-in').click()">📸 Ekstre Tara (AI)</button>
         <input type="file" id="scan-in" accept="image/*" hidden onchange="processScan(this)">
+        
         <button class="act-btn" onclick="openModal('m-paste')">JSON Ekle</button>
         <button class="act-btn" onclick="triggerExport()">Yedekle</button>
         <button class="act-btn" onclick="document.getElementById('f-in').click()">Yükle</button>
@@ -291,6 +488,7 @@
                     </table>
             </div>
         </div>
+
     </div>
 </main>
 
@@ -687,17 +885,6 @@
             <label class="inp-lbl">Kaynak Hesap</label>
             <select id="mp-acc" class="inp"></select>
         </div>
-        <div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;">
-            <label>
-                <input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> 
-                Erken / İndirimli Ödeme
-            </label>
-            <div id="mp-early-opts" class="d-none" style="margin-top:5px;">
-                <label class="inp-lbl">Gerçek Ödenen</label>
-                <input type="number" id="mp-real" class="inp" step="0.01">
-                <small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small>
-            </div>
-        </div>
         <button class="btn-pri" onclick="confirmPay()">Öde</button>
         <button class="btn-clo" onclick="closeModal('m-pay')">İptal</button>
     </div>
@@ -766,45 +953,27 @@
 </div>
 
 <script>
-// Supabase Yapılandırması
 const SUPABASE_URL = 'https://kdycxoweuaxslzbklprh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Tm-hZqU0CN6TPk8hKSfZ1Q_VtiWUqY1';
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Ana Veritabanı Değişkeni
 let db = { 
     banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
     categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
-    accounts: [], 
-    cards: [], 
-    loans: [], 
-    transactions: [], 
-    planned: [], 
-    assets: [], 
-    goals: [], 
+    accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [], 
     limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } 
 };
 
-// Global Durum Değişkenleri
-let curPro = 'Hane';
-let curDate = new Date();
-let payId = null;
-let closeId = null;
+let curPro = 'Hane', curDate = new Date(), payId = null, closeId = null;
 let scannedItems = [];
+let editTransId = null; let editIsPlan = false;
+let editAccIdx = null; let editCardIdx = null; let editLoanIdx = null;
 
-// Düzenleme (Edit) Modal Değişkenleri
-let editTransId = null;
-let editIsPlan = false;
-let editAccIdx = null;
-let editCardIdx = null;
-let editLoanIdx = null;
-
-// Chart.js Instance Değişkenleri
 let catChartInstance = null;
 let monthlyTrendChartInstance = null;
 let planStatusChartInstance = null;
 
-// --- AYARLAR VE SİSTEM FONKSİYONLARI ---
+// --- AYARLAR VE YARDIMCI FONKSİYONLAR ---
 
 function loadSettings() { 
     const key = localStorage.getItem('hf_gemini_key'); 
@@ -843,15 +1012,9 @@ function chgMonth(n) {
 function openModal(id) { 
     updSel(); 
     document.getElementById(id).classList.add('show'); 
-    if (id === 'm-banks') {
-        renderBanks(); 
-    }
-    if (id === 'm-cats') {
-        renderCats(); 
-    }
-    if (id === 'm-limits') {
-        openLimits(); 
-    }
+    if (id === 'm-banks') renderBanks(); 
+    if (id === 'm-cats') renderCats(); 
+    if (id === 'm-limits') openLimits(); 
 }
 
 function closeModal(id) { 
@@ -882,6 +1045,224 @@ function setPro(p) {
     if (document.getElementById('p-analysis').classList.contains('active')) {
         renderAnl(); 
     }
+}
+
+// --- DÜZELTİLEN YAPAY ZEKA FONKSİYONLARI ---
+
+async function processScan(input) {
+    try {
+        const apiKey = localStorage.getItem('hf_gemini_key');
+        if (!apiKey) {
+            alert("Önce Ayarlar bölümünden Gemini API Anahtarınızı giriniz!");
+            openModal('m-settings');
+            return;
+        }
+
+        const file = input.files[0];
+        if (!file) {
+            return;
+        }
+        
+        // Inputu sıfırla
+        input.value = "";
+
+        // Ekrana yükleniyor modalını çıkar
+        document.getElementById('ai-loading-overlay').style.display = 'flex';
+
+        const reader = new FileReader();
+        
+        reader.onload = async (e) => {
+            try {
+                const base64Data = e.target.result.split(',')[1];
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: "Bu bir banka/kredi kartı işlem listesi ekran görüntüsüdür. Resimdeki tüm işlemleri sırasıyla çıkar. Kurallar: 1. Tutarları (amount) ondalık sayı (float) formatına çevir. 2. Tarihleri (date) YYYY-MM-DD formatına çevir. 3. Kategori (category) için akıllıca bir tahmin yap." },
+                                { inline_data: { mime_type: file.type, data: base64Data } }
+                            ]
+                        }],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            responseSchema: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        date: { type: "STRING" },
+                                        description: { type: "STRING" },
+                                        amount: { type: "NUMBER" },
+                                        category: { type: "STRING" }
+                                    },
+                                    required: ["date", "description", "amount", "category"]
+                                }
+                            }
+                        }
+                    })
+                });
+                
+                const res = await response.json();
+                
+                if (res.error) {
+                    throw new Error(res.error.message);
+                }
+                
+                let rawText = res.candidates[0].content.parts[0].text;
+                
+                try {
+                    scannedItems = JSON.parse(rawText);
+                } catch (parseError) {
+                    throw new Error("Yapay Zeka JSON formatını bozdu. Lütfen tekrar deneyin.");
+                }
+                
+                if (scannedItems.length === 0) {
+                    throw new Error("Görselde işlem bulunamadı veya tutarlar okunamadı.");
+                }
+                
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+                renderScanModal(scannedItems);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+                alert("Okuma İşlemi Başarısız Oldu!\n\nDetay:\n" + err.message);
+            }
+        };
+        
+        reader.onerror = () => {
+            document.getElementById('ai-loading-overlay').style.display = 'none';
+            alert("Dosya okuma hatası!");
+        };
+
+        reader.readAsDataURL(file);
+
+    } catch (globalErr) {
+        document.getElementById('ai-loading-overlay').style.display = 'none';
+        console.error(globalErr);
+        alert("Sistemsel Hata: " + globalErr.message);
+    }
+}
+
+function removeScannedItem(idx) {
+    scannedItems.forEach((item, i) => {
+        const descEl = document.getElementById(`ai-desc-${i}`);
+        if (descEl) {
+            item.description = descEl.value;
+            item.date = document.getElementById(`ai-date-${i}`).value;
+            item.amount = parseFloat(document.getElementById(`ai-amt-${i}`).value) || 0;
+            item.category = document.getElementById(`ai-cat-${i}`).value;
+        }
+    });
+    
+    scannedItems.splice(idx, 1);
+    
+    if (scannedItems.length === 0) {
+        closeModal('m-scan-res');
+        alert("Tüm işlemler listeden silindi.");
+    } else {
+        renderScanModal(scannedItems);
+    }
+}
+
+function renderScanModal(items) {
+    const aiAccSelect = document.getElementById('ai-acc');
+    aiAccSelect.innerHTML = '';
+    aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
+    
+    db.accounts.forEach((a, i) => aiAccSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
+    db.cards.forEach((c, i) => aiAccSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
+    
+    let dl = document.getElementById('cat-list-options');
+    if (!dl) {
+        dl = document.createElement('datalist');
+        dl.id = 'cat-list-options';
+        document.body.appendChild(dl);
+    }
+    dl.innerHTML = '';
+    db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
+    
+    const list = document.getElementById('ai-results-list');
+    list.innerHTML = '';
+    
+    items.forEach((item, index) => {
+        list.innerHTML += `
+            <div class="ai-row-box">
+                <div class="ai-row-top">
+                    <input type="text" class="ai-inp" style="flex:2;" id="ai-desc-${index}" value="${item.description}">
+                    <input type="number" class="ai-inp" style="flex:1;" id="ai-amt-${index}" value="${item.amount}" step="0.01">
+                    <button class="btn-del" onclick="removeScannedItem(${index})" style="color:var(--danger); padding:0 5px; font-size:1.2rem;">×</button>
+                </div>
+                <div class="ai-row-bot">
+                    <input type="date" class="ai-inp" style="flex:1.2;" id="ai-date-${index}" value="${item.date}">
+                    <input type="text" class="ai-inp" style="flex:1.5;" id="ai-cat-${index}" value="${item.category}" list="cat-list-options" placeholder="Kategori">
+                    <select class="ai-inp" style="flex:1;" id="ai-own-${index}">
+                        <option value="Baba">Baba</option>
+                        <option value="Anne">Anne</option>
+                    </select>
+                    <select class="ai-inp" style="flex:1;" id="ai-plan-${index}">
+                        <option value="dahil">Dahil</option>
+                        <option value="dahil_degil">D.Değil</option>
+                        <option value="kapsam_disi">Kapsam D.</option>
+                    </select>
+                </div>
+            </div>`;
+    });
+    
+    openModal('m-scan-res');
+}
+
+function saveScannedData() {
+    const targetVal = document.getElementById('ai-acc').value;
+    
+    scannedItems.forEach((item, index) => {
+        const descEl = document.getElementById(`ai-desc-${index}`);
+        if (!descEl) return;
+        
+        const desc = descEl.value;
+        const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
+        
+        let dateVal = document.getElementById(`ai-date-${index}`).value;
+        let finalDate = new Date().toISOString();
+        if (dateVal && dateVal.length === 10) {
+            finalDate = `${dateVal}T12:00:00.000Z`;
+        } else if (dateVal) {
+            finalDate = new Date(dateVal).toISOString();
+        }
+
+        let cat = document.getElementById(`ai-cat-${index}`).value.trim() || 'Diğer';
+        let own = document.getElementById(`ai-own-${index}`).value;
+        let planStat = document.getElementById(`ai-plan-${index}`).value;
+
+        if (!db.categories.expense.includes(cat) && !db.categories.income.includes(cat)) {
+            db.categories.expense.push(cat);
+        }
+
+        if (amt !== 0) {
+            let parsedType = amt >= 0 ? 'expense' : 'income';
+            let parsedAmt = Math.abs(amt);
+            
+            db.transactions.push({
+                id: 't_' + Date.now() + '_' + index,
+                type: parsedType,
+                amount: parsedAmt,
+                category: cat,
+                description: desc,
+                date: finalDate,
+                owner: own,
+                planStatus: planStat,
+                sourceId: targetVal !== 'none' ? targetVal : null
+            });
+            
+            applyBalanceEffect(targetVal, parsedType, parsedAmt, false);
+        }
+    });
+    
+    save();
+    closeModal('m-scan-res');
+    alert(`${scannedItems.length} işlem başarıyla buluta kaydedildi!`);
 }
 
 // --- HESAP, KART VE KREDİ DÜZENLEME (CRUD) KISMI ---
@@ -1188,15 +1569,9 @@ function updateAccListByOwner(prefix, selectedVal = null) {
         if(toSelect) {
             const currentTo = toSelect.value;
             toSelect.innerHTML = '';
-            db.accounts.forEach((a, i) => {
-                toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i));
-            });
-            db.cards.forEach((c, i) => {
-                toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i));
-            });
-            db.loans.forEach((l, i) => {
-                toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i));
-            });
+            db.accounts.forEach((a, i) => toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
+            db.cards.forEach((c, i) => toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
+            db.loans.forEach((l, i) => toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i)));
             
             if (currentTo && Array.from(toSelect.options).some(opt => opt.value === currentTo)) {
                 toSelect.value = currentTo;
@@ -1267,6 +1642,7 @@ function saveTrans() {
             } 
         } else { 
             applyBalanceEffect(sourceId, type, amt, false); 
+            
             db.transactions.push({ 
                 id: 't_' + Date.now(), 
                 type: type, 
@@ -1327,7 +1703,6 @@ function saveEditTrans() {
         return; 
     }
     
-    // Eski işlemi geri al
     if (!editIsPlan) { 
         if (t.type === 'transfer' && t.toId) { 
             applyBalanceEffect(t.sourceId, 'expense', t.amount, true); 
@@ -1337,7 +1712,6 @@ function saveEditTrans() {
         } 
     } 
     
-    // Yeni değerleri ata
     t.type = document.getElementById('et-type').value; 
     t.owner = document.getElementById('et-own').value; 
     t.planStatus = document.getElementById('et-planStatus').value; 
@@ -1359,7 +1733,6 @@ function saveEditTrans() {
     const accVal = document.getElementById('et-acc').value; 
     t.sourceId = accVal !== 'none' ? accVal : null; 
     
-    // Yeni durumu banka bakiyesine uygula
     if (!editIsPlan) { 
         if (t.type === 'transfer' && t.toId) { 
             applyBalanceEffect(t.sourceId, 'expense', t.amount, false); 
@@ -1393,6 +1766,7 @@ function delTrans(id) {
                 applyBalanceEffect(t.sourceId, t.type, t.amount, true); 
             } 
         } 
+        
         db.transactions = db.transactions.filter(x => x.id != id); 
         save(); 
         
@@ -1414,9 +1788,11 @@ function saveAsset() {
         name: document.getElementById('ias-name').value, 
         value: parseFloat(document.getElementById('ias-val').value) || 0 
     }; 
+    
     if (!a.name) {
         return alert('İsim girin'); 
     }
+    
     db.assets.push(a); 
     save(); 
     closeModal('m-asset'); 
@@ -1430,9 +1806,11 @@ function saveGoal() {
         target: parseFloat(document.getElementById('ig-target').value) || 0, 
         current: parseFloat(document.getElementById('ig-current').value) || 0 
     }; 
+    
     if (!g.name || !g.target) {
         return alert('Eksik bilgi'); 
     }
+    
     db.goals.push(g); 
     save(); 
     closeModal('m-goal'); 
@@ -1488,8 +1866,8 @@ function calcLoan() {
     const term = parseFloat(document.getElementById('la-term').value); 
     const inst = parseFloat(document.getElementById('la-inst').value); 
     const res = document.getElementById('loan-compare-res'); 
-    
     res.innerHTML = ''; 
+    
     if (amt && term && inst) { 
         res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`; 
     } 
@@ -2308,7 +2686,7 @@ function renderAnl() {
         pivotContainer.style.display = 'block';
         document.getElementById('trend-title').innerText = catFilter === 'all' ? 'Aylık Tüm Gider Trendi' : `Aylık "${catFilter}" Trendi`;
         
-        let monthGroups = {}; // Ay -> Plan Status -> Kategori
+        let monthGroups = {}; 
         
         chartTx.forEach(t => {
             let d = new Date(t.date);
@@ -2318,7 +2696,6 @@ function renderAnl() {
                 monthGroups[mKey] = { 'dahil': {}, 'kapsam_disi': {} };
             }
             
-            // Gruplamayı Excel'deki gibi iki ana dala indirelim: Dahil vs Kapsam Dışı
             let pStatus = (t.planStatus === 'kapsam_disi' || t.planStatus === 'dahil_degil') ? 'kapsam_disi' : 'dahil';
             
             monthGroups[mKey][pStatus][t.category] = (monthGroups[mKey][pStatus][t.category] || 0) + t.amount;
@@ -2326,7 +2703,6 @@ function renderAnl() {
 
         let monthLabels = Object.keys(monthGroups).sort();
         
-        // 1. TREND GRAFİĞİNİ ÇİZ (Sadece Aylık Toplamlar)
         let trendDahil = monthLabels.map(m => {
             let sum = 0; 
             for(let c in monthGroups[m]['dahil']) sum += monthGroups[m]['dahil'][c]; 
@@ -2367,25 +2743,19 @@ function renderAnl() {
             }
         });
 
-        // 2. EXCEL BENZERİ PİVOT TABLOYU OLUŞTUR
-        // Tüm Benzersiz Kategorileri Bul (Sütunlar İçin)
         let allUniqueCats = new Set();
         chartTx.forEach(t => allUniqueCats.add(t.category));
         let columns = Array.from(allUniqueCats).sort();
 
-        // Başlık (Header) Satırı
         let tableHTML = `<tr><th style="text-align:left;">Aylar / Durum</th><th>Genel Toplam</th>`;
         columns.forEach(c => {
             tableHTML += `<th>${c}</th>`;
         });
         tableHTML += `</tr>`;
 
-        // Satırları (Aylar) Oluştur
         monthLabels.forEach(m => {
-            // Ayın Genel Toplamı
             let mTotal = trendDahil[monthLabels.indexOf(m)] + trendKapsamDisi[monthLabels.indexOf(m)];
             
-            // Ay Başlığı (Ana Satır)
             tableHTML += `<tr class="row-group"><td>📅 ${m}</td><td>${fmt(mTotal)}</td>`;
             columns.forEach(c => {
                 let catSum = (monthGroups[m]['dahil'][c] || 0) + (monthGroups[m]['kapsam_disi'][c] || 0);
@@ -2393,7 +2763,6 @@ function renderAnl() {
             });
             tableHTML += `</tr>`;
 
-            // Alt Satır 1: Kapsam Dışı
             let mKapsamDisi = trendKapsamDisi[monthLabels.indexOf(m)];
             if (mKapsamDisi > 0) {
                 tableHTML += `<tr><td class="row-sub">└ Kapsam Dışı</td><td>${fmt(mKapsamDisi)}</td>`;
@@ -2403,7 +2772,6 @@ function renderAnl() {
                 tableHTML += `</tr>`;
             }
 
-            // Alt Satır 2: Plana Dahil
             let mDahil = trendDahil[monthLabels.indexOf(m)];
             if (mDahil > 0) {
                 tableHTML += `<tr><td class="row-sub" style="color:var(--success);">└ Plana Dahil</td><td style="color:var(--success);">${fmt(mDahil)}</td>`;
