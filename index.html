@@ -85,7 +85,6 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .ai-table-row { display: grid; grid-template-columns: 2fr 2fr 1.5fr; gap: 5px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; align-items: center; }
         .ai-inp { padding: 6px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.8rem; width:100%; background:#fff; }
     </style>
 </head>
@@ -219,16 +218,20 @@
     <button class="btn-clo" onclick="closeModal('m-settings')">Kapat</button>
 </div></div>
 
-<!-- AI TARAMA SONUÇ MODALI -->
+<!-- AI TARAMA SONUÇ MODALI (GELİŞMİŞ EKRAN) -->
 <div class="modal" id="m-scan-res"><div class="modal-box">
     <h3>Yapay Zeka Analiz Sonucu</h3>
-    <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Aşağıdaki işlemleri gözden geçirin. Yanlış tahmin edilen kategorileri düzeltebilirsiniz.</p>
+    <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Aşağıdaki işlemleri gözden geçirin. Yanlış tahmin edilen kategorileri düzeltebilir, yenisini yazabilir veya hatalı satırları silebilirsiniz.</p>
     
-    <div class="inp-grp"><label class="inp-lbl">Hangi Hesaptan Düşülsün?</label><select id="ai-acc" class="inp"></select></div>
-
-    <div style="font-size:0.75rem; font-weight:bold; display:grid; grid-template-columns: 2fr 2fr 1.5fr; gap:5px; margin-bottom:5px; padding:0 5px;">
-        <div>Açıklama / Tarih</div><div>Kategori</div><div>Tutar (₺)</div>
+    <div class="inp-grp">
+        <label class="inp-lbl">Hangi Hesaba/Karta İşlensin?</label>
+        <select id="ai-acc" class="inp"></select>
     </div>
+
+    <div style="font-size:0.75rem; font-weight:bold; display:grid; grid-template-columns: 2fr 1.5fr 1fr 30px; gap:5px; margin-bottom:5px; padding:0 5px;">
+        <div>Açıklama / Tarih</div><div>Kategori</div><div>Tutar (₺)</div><div></div>
+    </div>
+    
     <div id="ai-results-list" style="background:#f8fafc; padding:10px; border-radius:10px; max-height:40vh; overflow-y:auto; border:1px solid #e2e8f0;"></div>
     
     <button class="btn-pri" style="background:var(--success)" onclick="saveScannedData()">Onayla ve Toplu Kaydet</button>
@@ -269,7 +272,7 @@ function saveSettings() {
     closeModal('m-settings');
 }
 
-// --- YAPAY ZEKA (VISION AI) OKUMA SÜRECİ (GÜNCELLENDİ: KESİN JSON) ---
+// --- YAPAY ZEKA (VISION AI) OKUMA SÜRECİ ---
 async function processScan(input) {
     const apiKey = localStorage.getItem('hf_gemini_key');
     if(!apiKey) {
@@ -299,7 +302,6 @@ async function processScan(input) {
                             { inline_data: { mime_type: file.type, data: base64Data } }
                         ]
                     }],
-                    // YENİ: Gemini'yi şablona uymaya ZORLUYORUZ.
                     generationConfig: {
                         responseMimeType: "application/json",
                         responseSchema: {
@@ -349,33 +351,62 @@ async function processScan(input) {
     reader.readAsDataURL(file);
 }
 
-// AI SONUÇLARINI ONAY EKRANINA BASMA
-function renderScanModal(items) {
-    updSel(); 
+// YENİ: TARANAN İŞLEMİ SİLME (ÇÖP KUTUSU)
+function removeScannedItem(idx) {
+    // Silmeden önce kullanıcının diğer kutularda yaptığı değişiklikleri kaydet ki kaybolmasın
+    scannedItems.forEach((item, i) => {
+        const descEl = document.getElementById(`ai-desc-${i}`);
+        if (descEl) {
+            item.description = descEl.value;
+            item.date = document.getElementById(`ai-date-${i}`).value;
+            item.category = document.getElementById(`ai-cat-${i}`).value;
+            item.amount = parseFloat(document.getElementById(`ai-amt-${i}`).value) || 0;
+        }
+    });
+
+    scannedItems.splice(idx, 1); // Listeden sil
     
+    if (scannedItems.length === 0) {
+        closeModal('m-scan-res');
+        alert("Tüm işlemler listeden silindi.");
+    } else {
+        renderScanModal(scannedItems); // Tabloyu yeni haliyle tekrar çiz
+    }
+}
+
+// AI SONUÇLARINI ONAY EKRANINA BASMA (GELİŞTİRİLDİ)
+function renderScanModal(items) {
     const aiAccSelect = document.getElementById('ai-acc');
     aiAccSelect.innerHTML = '';
-    db.accounts.forEach((a,i)=> aiAccSelect.add(new Option(a.name, i)));
+    // YENİ: Sadece Geçmişe Kaydet seçeneği ve Kredi Kartları eklendi
+    aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
+    db.accounts.forEach((a,i)=> aiAccSelect.add(new Option('Hesap: ' + a.name, 'acc-'+i)));
+    db.cards.forEach((c,i)=> aiAccSelect.add(new Option('Kart: ' + c.name, 'card-'+i)));
     
+    // YENİ: Kategoriler için Akıllı Liste (Datalist) oluşturma
+    let dl = document.getElementById('cat-list-options');
+    if(!dl) {
+        dl = document.createElement('datalist');
+        dl.id = 'cat-list-options';
+        document.body.appendChild(dl);
+    }
+    dl.innerHTML = '';
+    db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
+
     const list = document.getElementById('ai-results-list');
     list.innerHTML = '';
 
-    let catOptions = '';
-    db.categories.expense.forEach(c => catOptions += `<option value="${c}">${c}</option>`);
-    
     items.forEach((item, index) => {
+        // select yerine input list kullanıldı (Hem seçilebilir hem yeni yazılabilir)
         list.innerHTML += `
-            <div class="ai-table-row">
+            <div class="ai-table-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 30px; gap: 5px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; align-items: center;">
                 <div style="display:flex; flex-direction:column; gap:2px;">
                     <input type="text" class="ai-inp" id="ai-desc-${index}" value="${item.description}">
                     <input type="date" class="ai-inp" id="ai-date-${index}" value="${item.date}" style="color:#666;">
                 </div>
-                <select class="ai-inp" id="ai-cat-${index}">
-                    <option value="${item.category}" selected>✨ ${item.category}</option>
-                    <option disabled>---</option>
-                    ${catOptions}
-                </select>
-                <input type="number" class="ai-inp" id="ai-amt-${index}" value="${item.amount}">
+                <input type="text" class="ai-inp" id="ai-cat-${index}" value="${item.category}" list="cat-list-options" placeholder="Kategori">
+                <input type="number" class="ai-inp" id="ai-amt-${index}" value="${item.amount}" step="0.01">
+                <button class="btn-del" onclick="removeScannedItem(${index})" style="color:var(--danger); font-size:1.2rem; padding:0; margin:0 auto;">×</button>
             </div>
         `;
     });
@@ -383,34 +414,71 @@ function renderScanModal(items) {
     openModal('m-scan-res');
 }
 
-// ONAYLANAN VERİLERİ VERİTABANINA KAYDET
+// ONAYLANAN VERİLERİ VERİTABANINA KAYDET (GELİŞTİRİLDİ)
 function saveScannedData() {
-    const accIdx = document.getElementById('ai-acc').value;
-    const acc = db.accounts[accIdx] || {owner:'Hane'};
-    
+    const targetVal = document.getElementById('ai-acc').value;
+    let owner = 'Hane';
+    let tType = null;
+    let tIdx = null;
+
+    // Hangi hesaba veya karta ait olduğunu çözümle
+    if (targetVal !== 'none') {
+        const parts = targetVal.split('-');
+        tType = parts[0];
+        tIdx = parts[1];
+        if (tType === 'acc' && db.accounts[tIdx]) owner = db.accounts[tIdx].owner;
+        if (tType === 'card' && db.cards[tIdx]) owner = db.cards[tIdx].owner;
+    }
+
     let totalDeduction = 0;
+    let newCatsAdded = false;
 
     scannedItems.forEach((item, index) => {
-        const desc = document.getElementById(`ai-desc-${index}`).value;
-        const date = document.getElementById(`ai-date-${index}`).value;
-        const cat = document.getElementById(`ai-cat-${index}`).value;
+        const descEl = document.getElementById(`ai-desc-${index}`);
+        if (!descEl) return; 
+
+        const desc = descEl.value;
+        let dateVal = document.getElementById(`ai-date-${index}`).value;
+        
+        // YENİ: Saat dilimi (timezone) kaymasını önlemek için tarihi tam sabitle
+        let finalDate = new Date().toISOString();
+        if (dateVal && dateVal.length === 10) {
+            finalDate = `${dateVal}T12:00:00.000Z`; // Gün ortasına sabitlendi, takvimde şaşmaz
+        } else if (dateVal) {
+            finalDate = new Date(dateVal).toISOString();
+        }
+
+        // Kategori Kontrolü ve Havuza Ekleme
+        let cat = document.getElementById(`ai-cat-${index}`).value.trim() || 'Diğer';
+        if (!db.categories.expense.includes(cat) && !db.categories.income.includes(cat)) {
+            db.categories.expense.push(cat);
+            newCatsAdded = true;
+        }
+
         const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
 
-        if (amt > 0) {
+        if (amt !== 0) { 
             totalDeduction += amt;
+            // Eğer eksi tutar girdiyse (Örn: İade), bunu gelir gibi düşünecek
             db.transactions.push({
-                type: 'expense',
-                amount: amt,
+                type: amt >= 0 ? 'expense' : 'income',
+                amount: Math.abs(amt),
                 category: cat,
                 description: desc,
-                date: date ? new Date(date).toISOString() : new Date().toISOString(),
-                owner: acc.owner
+                date: finalDate,
+                owner: owner
             });
         }
     });
 
-    if(db.accounts[accIdx]) {
-        db.accounts[accIdx].balance -= totalDeduction;
+    // Hesap veya Kart Bakiyelerini Güncelleme
+    if (targetVal !== 'none') {
+        if(tType === 'acc' && db.accounts[tIdx]) {
+            db.accounts[tIdx].balance -= totalDeduction;
+        }
+        if(tType === 'card' && db.cards[tIdx]) {
+            db.cards[tIdx].debt += totalDeduction;
+        }
     }
 
     save();
@@ -679,7 +747,7 @@ function del(type, idx) {
 }
 
 function updSel() {
-    const accs=document.querySelectorAll('#it-acc, #mp-acc, #mcl-acc, #ai-acc');
+    const accs=document.querySelectorAll('#it-acc, #mp-acc, #mcl-acc'); // ai-acc kendi içinde oluşturuluyor
     accs.forEach(s=>{s.innerHTML=''; db.accounts.forEach((a,i)=>s.add(new Option(a.name,i)))});
     
     const tgs=document.getElementById('it-target');
