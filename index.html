@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hane Finans: AI Vision Master</title>
-    <!-- SUPABASE VE CHART.JS BAĞLANTILARI -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -129,7 +128,6 @@
 </header>
 
 <main>
-    <!-- HOME -->
     <div id="p-home" class="page active">
         <div class="health-card">
             <div>
@@ -157,7 +155,6 @@
         </div>
     </div>
 
-    <!-- PORTFÖY VE HEDEFLER -->
     <div id="p-assets" class="page">
         <div class="head-row">
             <h3>Hesaplar</h3>
@@ -166,7 +163,6 @@
                 <button class="act-btn" style="background:var(--primary)" onclick="openAddAcc()">+ Ekle</button>
             </div>
         </div>
-        <!-- HESAPLAR LİSTESİ BURAYA RENDER EDİLECEK -->
         <div id="list-acc"></div>
 
         <div class="head-row" style="margin-top:20px;">
@@ -182,7 +178,6 @@
         <div class="card" id="list-goals"></div>
     </div>
 
-    <!-- CALENDAR -->
     <div id="p-calendar" class="page">
         <div class="cal-nav">
             <span onclick="chgMonth(-1)" style="cursor:pointer; padding:10px;">❮ Önceki</span>
@@ -196,7 +191,6 @@
         <div class="card" id="list-plans"></div>
     </div>
 
-    <!-- DEBTS -->
     <div id="p-debts" class="page">
         <div class="head-row">
             <h3>Kredi Kartları & Borçlar</h3>
@@ -206,11 +200,9 @@
             <button class="btn-pri" style="margin:0; padding:10px;" onclick="openAddCard()">+ Kart Ekle</button>
             <button class="btn-pri" style="margin:0; padding:10px;" onclick="openAddLoan()">+ Kredi Ekle</button>
         </div>
-        <!-- BORÇLAR (KARTLAR VE KREDİLER) BURAYA RENDER EDİLECEK -->
         <div id="list-debts"></div>
     </div>
 
-    <!-- LOAN ANALYSIS -->
     <div id="p-analysis-loan" class="page">
         <div class="head-row">
             <h3>Yapılandırma</h3>
@@ -226,7 +218,6 @@
         <div id="loan-compare-res"></div>
     </div>
 
-    <!-- GELİŞMİŞ ANALİZ VE LİMİT SAYFASI -->
     <div id="p-analysis" class="page">
         <div class="head-row" style="margin-bottom:5px;">
             <h3>Detaylı Analiz</h3>
@@ -284,9 +275,6 @@
     <div class="nav-btn" onclick="switchPage('analysis')"><div class="nav-icon">📊</div>Analiz</div>
 </nav>
 
-<!-- MODALLAR -->
-
-<!-- HESAP EKLE / DÜZENLE MODALI -->
 <div class="modal" id="m-acc">
     <div class="modal-box">
         <h3 id="acc-modal-title">Hesap Ekle</h3>
@@ -320,7 +308,6 @@
     </div>
 </div>
 
-<!-- KART EKLE / DÜZENLE MODALI -->
 <div class="modal" id="m-card">
     <div class="modal-box">
         <h3 id="card-modal-title">Kart Ekle</h3>
@@ -364,7 +351,6 @@
     </div>
 </div>
 
-<!-- KREDİ EKLE / DÜZENLE MODALI -->
 <div class="modal" id="m-loan">
     <div class="modal-box">
         <h3 id="loan-modal-title">Kredi Ekle</h3>
@@ -442,6 +428,42 @@
     </div>
 </div>
 
+<div class="modal" id="m-edit-acc-bal">
+    <div class="modal-box">
+        <h3>Hesap Bakiyesi Düzenle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Yeni Bakiye (₺)</label>
+            <input type="number" id="eab-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveEditAccBal()">Güncelle</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-acc-bal')">İptal</button>
+    </div>
+</div>
+
+<div class="modal" id="m-edit-card-debt">
+    <div class="modal-box">
+        <h3>Kart Borcu Düzenle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Yeni Güncel Borç (₺)</label>
+            <input type="number" id="ecd-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveEditCardDebt()">Güncelle</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-card-debt')">İptal</button>
+    </div>
+</div>
+
+<div class="modal" id="m-edit-loan-debt">
+    <div class="modal-box">
+        <h3>Kredi Kalan Borcu Düzenle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Yeni Kalan Borç (₺)</label>
+            <input type="number" id="eld-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveEditLoanDebt()">Güncelle</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-loan-debt')">İptal</button>
+    </div>
+</div>
+
 <div class="modal" id="m-scan-res">
     <div class="modal-box">
         <h3>AI Analiz Sonucu</h3>
@@ -459,7 +481,7 @@
 <div class="modal" id="m-edit-trans">
     <div class="modal-box">
         <h3>İşlemi Düzenle</h3>
-        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Yapılan tutar veya kaynak değişimi seçilen hesaba/karta otomatik yansıyacaktır.</p>
+        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Yapılan tutar veya kaynak değişimi seçilen hesaba otomatik yansıyacaktır.</p>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <div style="flex:1;">
                 <label class="inp-lbl">İşlem Tipi</label>
@@ -470,7 +492,7 @@
             </div>
             <div style="flex:1;">
                 <label class="inp-lbl">Sahibi</label>
-                <select id="et-own" class="inp">
+                <select id="et-own" class="inp" onchange="updateAccListByOwner('et')">
                     <option value="Baba">Baba</option>
                     <option value="Anne">Anne</option>
                 </select>
@@ -518,7 +540,7 @@
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <div style="flex:1;">
                 <label class="inp-lbl">Sahibi</label>
-                <select id="it-own" class="inp">
+                <select id="it-own" class="inp" onchange="updateAccListByOwner('it')">
                     <option value="Baba">Baba</option>
                     <option value="Anne">Anne</option>
                 </select>
@@ -565,7 +587,6 @@
     </div>
 </div>
 
-<!-- DİĞER STANDART MODALLAR -->
 <div class="modal" id="m-asset">
     <div class="modal-box">
         <h3>Yatırım / Varlık Ekle</h3>
@@ -927,14 +948,10 @@ function saveLoan() {
 
     if (editLoanIdx !== null) {
         loanData.id = db.loans[editLoanIdx].id;
-        // Düzenleme anında sadece remaining (kalan) tutarını güncelliyoruz ki net duruma etki etsin.
-        // Mevcut takvim planlarını (planned array) değiştirmek çok karmaşık olacağından, 
-        // sadece ana kredi borcu tutarını güncelliyoruz.
         db.loans[editLoanIdx] = loanData;
     } else {
         loanData.id = Date.now();
         db.loans.push(loanData);
-        // Yeni kredi ise takvime taksitleri diz
         let d = new Date(document.getElementById('il-date').value);
         for (let i = 0; i < loanData.count; i++) {
             db.planned.push({
@@ -954,7 +971,6 @@ function saveLoan() {
     save();
     closeModal('m-loan');
 }
-
 
 // --- LİMİT AYARLARI ---
 function openLimits() {
@@ -1094,8 +1110,9 @@ function renderScanModal(items) {
     aiAccSelect.innerHTML = '';
     aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
     
-    db.accounts.forEach((a, i) => aiAccSelect.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
-    db.cards.forEach((c, i) => aiAccSelect.add(new Option('Kart: ' + c.name, 'card-' + i)));
+    // YENİ: AI Modalındaki genel hesaba isim eklendi
+    db.accounts.forEach((a, i) => aiAccSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
+    db.cards.forEach((c, i) => aiAccSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
     
     let dl = document.getElementById('cat-list-options');
     if (!dl) {
@@ -1277,6 +1294,47 @@ function resetApp() {
     }
 }
 
+// YENİ: DİNAMİK KAYNAK FİLTRELEME MOTORU
+function updateAccListByOwner(prefix, selectedVal = null) {
+    const owner = document.getElementById(prefix + '-own').value;
+    const accSelect = document.getElementById(prefix + '-acc');
+    
+    if(!accSelect) return;
+    
+    const currentSelection = selectedVal || accSelect.value; 
+
+    accSelect.innerHTML = '';
+    if (prefix === 'it' || prefix === 'et') {
+        accSelect.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
+    }
+
+    db.accounts.forEach((a, i) => {
+        if (a.owner === owner) accSelect.add(new Option('Hesap: ' + a.name + ' (' + a.bank + ')', 'acc-' + i));
+    });
+
+    db.cards.forEach((c, i) => {
+        if (c.owner === owner) accSelect.add(new Option('Kart: ' + c.name + ' (' + c.bank + ')', 'card-' + i));
+    });
+
+    if (currentSelection && Array.from(accSelect.options).some(opt => opt.value === currentSelection)) {
+        accSelect.value = currentSelection;
+    } else {
+        accSelect.value = 'none';
+    }
+    
+    // Transfer alıcısı (it-to) tüm profillerin hesaplarını görebilsin ama ismen etiketlensin
+    if (prefix === 'it') {
+        const toSelect = document.getElementById('it-to');
+        if(toSelect) {
+            const currentTo = toSelect.value;
+            toSelect.innerHTML = '';
+            db.accounts.forEach((a, i) => toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
+            db.cards.forEach((c, i) => toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
+            db.loans.forEach((l, i) => toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i)));
+            if (currentTo && Array.from(toSelect.options).some(opt => opt.value === currentTo)) toSelect.value = currentTo;
+        }
+    }
+}
 
 function openTrans(type) {
     document.getElementById('it-type').value = type;
@@ -1286,6 +1344,9 @@ function openTrans(type) {
     toggle('it-to-div', type === 'transfer');
     openModal('m-trans');
     updateEditCatList('it');
+    
+    // YENİ: Modal açıldığında dinamik listeyi tetikle
+    updateAccListByOwner('it');
 }
 
 function saveTrans() {
@@ -1382,20 +1443,10 @@ function openEditTrans(id, isPlan) {
     updateEditCatList('et');
     document.getElementById('et-cat').value = t.category || '';
     
-    const etAccSelect = document.getElementById('et-acc');
-    etAccSelect.innerHTML = '';
-    etAccSelect.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
-    
-    db.accounts.forEach((a, i) => etAccSelect.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
-    db.cards.forEach((c, i) => etAccSelect.add(new Option('Kart: ' + c.name, 'card-' + i)));
-    
-    if (t.sourceId) {
-        etAccSelect.value = t.sourceId;
-    } else {
-        etAccSelect.value = 'none';
-    }
-    
     openModal('m-edit-trans');
+    
+    // YENİ: Modal açıldığında dinamik listeyi tetikle ve eski kaynağı seçili hale getir
+    updateAccListByOwner('et', t.sourceId);
 }
 
 function saveEditTrans() {
@@ -1488,7 +1539,6 @@ function render() {
     const accBalance = fAcc.reduce((a, b) => a + b.balance, 0);
     const invBalance = fAssets.reduce((a, b) => a + b.value, 0);
     const ast = accBalance + invBalance;
-    // Net durumu hesaplarken Esnek Hesap limitini (overdraft) varlık olarak saymıyoruz, sadece mevcut bakiyeyi sayıyoruz.
     const dbt = fCards.reduce((a, b) => a + b.debt + b.future, 0) + fLoans.reduce((a, b) => a + b.remaining, 0);
 
     document.getElementById('dash-net').innerText = fmt(ast - dbt);
@@ -1788,7 +1838,11 @@ function openDay(d) {
 
 function initPay(id) {
     payId = id;
-    updSel();
+    
+    const mpAccSelect = document.getElementById('mp-acc');
+    mpAccSelect.innerHTML = '';
+    db.accounts.forEach((a, i) => mpAccSelect.add(new Option(`${a.owner} - ${a.name}`, i)));
+
     openModal('m-pay');
 }
 
@@ -1803,7 +1857,7 @@ function confirmPay() {
         if (loan) loan.remaining -= p.amount;
     }
 
-    let sourceId = accIdx !== 'none' ? accIdx : null;
+    let sourceId = accIdx !== 'none' ? 'acc-' + accIdx : null;
     
     applyBalanceEffect(sourceId, p.type, amt, false);
 
@@ -1835,7 +1889,11 @@ function delPlan(id) {
 
 function openCloseLoan(idx) {
     closeId = idx;
-    updSel();
+    
+    const mclAccSelect = document.getElementById('mcl-acc');
+    mclAccSelect.innerHTML = '';
+    db.accounts.forEach((a, i) => mclAccSelect.add(new Option(`${a.owner} - ${a.name}`, i)));
+
     openModal('m-close-loan');
 }
 
@@ -1844,7 +1902,7 @@ function doCloseLoan() {
     const accIdx = document.getElementById('mcl-acc').value;
     const loan = db.loans[closeId];
     
-    applyBalanceEffect(accIdx, 'expense', amt, false);
+    applyBalanceEffect('acc-'+accIdx, 'expense', amt, false);
 
     db.transactions.push({
         id: 't_' + Date.now(),
@@ -1853,7 +1911,8 @@ function doCloseLoan() {
         category: 'Kredi Kapama',
         owner: loan.owner,
         date: new Date().toISOString(),
-        planStatus: 'kapsam_disi'
+        planStatus: 'kapsam_disi',
+        sourceId: 'acc-'+accIdx
     });
     
     db.planned = db.planned.filter(p => !p.title.includes(loan.name));
@@ -1875,37 +1934,6 @@ function del(type, idx) {
 }
 
 function updSel() {
-    const accs = document.querySelectorAll('#mp-acc, #mcl-acc');
-    accs.forEach(s => {
-        s.innerHTML = '';
-        db.accounts.forEach((a, i) => s.add(new Option(a.name, 'acc-'+i)));
-        db.cards.forEach((c, i) => s.add(new Option(c.name + ' (Kart)', 'card-'+i)));
-    });
-
-    const itAcc = document.getElementById('it-acc');
-    if (itAcc) {
-        itAcc.innerHTML = '';
-        itAcc.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
-        db.accounts.forEach((a, i) => itAcc.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
-        db.cards.forEach((c, i) => itAcc.add(new Option('Kart: ' + c.name, 'card-' + i)));
-    }
-
-    const tgs = document.getElementById('it-target');
-    if (tgs) {
-        tgs.innerHTML = '';
-        db.accounts.forEach((a, i) => tgs.add(new Option('H:' + a.name, 'acc-' + i)));
-        db.cards.forEach((c, i) => tgs.add(new Option('K:' + c.name, 'card-' + i)));
-        db.loans.forEach((l, i) => tgs.add(new Option('Kr:' + l.name, 'loan-' + i)));
-    }
-    
-    const itTo = document.getElementById('it-to');
-    if (itTo) {
-        itTo.innerHTML = '';
-        db.accounts.forEach((a, i) => itTo.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
-        db.cards.forEach((c, i) => itTo.add(new Option('Kart: ' + c.name, 'card-' + i)));
-        db.loans.forEach((l, i) => itTo.add(new Option('Kredi: ' + l.name, 'loan-' + i)));
-    }
-
     const bnks = document.querySelectorAll('#ia-bank, #ic-bank, #il-bank');
     bnks.forEach(s => {
         s.innerHTML = '';
