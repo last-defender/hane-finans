@@ -154,19 +154,35 @@
 
     <!-- PORTFÖY VE HEDEFLER -->
     <div id="p-assets" class="page">
-        <div class="head-row"><h3>Hesaplar</h3><div style="display:flex; gap:5px;"><button class="act-btn" style="background:#64748b" onclick="openModal('m-bank-list')">Bankalar</button><button class="act-btn" style="background:var(--primary)" onclick="openModal('m-acc')">+ Ekle</button></div></div>
+        <div class="head-row">
+            <h3>Hesaplar</h3>
+            <div style="display:flex; gap:5px;">
+                <button class="act-btn" style="background:#64748b" onclick="openModal('m-bank-list')">Bankalar</button>
+                <button class="act-btn" style="background:var(--primary)" onclick="openModal('m-acc')">+ Ekle</button>
+            </div>
+        </div>
         <div class="card" id="list-acc"></div>
 
-        <div class="head-row" style="margin-top:20px;"><h3>Yatırımlar / Varlıklar</h3><button class="act-btn" style="background:var(--success)" onclick="openModal('m-asset')">+ Ekle</button></div>
+        <div class="head-row" style="margin-top:20px;">
+            <h3>Yatırımlar / Varlıklar</h3>
+            <button class="act-btn" style="background:var(--success)" onclick="openModal('m-asset')">+ Ekle</button>
+        </div>
         <div class="card" id="list-assets"></div>
 
-        <div class="head-row" style="margin-top:20px;"><h3>Birikim Hedefleri</h3><button class="act-btn" style="background:var(--info)" onclick="openModal('m-goal')">+ Hedef</button></div>
+        <div class="head-row" style="margin-top:20px;">
+            <h3>Birikim Hedefleri</h3>
+            <button class="act-btn" style="background:var(--info)" onclick="openModal('m-goal')">+ Hedef</button>
+        </div>
         <div class="card" id="list-goals"></div>
     </div>
 
     <!-- CALENDAR -->
     <div id="p-calendar" class="page">
-        <div class="cal-nav"><span onclick="chgMonth(-1)" style="cursor:pointer; padding:10px;">❮ Önceki</span><span id="cal-title" style="font-size:1.1rem;"></span><span onclick="chgMonth(1)" style="cursor:pointer; padding:10px;">Sonraki ❯</span></div>
+        <div class="cal-nav">
+            <span onclick="chgMonth(-1)" style="cursor:pointer; padding:10px;">❮ Önceki</span>
+            <span id="cal-title" style="font-size:1.1rem;"></span>
+            <span onclick="chgMonth(1)" style="cursor:pointer; padding:10px;">Sonraki ❯</span>
+        </div>
         <div class="card"><div class="cal-grid" id="cal-grid"></div></div>
         <h4 style="margin:15px 5px 10px;">Ay İçi Nakit Akışı</h4>
         <div id="period-view" class="p-row"></div>
@@ -176,14 +192,23 @@
 
     <!-- DEBTS -->
     <div id="p-debts" class="page">
-        <div class="head-row"><h3>Borçlar</h3><button class="act-btn" style="background:var(--purple)" onclick="switchPage('analysis-loan')">Yapılandırma</button></div>
-        <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="btn-pri" style="margin:0; padding:10px;" onclick="openModal('m-card')">+ Kart</button><button class="btn-pri" style="margin:0; padding:10px;" onclick="openModal('m-loan')">+ Kredi</button></div>
+        <div class="head-row">
+            <h3>Borçlar</h3>
+            <button class="act-btn" style="background:var(--purple)" onclick="switchPage('analysis-loan')">Yapılandırma</button>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn-pri" style="margin:0; padding:10px;" onclick="openModal('m-card')">+ Kart</button>
+            <button class="btn-pri" style="margin:0; padding:10px;" onclick="openModal('m-loan')">+ Kredi</button>
+        </div>
         <div id="list-debts"></div>
     </div>
 
     <!-- LOAN ANALYSIS -->
     <div id="p-analysis-loan" class="page">
-        <div class="head-row"><h3>Yapılandırma</h3><button class="btn-clo" onclick="switchPage('debts')">Geri</button></div>
+        <div class="head-row">
+            <h3>Yapılandırma</h3>
+            <button class="btn-clo" onclick="switchPage('debts')">Geri</button>
+        </div>
         <div class="card" style="border:1px solid var(--purple);">
             <h4>Yeni Teklif</h4>
             <div class="inp-grp"><input type="number" id="la-amt" class="inp" placeholder="Ele Geçen Tutar"></div>
@@ -258,88 +283,454 @@
 </nav>
 
 <!-- MODALLAR -->
-<div class="modal" id="m-limits"><div class="modal-box">
-    <h3>Dönemsel Bütçe Limitleri</h3>
-    <p style="font-size:0.75rem; color:var(--light); margin-bottom:15px;">Aylık bazda planlı ve plansız giderleriniz için kendinize bir üst sınır belirleyin.</p>
-    <div class="inp-grp"><label class="inp-lbl">Plana Dahil Gider Limiti (₺)</label><input type="number" id="lim-dahil" class="inp" placeholder="Örn: 30000"></div>
-    <div class="inp-grp"><label class="inp-lbl">Plana Dahil Olmayan Gider Limiti (₺)</label><input type="number" id="lim-dahilDegil" class="inp" placeholder="Örn: 5000"></div>
-    <div class="inp-grp"><label class="inp-lbl">Kapsam Dışı (Yatırım/Transfer) Limiti (₺)</label><input type="number" id="lim-kapsamDisi" class="inp" placeholder="Limitsiz ise boş bırakın"></div>
-    <button class="btn-pri" onclick="saveLimits()">Limitleri Kaydet</button>
-    <button class="btn-clo" onclick="closeModal('m-limits')">Kapat</button>
-</div></div>
+<div class="modal" id="m-limits">
+    <div class="modal-box">
+        <h3>Dönemsel Bütçe Limitleri</h3>
+        <p style="font-size:0.75rem; color:var(--light); margin-bottom:15px;">Aylık bazda planlı ve plansız giderleriniz için kendinize bir üst sınır belirleyin.</p>
+        <div class="inp-grp">
+            <label class="inp-lbl">Plana Dahil Gider Limiti (₺)</label>
+            <input type="number" id="lim-dahil" class="inp" placeholder="Örn: 30000">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Plana Dahil Olmayan Gider Limiti (₺)</label>
+            <input type="number" id="lim-dahilDegil" class="inp" placeholder="Örn: 5000">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kapsam Dışı (Yatırım/Transfer) Limiti (₺)</label>
+            <input type="number" id="lim-kapsamDisi" class="inp" placeholder="Limitsiz ise boş bırakın">
+        </div>
+        <button class="btn-pri" onclick="saveLimits()">Limitleri Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-limits')">Kapat</button>
+    </div>
+</div>
 
-<div class="modal" id="m-settings"><div class="modal-box">
-    <h3>Sistem Ayarları</h3>
-    <p style="font-size:0.8rem; color:#666;">Yapay zeka (AI) ile ekstre tarama özelliğini kullanmak için Google Gemini API anahtarınızı aşağıya girin.</p>
-    <div class="inp-grp"><label class="inp-lbl">Gemini API Key</label><input type="password" id="set-api-key" class="inp" placeholder="AIzaSy..."></div>
-    <button class="btn-pri" onclick="saveSettings()">Ayarları Kaydet</button>
-    <button class="btn-clo" onclick="closeModal('m-settings')">Kapat</button>
-</div></div>
+<div class="modal" id="m-settings">
+    <div class="modal-box">
+        <h3>Sistem Ayarları</h3>
+        <p style="font-size:0.8rem; color:#666;">Yapay zeka (AI) ile ekstre tarama özelliğini kullanmak için Google Gemini API anahtarınızı aşağıya girin.</p>
+        <div class="inp-grp">
+            <label class="inp-lbl">Gemini API Key</label>
+            <input type="password" id="set-api-key" class="inp" placeholder="AIzaSy...">
+        </div>
+        <button class="btn-pri" onclick="saveSettings()">Ayarları Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-settings')">Kapat</button>
+    </div>
+</div>
 
-<div class="modal" id="m-scan-res"><div class="modal-box">
-    <h3>AI Analiz Sonucu</h3>
-    <p style="font-size:0.75rem; color:#666; margin-bottom:15px;">İşlemleri kontrol edin. Hatalı olanları silebilir, sahibini ve plan durumunu değiştirebilirsiniz.</p>
-    <div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;">
-        <label class="inp-lbl" style="margin:0 0 5px 0;">Varsayılan Kaynak/Hesap (İsteğe Bağlı)</label>
-        <select id="ai-acc" class="inp" style="background:#fff;"></select>
+<!-- MANUEL BAKİYE DÜZENLEME MODALLARI -->
+<div class="modal" id="m-edit-acc-bal">
+    <div class="modal-box">
+        <h3>Hesap Bakiyesi Düzenle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Yeni Bakiye (₺)</label>
+            <input type="number" id="eab-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveEditAccBal()">Güncelle</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-acc-bal')">İptal</button>
     </div>
-    <div id="ai-results-list" style="max-height:50vh; overflow-y:auto; margin-bottom:15px;"></div>
-    <button class="btn-pri" style="background:var(--success)" onclick="saveScannedData()">Onayla ve Toplu Kaydet</button>
-    <button class="btn-clo" onclick="closeModal('m-scan-res')">İptal Et</button>
-</div></div>
+</div>
 
-<div class="modal" id="m-edit-trans"><div class="modal-box">
-    <h3>İşlemi Düzenle</h3>
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div style="flex:1;"><label class="inp-lbl">İşlem Tipi</label><select id="et-type" class="inp" onchange="updateEditCatList()"><option value="expense">Gider (-)</option><option value="income">Gelir (+)</option></select></div>
-        <div style="flex:1;"><label class="inp-lbl">Sahibi</label><select id="et-own" class="inp"><option value="Baba">Baba</option><option value="Anne">Anne</option></select></div>
+<div class="modal" id="m-edit-card-debt">
+    <div class="modal-box">
+        <h3>Kart Borcu Düzenle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Yeni Güncel Borç (₺)</label>
+            <input type="number" id="ecd-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveEditCardDebt()">Güncelle</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-card-debt')">İptal</button>
     </div>
-    <div class="inp-grp"><label class="inp-lbl">Tarih</label><input type="date" id="et-date" class="inp"></div>
-    <div class="inp-grp"><label class="inp-lbl">Tutar (₺)</label><input type="number" id="et-amt" class="inp" step="0.01"></div>
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div style="flex:1;"><label class="inp-lbl">Kategori</label><select id="et-cat" class="inp"></select></div>
-        <div style="flex:1;"><label class="inp-lbl">Plan Durumu</label><select id="et-planStatus" class="inp"><option value="dahil">Plana Dahil</option><option value="dahil_degil">Dahil Değil</option><option value="kapsam_disi">Kapsam Dışı</option></select></div>
-    </div>
-    <div class="inp-grp"><label class="inp-lbl">Hesap / Kaynak</label><select id="et-acc" class="inp"></select></div>
-    <div class="inp-grp"><label class="inp-lbl">Açıklama</label><input type="text" id="et-desc" class="inp"></div>
-    <button class="btn-pri" onclick="saveEditTrans()">Değişiklikleri Kaydet</button>
-    <button class="btn-clo" onclick="closeModal('m-edit-trans')">İptal</button>
-</div></div>
+</div>
 
-<div class="modal" id="m-trans"><div class="modal-box">
-    <h3 id="it-tit">İşlem</h3>
-    <input type="hidden" id="it-type">
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div style="flex:1;"><label class="inp-lbl">Sahibi</label><select id="it-own" class="inp"><option value="Baba">Baba</option><option value="Anne">Anne</option></select></div>
-        <div style="flex:1;"><label class="inp-lbl">Tarih</label><input type="date" id="it-date" class="inp"></div>
+<div class="modal" id="m-edit-loan-debt">
+    <div class="modal-box">
+        <h3>Kredi Kalan Borcu Düzenle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Yeni Kalan Borç (₺)</label>
+            <input type="number" id="eld-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveEditLoanDebt()">Güncelle</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-loan-debt')">İptal</button>
     </div>
-    <div class="inp-grp"><label class="inp-lbl">Tutar</label><input type="number" id="it-amt" class="inp"></div>
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div style="flex:1;" id="it-cat-div"><label class="inp-lbl">Kategori</label><select id="it-cat" class="inp"></select></div>
-        <div style="flex:1;" id="it-planStatus-div"><label class="inp-lbl">Plan Durumu</label><select id="it-planStatus" class="inp"><option value="dahil">Plana Dahil</option><option value="dahil_degil">Dahil Değil</option><option value="kapsam_disi">Kapsam Dışı</option></select></div>
+</div>
+
+<div class="modal" id="m-scan-res">
+    <div class="modal-box">
+        <h3>AI Analiz Sonucu</h3>
+        <p style="font-size:0.75rem; color:#666; margin-bottom:15px;">İşlemleri kontrol edin. Hatalı olanları silebilir, sahibini ve plan durumunu değiştirebilirsiniz.</p>
+        <div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;">
+            <label class="inp-lbl" style="margin:0 0 5px 0;">Varsayılan Kaynak/Hesap (İsteğe Bağlı)</label>
+            <select id="ai-acc" class="inp" style="background:#fff;"></select>
+        </div>
+        <div id="ai-results-list" style="max-height:50vh; overflow-y:auto; margin-bottom:15px;"></div>
+        <button class="btn-pri" style="background:var(--success)" onclick="saveScannedData()">Onayla ve Toplu Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-scan-res')">İptal Et</button>
     </div>
-    <div class="inp-grp"><label class="inp-lbl">Hesap</label><select id="it-acc" class="inp"></select></div>
-    <div class="inp-grp d-none" id="it-to-div"><label class="inp-lbl">Alıcı</label><select id="it-to" class="inp"></select></div>
-    <div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;">
-        <label><input type="checkbox" id="it-plan" onchange="toggle('it-plan-opts', this.checked)"> Gelecek/Taksitli Plan</label>
-        <div id="it-plan-opts" class="d-none" style="margin-top:5px;"><input type="number" id="it-rep" class="inp" placeholder="Kaç Ay Tekrar Etsin?" value="1"></div>
+</div>
+
+<div class="modal" id="m-edit-trans">
+    <div class="modal-box">
+        <h3>İşlemi Düzenle</h3>
+        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Yapılan tutar veya kaynak değişimi seçilen hesaba otomatik yansıyacaktır.</p>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">İşlem Tipi</label>
+                <select id="et-type" class="inp" onchange="updateEditCatList()">
+                    <option value="expense">Gider (-)</option>
+                    <option value="income">Gelir (+)</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Sahibi</label>
+                <select id="et-own" class="inp">
+                    <option value="Baba">Baba</option>
+                    <option value="Anne">Anne</option>
+                </select>
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Tarih</label>
+            <input type="date" id="et-date" class="inp">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Tutar (₺)</label>
+            <input type="number" id="et-amt" class="inp" step="0.01">
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">Kategori</label>
+                <select id="et-cat" class="inp"></select>
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Plan Durumu</label>
+                <select id="et-planStatus" class="inp">
+                    <option value="dahil">Plana Dahil</option>
+                    <option value="dahil_degil">Dahil Değil</option>
+                    <option value="kapsam_disi">Kapsam Dışı</option>
+                </select>
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Hesap / Kaynak</label>
+            <select id="et-acc" class="inp"></select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Açıklama</label>
+            <input type="text" id="et-desc" class="inp">
+        </div>
+        <button class="btn-pri" onclick="saveEditTrans()">Değişiklikleri Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-edit-trans')">İptal</button>
     </div>
-    <button class="btn-pri" onclick="saveTrans()">Kaydet</button>
-    <button class="btn-clo" onclick="closeModal('m-trans')">Kapat</button>
-</div></div>
+</div>
+
+<div class="modal" id="m-trans">
+    <div class="modal-box">
+        <h3 id="it-tit">İşlem</h3>
+        <input type="hidden" id="it-type">
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;">
+                <label class="inp-lbl">Sahibi</label>
+                <select id="it-own" class="inp">
+                    <option value="Baba">Baba</option>
+                    <option value="Anne">Anne</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label class="inp-lbl">Tarih</label>
+                <input type="date" id="it-date" class="inp">
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Tutar</label>
+            <input type="number" id="it-amt" class="inp" step="0.01">
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <div style="flex:1;" id="it-cat-div">
+                <label class="inp-lbl">Kategori</label>
+                <select id="it-cat" class="inp"></select>
+            </div>
+            <div style="flex:1;" id="it-planStatus-div">
+                <label class="inp-lbl">Plan Durumu</label>
+                <select id="it-planStatus" class="inp">
+                    <option value="dahil">Plana Dahil</option>
+                    <option value="dahil_degil">Dahil Değil</option>
+                    <option value="kapsam_disi">Kapsam Dışı</option>
+                </select>
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Hesap veya Kart (Kaynak)</label>
+            <select id="it-acc" class="inp"></select>
+        </div>
+        <div class="inp-grp d-none" id="it-to-div">
+            <label class="inp-lbl">Alıcı (Transfer Hedefi)</label>
+            <select id="it-to" class="inp"></select>
+        </div>
+        <div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;">
+            <label><input type="checkbox" id="it-plan" onchange="toggle('it-plan-opts', this.checked)"> Gelecek/Taksitli Plan (Bekleyen İşlem)</label>
+            <div id="it-plan-opts" class="d-none" style="margin-top:5px;">
+                <input type="number" id="it-rep" class="inp" placeholder="Kaç Ay Tekrar Etsin?" value="1">
+            </div>
+        </div>
+        <button class="btn-pri" onclick="saveTrans()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-trans')">Kapat</button>
+    </div>
+</div>
 
 <!-- DİĞER STANDART MODALLAR -->
-<div class="modal" id="m-asset"><div class="modal-box"><h3>Yatırım / Varlık Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip (Sadece Birey)</label><select id="ias-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Tür</label><select id="ias-type" class="inp"><option>Altın</option><option>Döviz</option><option>Kripto</option><option>Gayrimenkul</option><option>Araç</option><option>Diğer</option></select></div><div class="inp-grp"><label class="inp-lbl">Varlık Adı</label><input id="ias-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Güncel Toplam Değeri (TL)</label><input type="number" id="ias-val" class="inp"></div><button class="btn-pri" onclick="saveAsset()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-asset')">Kapat</button></div></div>
-<div class="modal" id="m-goal"><div class="modal-box"><h3>Birikim Hedefi Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip (Sadece Birey)</label><select id="ig-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Hedef Adı</label><input id="ig-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Hedeflenen Tutar</label><input type="number" id="ig-target" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Şu An Biriken</label><input type="number" id="ig-current" class="inp"></div><button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Hedefi Başlat</button><button class="btn-clo" onclick="closeModal('m-goal')">Kapat</button></div></div>
-<div class="modal" id="m-acc"><div class="modal-box"><h3>Hesap Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ia-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ia-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ia-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Bakiye</label><input type="number" id="ia-bal" class="inp"></div><button class="btn-pri" onclick="saveAcc()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-acc')">Kapat</button></div></div>
-<div class="modal" id="m-card"><div class="modal-box"><h3>Kart Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ic-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ic-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ic-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Limit</label><input type="number" id="ic-lim" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Borç</label><input type="number" id="ic-debt" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Gelecek Taksitler</label><input type="number" id="ic-fut" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Kesim / Son Ödeme</label><div style="display:flex; gap:10px"><input type="number" id="ic-cut" class="inp" placeholder="Kesim"><input type="number" id="ic-due" class="inp" placeholder="Son Ö."></div></div><button class="btn-pri" onclick="saveCard()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-card')">Kapat</button></div></div>
-<div class="modal" id="m-loan"><div class="modal-box"><h3>Kredi Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="il-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="il-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="il-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Toplam Tutar</label><input type="number" id="il-tot" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Taksit Sayısı</label><input type="number" id="il-cnt" class="inp"></div><div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px;"><label class="inp-lbl">1. Taksit</label><div style="display:flex; gap:10px;"><input type="date" id="il-date" class="inp"><input type="number" id="il-amt1" class="inp" placeholder="Tutar"></div></div><div class="inp-grp"><label class="inp-lbl">Diğer Taksitler</label><input type="number" id="il-amtr" class="inp"></div><button class="btn-pri" onclick="saveLoan()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-loan')">Kapat</button></div></div>
-<div class="modal" id="m-pay"><div class="modal-box"><h3>Ödeme Yap</h3><p id="mp-desc"></p><div class="inp-grp"><label class="inp-lbl">Kaynak Hesap</label><select id="mp-acc" class="inp"></select></div><div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;"><label><input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> Erken / İndirimli Ödeme</label><div id="mp-early-opts" class="d-none" style="margin-top:5px;"><label class="inp-lbl">Gerçek Ödenen</label><input type="number" id="mp-real" class="inp"><small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small></div></div><button class="btn-pri" onclick="confirmPay()">Öde</button><button class="btn-clo" onclick="closeModal('m-pay')">İptal</button></div></div>
-<div class="modal" id="m-close-loan"><div class="modal-box"><h3>Kredi Kapat</h3><p id="mcl-desc"></p><div class="inp-grp"><label class="inp-lbl">Kapatma Tutarı</label><input type="number" id="mcl-amt" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Kaynak Hesap</label><select id="mcl-acc" class="inp"></select></div><button class="btn-pri" style="background:var(--danger)" onclick="doCloseLoan()">Kapat ve Sil</button><button class="btn-clo" onclick="closeModal('m-close-loan')">İptal</button></div></div>
-<div class="modal" id="m-bank-list"><div class="modal-box"><h3>Bankalar</h3><div style="display:flex; gap:5px;"><input id="ib-new" class="inp"><button class="btn-pri" style="width:auto; margin:0;" onclick="addBank()">Ekle</button></div><div id="lst-banks" style="margin-top:10px;"></div><button class="btn-clo" onclick="closeModal('m-bank-list')">Kapat</button></div></div>
-<div class="modal" id="m-cat-list"><div class="modal-box"><h3>Kategoriler</h3><select id="ic-type" class="inp" onchange="renderCats()"><option value="expense">Gider</option><option value="income">Gelir</option></select><div style="display:flex; gap:5px; margin-top:5px;"><input id="ic-new" class="inp"><button class="btn-pri" style="width:auto; margin:0;" onclick="addCat()">Ekle</button></div><div id="lst-cats" style="margin-top:10px;"></div><button class="btn-clo" onclick="closeModal('m-cat-list')">Kapat</button></div></div>
-<div class="modal" id="m-day"><div class="modal-box"><h3 id="md-tit"></h3><div id="md-list"></div><button class="btn-clo" onclick="closeModal('m-day')">Kapat</button></div></div>
-<div class="modal" id="m-paste"><div class="modal-box"><h3>JSON Yapıştır</h3><textarea id="paste-txt" class="inp" rows="8"></textarea><button class="btn-pri" onclick="doPaste()">Yükle</button><button class="btn-clo" onclick="closeModal('m-paste')">Kapat</button></div></div>
+<div class="modal" id="m-asset">
+    <div class="modal-box">
+        <h3>Yatırım / Varlık Ekle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Sahip (Sadece Birey)</label>
+            <select id="ias-own" class="inp">
+                <option>Baba</option>
+                <option>Anne</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Tür</label>
+            <select id="ias-type" class="inp">
+                <option>Altın</option><option>Döviz</option><option>Kripto</option>
+                <option>Gayrimenkul</option><option>Araç</option><option>Diğer</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Varlık Adı</label>
+            <input id="ias-name" class="inp">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Güncel Toplam Değeri (TL)</label>
+            <input type="number" id="ias-val" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveAsset()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-asset')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-goal">
+    <div class="modal-box">
+        <h3>Birikim Hedefi Ekle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Sahip (Sadece Birey)</label>
+            <select id="ig-own" class="inp">
+                <option>Baba</option>
+                <option>Anne</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Hedef Adı</label>
+            <input id="ig-name" class="inp">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Hedeflenen Tutar</label>
+            <input type="number" id="ig-target" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Şu An Biriken</label>
+            <input type="number" id="ig-current" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Hedefi Başlat</button>
+        <button class="btn-clo" onclick="closeModal('m-goal')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-acc">
+    <div class="modal-box">
+        <h3>Hesap Ekle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Sahip</label>
+            <select id="ia-own" class="inp">
+                <option>Baba</option>
+                <option>Anne</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Banka</label>
+            <select id="ia-bank" class="inp"></select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Ad</label>
+            <input id="ia-name" class="inp">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Bakiye</label>
+            <input type="number" id="ia-bal" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveAcc()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-acc')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-card">
+    <div class="modal-box">
+        <h3>Kart Ekle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Sahip</label>
+            <select id="ic-own" class="inp">
+                <option>Baba</option>
+                <option>Anne</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Banka</label>
+            <select id="ic-bank" class="inp"></select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Ad</label>
+            <input id="ic-name" class="inp">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Limit</label>
+            <input type="number" id="ic-lim" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Borç</label>
+            <input type="number" id="ic-debt" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Gelecek Taksitler</label>
+            <input type="number" id="ic-fut" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kesim / Son Ödeme</label>
+            <div style="display:flex; gap:10px">
+                <input type="number" id="ic-cut" class="inp" placeholder="Kesim">
+                <input type="number" id="ic-due" class="inp" placeholder="Son Ö.">
+            </div>
+        </div>
+        <button class="btn-pri" onclick="saveCard()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-card')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-loan">
+    <div class="modal-box">
+        <h3>Kredi Ekle</h3>
+        <div class="inp-grp">
+            <label class="inp-lbl">Sahip</label>
+            <select id="il-own" class="inp">
+                <option>Baba</option>
+                <option>Anne</option>
+            </select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Banka</label>
+            <select id="il-bank" class="inp"></select>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Ad</label>
+            <input id="il-name" class="inp">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Toplam Tutar</label>
+            <input type="number" id="il-tot" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Taksit Sayısı</label>
+            <input type="number" id="il-cnt" class="inp">
+        </div>
+        <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <label class="inp-lbl">1. Taksit</label>
+            <div style="display:flex; gap:10px;">
+                <input type="date" id="il-date" class="inp">
+                <input type="number" id="il-amt1" class="inp" placeholder="Tutar" step="0.01">
+            </div>
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Diğer Taksitler</label>
+            <input type="number" id="il-amtr" class="inp" step="0.01">
+        </div>
+        <button class="btn-pri" onclick="saveLoan()">Kaydet</button>
+        <button class="btn-clo" onclick="closeModal('m-loan')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-pay">
+    <div class="modal-box">
+        <h3>Ödeme Yap</h3>
+        <p id="mp-desc"></p>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kaynak Hesap</label>
+            <select id="mp-acc" class="inp"></select>
+        </div>
+        <div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <label>
+                <input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> 
+                Erken / İndirimli Ödeme
+            </label>
+            <div id="mp-early-opts" class="d-none" style="margin-top:5px;">
+                <label class="inp-lbl">Gerçek Ödenen</label>
+                <input type="number" id="mp-real" class="inp" step="0.01">
+                <small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small>
+            </div>
+        </div>
+        <button class="btn-pri" onclick="confirmPay()">Öde</button>
+        <button class="btn-clo" onclick="closeModal('m-pay')">İptal</button>
+    </div>
+</div>
+
+<div class="modal" id="m-close-loan">
+    <div class="modal-box">
+        <h3>Kredi Kapat</h3>
+        <p id="mcl-desc"></p>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kapatma Tutarı</label>
+            <input type="number" id="mcl-amt" class="inp" step="0.01">
+        </div>
+        <div class="inp-grp">
+            <label class="inp-lbl">Kaynak Hesap</label>
+            <select id="mcl-acc" class="inp"></select>
+        </div>
+        <button class="btn-pri" style="background:var(--danger)" onclick="doCloseLoan()">Kapat ve Sil</button>
+        <button class="btn-clo" onclick="closeModal('m-close-loan')">İptal</button>
+    </div>
+</div>
+
+<div class="modal" id="m-bank-list">
+    <div class="modal-box">
+        <h3>Bankalar</h3>
+        <div style="display:flex; gap:5px;">
+            <input id="ib-new" class="inp">
+            <button class="btn-pri" style="width:auto; margin:0;" onclick="addBank()">Ekle</button>
+        </div>
+        <div id="lst-banks" style="margin-top:10px;"></div>
+        <button class="btn-clo" onclick="closeModal('m-bank-list')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-cat-list">
+    <div class="modal-box">
+        <h3>Kategoriler</h3>
+        <select id="ic-type" class="inp" onchange="renderCats()">
+            <option value="expense">Gider</option>
+            <option value="income">Gelir</option>
+        </select>
+        <div style="display:flex; gap:5px; margin-top:5px;">
+            <input id="ic-new" class="inp">
+            <button class="btn-pri" style="width:auto; margin:0;" onclick="addCat()">Ekle</button>
+        </div>
+        <div id="lst-cats" style="margin-top:10px;"></div>
+        <button class="btn-clo" onclick="closeModal('m-cat-list')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-day">
+    <div class="modal-box">
+        <h3 id="md-tit"></h3>
+        <div id="md-list"></div>
+        <button class="btn-clo" onclick="closeModal('m-day')">Kapat</button>
+    </div>
+</div>
+
+<div class="modal" id="m-paste">
+    <div class="modal-box">
+        <h3>JSON Yapıştır</h3>
+        <textarea id="paste-txt" class="inp" rows="8"></textarea>
+        <button class="btn-pri" onclick="doPaste()">Yükle</button>
+        <button class="btn-clo" onclick="closeModal('m-paste')">Kapat</button>
+    </div>
+</div>
 
 <script>
 const SUPABASE_URL = 'https://kdycxoweuaxslzbklprh.supabase.co';
@@ -356,12 +747,12 @@ let db = {
 let curPro = 'Hane', curDate = new Date(), payId = null, closeId = null;
 let scannedItems = [];
 let editTransId = null; let editIsPlan = false;
+let editAccBalIdx = null; let editCardDebtIdx = null; let editLoanDebtIdx = null;
 
-// CHART.JS INSTANCES
 let catChartInstance = null;
 let monthlyTrendChartInstance = null;
 
-// --- YARDIMCI FONKSİYONLAR VE AYARLAR ---
+// --- YARDIMCI FONKSİYONLAR ---
 function loadSettings() {
     const key = localStorage.getItem('hf_gemini_key');
     if (key) document.getElementById('set-api-key').value = key;
@@ -421,6 +812,49 @@ function setPro(p) {
     if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
 }
 
+// --- MANUEL BAKİYE DÜZENLEME (HESAP, KART, KREDİ) ---
+function openEditAccBal(idx) {
+    editAccBalIdx = idx;
+    document.getElementById('eab-val').value = db.accounts[idx].balance;
+    openModal('m-edit-acc-bal');
+}
+
+function saveEditAccBal() {
+    if(editAccBalIdx !== null) {
+        db.accounts[editAccBalIdx].balance = parseFloat(document.getElementById('eab-val').value) || 0;
+        save();
+        closeModal('m-edit-acc-bal');
+    }
+}
+
+function openEditCardDebt(idx) {
+    editCardDebtIdx = idx;
+    document.getElementById('ecd-val').value = db.cards[idx].debt;
+    openModal('m-edit-card-debt');
+}
+
+function saveEditCardDebt() {
+    if(editCardDebtIdx !== null) {
+        db.cards[editCardDebtIdx].debt = parseFloat(document.getElementById('ecd-val').value) || 0;
+        save();
+        closeModal('m-edit-card-debt');
+    }
+}
+
+function openEditLoanDebt(idx) {
+    editLoanDebtIdx = idx;
+    document.getElementById('eld-val').value = db.loans[idx].remaining;
+    openModal('m-edit-loan-debt');
+}
+
+function saveEditLoanDebt() {
+    if(editLoanDebtIdx !== null) {
+        db.loans[editLoanDebtIdx].remaining = parseFloat(document.getElementById('eld-val').value) || 0;
+        save();
+        closeModal('m-edit-loan-debt');
+    }
+}
+
 // --- LİMİT AYARLARI ---
 function openLimits() {
     document.getElementById('lim-dahil').value = db.limits.planDahil || '';
@@ -436,6 +870,30 @@ function saveLimits() {
     save();
     closeModal('m-limits');
     if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
+}
+
+// --- OTOMATİK BAKİYE ETKİLEŞİMİ (MUHASEBE MANTIĞI) ---
+function applyBalanceEffect(sourceId, type, amount, reverse = false) {
+    if (!sourceId || sourceId === 'none') return;
+    
+    const parts = sourceId.split('-');
+    const sType = parts[0];
+    const sIdx = parts[1];
+    
+    let sign = (type === 'expense') ? -1 : 1; 
+    if (reverse) sign *= -1; 
+
+    if (sType === 'acc' && db.accounts[sIdx]) {
+        db.accounts[sIdx].balance += (sign * amount);
+    } else if (sType === 'card' && db.cards[sIdx]) {
+        if (!reverse) {
+            if (type === 'expense') db.cards[sIdx].debt += amount;
+            else db.cards[sIdx].debt -= amount;
+        } else {
+            if (type === 'expense') db.cards[sIdx].debt -= amount;
+            else db.cards[sIdx].debt += amount;
+        }
+    }
 }
 
 // --- YAPAY ZEKA (VISION AI) OKUMA SÜRECİ ---
@@ -487,13 +945,13 @@ async function processScan(input) {
             });
             const res = await response.json();
             if (res.error) throw new Error("API Hatası: " + res.error.message);
-
+            
             try {
                 scannedItems = JSON.parse(res.candidates[0].content.parts[0].text);
             } catch (parseError) {
                 throw new Error("Yapay Zeka JSON formatını bozdu. Lütfen tekrar deneyin.");
             }
-
+            
             if (scannedItems.length === 0) throw new Error("Görselde işlem bulunamadı veya tutarlar okunamadı.");
             renderScanModal(scannedItems);
 
@@ -501,7 +959,7 @@ async function processScan(input) {
             console.error(err);
             alert("Okuma İşlemi Başarısız Oldu!\n\nDetay:\n" + err.message);
         }
-
+        
         document.getElementById('cloud-status').innerText = "☁️ Güncel";
         document.getElementById('cloud-status').style.color = "var(--success)";
         input.value = "";
@@ -519,7 +977,9 @@ function removeScannedItem(idx) {
             item.category = document.getElementById(`ai-cat-${i}`).value;
         }
     });
+    
     scannedItems.splice(idx, 1);
+    
     if (scannedItems.length === 0) {
         closeModal('m-scan-res');
         alert("Tüm işlemler listeden silindi.");
@@ -532,9 +992,10 @@ function renderScanModal(items) {
     const aiAccSelect = document.getElementById('ai-acc');
     aiAccSelect.innerHTML = '';
     aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
+    
     db.accounts.forEach((a, i) => aiAccSelect.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
     db.cards.forEach((c, i) => aiAccSelect.add(new Option('Kart: ' + c.name, 'card-' + i)));
-
+    
     let dl = document.getElementById('cat-list-options');
     if (!dl) {
         dl = document.createElement('datalist');
@@ -543,9 +1004,10 @@ function renderScanModal(items) {
     }
     dl.innerHTML = '';
     db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
-
+    
     const list = document.getElementById('ai-results-list');
     list.innerHTML = '';
+    
     items.forEach((item, index) => {
         list.innerHTML += `
             <div class="ai-row-box">
@@ -567,27 +1029,18 @@ function renderScanModal(items) {
                         <option value="kapsam_disi">Kapsam D.</option>
                     </select>
                 </div>
-            </div>
-        `;
+            </div>`;
     });
     openModal('m-scan-res');
 }
 
 function saveScannedData() {
     const targetVal = document.getElementById('ai-acc').value;
-    let tType = null, tIdx = null;
     
-    if (targetVal !== 'none') {
-        const parts = targetVal.split('-');
-        tType = parts[0];
-        tIdx = parts[1];
-    }
-
-    let totalDeduction = 0;
     scannedItems.forEach((item, index) => {
         const descEl = document.getElementById(`ai-desc-${index}`);
         if (!descEl) return;
-
+        
         const desc = descEl.value;
         const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
         
@@ -605,11 +1058,13 @@ function saveScannedData() {
         }
 
         if (amt !== 0) {
-            totalDeduction += amt;
+            let parsedType = amt >= 0 ? 'expense' : 'income';
+            let parsedAmt = Math.abs(amt);
+            
             db.transactions.push({
                 id: 't_' + Date.now() + '_' + index,
-                type: amt >= 0 ? 'expense' : 'income',
-                amount: Math.abs(amt),
+                type: parsedType,
+                amount: parsedAmt,
                 category: cat,
                 description: desc,
                 date: finalDate,
@@ -617,13 +1072,11 @@ function saveScannedData() {
                 planStatus: planStat,
                 sourceId: targetVal !== 'none' ? targetVal : null
             });
+            
+            // Otomatik Bakiye Etkileme
+            applyBalanceEffect(targetVal, parsedType, parsedAmt, false);
         }
     });
-
-    if (targetVal !== 'none') {
-        if (tType === 'acc' && db.accounts[tIdx]) db.accounts[tIdx].balance -= totalDeduction;
-        if (tType === 'card' && db.cards[tIdx]) db.cards[tIdx].debt += totalDeduction;
-    }
     
     save();
     closeModal('m-scan-res');
@@ -665,6 +1118,7 @@ async function init() {
             document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor...";
             const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]);
             if (insertErr) throw insertErr;
+            
             document.getElementById('cloud-status').innerText = "☁️ Güncel";
             document.getElementById('cloud-status').style.color = "#10b981";
         } else {
@@ -689,6 +1143,7 @@ async function init() {
     
     const t = new Date().toISOString().split('T')[0];
     ['il-date', 'it-date'].forEach(i => { if (document.getElementById(i)) document.getElementById(i).value = t; });
+    
     loadSettings();
 }
 
@@ -826,28 +1281,31 @@ function openTrans(type) {
 function saveTrans() {
     const type = document.getElementById('it-type').value;
     const amt = parseFloat(document.getElementById('it-amt').value);
-    const accIdx = document.getElementById('it-acc').value;
     const isPlan = document.getElementById('it-plan').checked;
     const tDate = document.getElementById('it-date').value;
     const owner = document.getElementById('it-own').value;
     const planStatus = type === 'transfer' ? 'kapsam_disi' : document.getElementById('it-planStatus').value;
-
+    
     if (!amt) return alert('Tutar?');
-    const acc = db.accounts[accIdx];
-    let sourceId = accIdx !== 'none' ? 'acc-' + accIdx : null;
+    
+    let sourceId = document.getElementById('it-acc').value !== 'none' ? document.getElementById('it-acc').value : null;
 
     if (type === 'transfer') {
-        const [tt, ti] = document.getElementById('it-to').value.split('-');
-        if (acc) acc.balance -= amt;
-        if (tt === 'acc') db.accounts[ti].balance += amt;
-        if (tt === 'card') db.cards[ti].debt -= amt;
-        if (tt === 'loan') db.loans[ti].remaining -= amt;
+        let toIdVal = document.getElementById('it-to').value;
+        
+        applyBalanceEffect(sourceId, 'expense', amt, false);
+        applyBalanceEffect(toIdVal, 'income', amt, false);
         
         db.transactions.push({
             id: 't_' + Date.now(),
-            type, amount: amt, category: 'Transfer',
+            type,
+            amount: amt,
+            category: 'Transfer',
             date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(),
-            owner: owner, sourceId: sourceId, planStatus: planStatus
+            owner: owner,
+            sourceId: sourceId,
+            toId: toIdVal,
+            planStatus: planStatus
         });
     } else {
         if (isPlan) {
@@ -856,23 +1314,30 @@ function saveTrans() {
             for (let i = 0; i < rep; i++) {
                 db.planned.push({
                     id: 'p_' + Date.now() + '_' + i,
-                    type, category: document.getElementById('it-cat').value,
-                    title: document.getElementById('it-cat').value, amount: amt,
-                    date: d.toISOString().split('T')[0], isPaid: false,
-                    owner: owner, sourceId: sourceId, planStatus: planStatus
+                    type,
+                    category: document.getElementById('it-cat').value,
+                    title: document.getElementById('it-cat').value,
+                    amount: amt,
+                    date: d.toISOString().split('T')[0],
+                    isPaid: false,
+                    owner: owner,
+                    sourceId: sourceId,
+                    planStatus: planStatus
                 });
                 d.setMonth(d.getMonth() + 1);
             }
         } else {
-            if (acc) {
-                if (type === 'expense') acc.balance -= amt;
-                else acc.balance += amt;
-            }
+            applyBalanceEffect(sourceId, type, amt, false);
+            
             db.transactions.push({
                 id: 't_' + Date.now(),
-                type, amount: amt, category: document.getElementById('it-cat').value,
+                type,
+                amount: amt,
+                category: document.getElementById('it-cat').value,
                 date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(),
-                owner: owner, sourceId: sourceId, planStatus: planStatus
+                owner: owner,
+                sourceId: sourceId,
+                planStatus: planStatus
             });
         }
     }
@@ -910,11 +1375,15 @@ function openEditTrans(id, isPlan) {
     const etAccSelect = document.getElementById('et-acc');
     etAccSelect.innerHTML = '';
     etAccSelect.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
+    
     db.accounts.forEach((a, i) => etAccSelect.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
     db.cards.forEach((c, i) => etAccSelect.add(new Option('Kart: ' + c.name, 'card-' + i)));
     
-    if (t.sourceId) etAccSelect.value = t.sourceId;
-    else etAccSelect.value = 'none';
+    if (t.sourceId) {
+        etAccSelect.value = t.sourceId;
+    } else {
+        etAccSelect.value = 'none';
+    }
     
     openModal('m-edit-trans');
 }
@@ -923,21 +1392,44 @@ function saveEditTrans() {
     const t = editIsPlan ? db.planned.find(x => x.id == editTransId) : db.transactions.find(x => x.id == editTransId);
     if (!t) return;
 
+    if (!editIsPlan) {
+        if (t.type === 'transfer' && t.toId) {
+            applyBalanceEffect(t.sourceId, 'expense', t.amount, true);
+            applyBalanceEffect(t.toId, 'income', t.amount, true);
+        } else {
+            applyBalanceEffect(t.sourceId, t.type, t.amount, true);
+        }
+    }
+
     t.type = document.getElementById('et-type').value;
     t.owner = document.getElementById('et-own').value;
     t.planStatus = document.getElementById('et-planStatus').value;
     t.amount = parseFloat(document.getElementById('et-amt').value) || 0;
     
     let dateVal = document.getElementById('et-date').value;
-    if (dateVal) t.date = `${dateVal}T12:00:00.000Z`;
+    if (dateVal) {
+        t.date = `${dateVal}T12:00:00.000Z`;
+    }
 
     t.category = document.getElementById('et-cat').value;
     
-    if (editIsPlan) t.title = document.getElementById('et-desc').value;
-    else t.description = document.getElementById('et-desc').value;
+    if (editIsPlan) {
+        t.title = document.getElementById('et-desc').value;
+    } else {
+        t.description = document.getElementById('et-desc').value;
+    }
 
     const accVal = document.getElementById('et-acc').value;
     t.sourceId = accVal !== 'none' ? accVal : null;
+
+    if (!editIsPlan) {
+        if (t.type === 'transfer' && t.toId) {
+            applyBalanceEffect(t.sourceId, 'expense', t.amount, false);
+            applyBalanceEffect(t.toId, 'income', t.amount, false);
+        } else {
+            applyBalanceEffect(t.sourceId, t.type, t.amount, false);
+        }
+    }
 
     save();
     closeModal('m-edit-trans');
@@ -945,16 +1437,31 @@ function saveEditTrans() {
     if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
     
     const mdTit = document.getElementById('md-tit').innerText;
-    if (mdTit && mdTit.includes('Detayları')) openDay(mdTit.replace(' Detayları', '').trim());
+    if (mdTit && mdTit.includes('Detayları')) {
+        openDay(mdTit.replace(' Detayları', '').trim());
+    }
 }
 
 function delTrans(id) {
-    if (confirm('Bu işlemi silmek istediğinize emin misiniz? (Banka bakiyeniz otomatik etkilenmez)')) {
+    if (confirm('Bu işlemi silmek istediğinize emin misiniz?')) {
+        const t = db.transactions.find(x => x.id == id);
+        if (t) {
+            if (t.type === 'transfer' && t.toId) {
+                applyBalanceEffect(t.sourceId, 'expense', t.amount, true);
+                applyBalanceEffect(t.toId, 'income', t.amount, true);
+            } else {
+                applyBalanceEffect(t.sourceId, t.type, t.amount, true);
+            }
+        }
+        
         db.transactions = db.transactions.filter(x => x.id != id);
         save();
         
         const mdTit = document.getElementById('md-tit').innerText;
-        if (mdTit && mdTit.includes('Detayları')) openDay(mdTit.replace(' Detayları', '').trim());
+        if (mdTit && mdTit.includes('Detayları')) {
+            openDay(mdTit.replace(' Detayları', '').trim());
+        }
+        
         if (document.getElementById('p-analysis').classList.contains('active')) renderAnl();
     }
 }
@@ -978,15 +1485,20 @@ function render() {
     document.getElementById('dash-dbt').innerText = fmt(dbt);
 
     let score = 0, desc = "Analiz Ediliyor";
-    if (ast === 0 && dbt === 0) { score = 50; desc = "Yeni Başlangıç"; }
-    else if (ast > 0 && dbt === 0) { score = 99; desc = "Mükemmel Durum 🏆"; }
-    else {
+    if (ast === 0 && dbt === 0) {
+        score = 50;
+        desc = "Yeni Başlangıç";
+    } else if (ast > 0 && dbt === 0) {
+        score = 99;
+        desc = "Mükemmel Durum 🏆";
+    } else {
         score = Math.round((ast / (ast + dbt)) * 100);
         if (score > 75) desc = "Çok İyi Durum 🌟";
         else if (score > 50) desc = "Sağlıklı Denge 👍";
         else if (score > 25) desc = "Dikkatli Olun ⚠️";
         else desc = "Kritik Seviye 🚨";
     }
+    
     document.getElementById('health-score').innerText = score;
     document.getElementById('health-desc').innerText = desc;
 
@@ -997,30 +1509,58 @@ function render() {
         fAcc.filter(x => x.bank === b).forEach(x => { net += x.balance; has = true; });
         fCards.filter(x => x.bank === b).forEach(x => { net -= (x.debt + x.future); has = true; });
         fLoans.filter(x => x.bank === b).forEach(x => { net -= x.remaining; has = true; });
-        if (has) bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`;
+        
+        if (has) {
+            bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`;
+        }
     });
 
     const al = document.getElementById('list-acc');
     al.innerHTML = '';
-    fAcc.forEach((a, i) => al.innerHTML += `<div class="item"><span>${a.bank}-${a.name}</span><b>${fmt(a.balance)} <button class="btn-del" onclick="del('accounts',${i})">×</button></b></div>`);
+    fAcc.forEach((a, i) => {
+        al.innerHTML += `<div class="item"><span>${a.bank}-${a.name}</span><div style="display:flex; align-items:center; gap:5px;"><b>${fmt(a.balance)}</b> <button class="act-btn" style="background:#64748b; padding:2px 6px;" onclick="openEditAccBal(${i})">✏️</button> <button class="btn-del" onclick="del('accounts',${i})">×</button></div></div>`;
+    });
 
     const asl = document.getElementById('list-assets');
     asl.innerHTML = '';
-    fAssets.forEach((a, i) => asl.innerHTML += `<div class="item"><span><span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> ${a.name}</span><b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b></div>`);
-    if (fAssets.length === 0) asl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Henüz yatırım eklenmemiş.</div>';
+    fAssets.forEach((a, i) => {
+        asl.innerHTML += `<div class="item"><span><span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> ${a.name}</span><b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b></div>`;
+    });
+    
+    if (fAssets.length === 0) {
+        asl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Henüz yatırım eklenmemiş.</div>';
+    }
 
     const gl = document.getElementById('list-goals');
     gl.innerHTML = '';
     (db.goals || []).forEach((g, i) => {
         let pct = Math.min(100, Math.round((g.current / g.target) * 100)) || 0;
-        gl.innerHTML += `<div style="padding:15px 0; border-bottom:1px solid #f1f5f9;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; font-size:0.9rem;">${g.name}</span><span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span></div><div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;"><span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div></div>`;
+        gl.innerHTML += `
+            <div style="padding:15px 0; border-bottom:1px solid #f1f5f9;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-weight:bold; font-size:0.9rem;">${g.name}</span>
+                    <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;">
+                    <span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span>
+                </div>
+                <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+            </div>`;
     });
-    if ((db.goals || []).length === 0) gl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Hedef belirlenmemiş.</div>';
+    
+    if ((db.goals || []).length === 0) {
+        gl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Hedef belirlenmemiş.</div>';
+    }
 
     const dl = document.getElementById('list-debts');
     dl.innerHTML = '';
-    fCards.forEach((c, i) => dl.innerHTML += `<div class="item"><span>${c.bank}-${c.name} (Kart)</span><div><span class="text-red">-${fmt(c.debt)}</span> <button class="btn-del" onclick="del('cards',${i})">×</button></div></div>`);
-    fLoans.forEach((l, i) => { dl.innerHTML += `<div class="item"><span>${l.bank}-${l.name} (Kredi)</span><div><span class="text-red">-${fmt(l.remaining)}</span> <button class="act-btn" style="background:var(--purple); color:white; margin:0 5px;" onclick="openCloseLoan(${i})">Kapat</button><button class="btn-del" onclick="del('loans',${i})">×</button></div></div>`; });
+    fCards.forEach((c, i) => {
+        dl.innerHTML += `<div class="item"><span>${c.bank}-${c.name} (Kart)</span><div style="display:flex; align-items:center; gap:5px;"><span class="text-red">-${fmt(c.debt)}</span> <button class="act-btn" style="background:#64748b; padding:2px 6px;" onclick="openEditCardDebt(${i})">✏️</button> <button class="btn-del" onclick="del('cards',${i})">×</button></div></div>`;
+    });
+    
+    fLoans.forEach((l, i) => {
+        dl.innerHTML += `<div class="item"><span>${l.bank}-${l.name} (Kredi)</span><div style="display:flex; align-items:center; gap:5px;"><span class="text-red">-${fmt(l.remaining)}</span> <button class="act-btn" style="background:#64748b; padding:2px 6px;" onclick="openEditLoanDebt(${i})">✏️</button> <button class="act-btn" style="background:var(--purple); color:white; padding:2px 6px;" onclick="openCloseLoan(${i})">Kapat</button><button class="btn-del" onclick="del('loans',${i})">×</button></div></div>`;
+    });
 
     renderCal(fPlans, fTrans);
 }
@@ -1034,8 +1574,12 @@ function renderCal(plans, trans) {
     grid.innerHTML = '';
     ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].forEach(d => grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`);
 
-    const dim = new Date(y, m + 1, 0).getDate(), start = new Date(y, m, 1).getDay() || 7;
-    for (let i = 1; i < start; i++) grid.innerHTML += `<div></div>`;
+    const dim = new Date(y, m + 1, 0).getDate();
+    const start = new Date(y, m, 1).getDay() || 7;
+    
+    for (let i = 1; i < start; i++) {
+        grid.innerHTML += `<div></div>`;
+    }
 
     for (let d = 1; d <= dim; d++) {
         const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -1064,6 +1608,7 @@ function renderCal(plans, trans) {
                 else if (t.type === 'expense') exp += t.amount;
             }
         });
+        
         plans.forEach(p => {
             const pd = new Date(p.date);
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) {
@@ -1071,20 +1616,33 @@ function renderCal(plans, trans) {
                 else if (p.type === 'expense') exp += p.amount;
             }
         });
+        
         pv.innerHTML += `<div class="p-card"><div class="p-head">${pr.s}-${pr.e}</div><div class="text-grn">+${fmt(inc)}</div><div class="text-red">-${fmt(exp)}</div><div class="p-net">${fmt(inc - exp)}</div></div>`;
     });
 
     const ml = document.getElementById('list-plans');
     ml.innerHTML = '';
+    
     let allMonthItems = [];
-    trans.forEach(t => { if ((t.date || '').startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) allMonthItems.push({ ...t, isReal: true, sortDate: t.date }); });
-    plans.forEach(p => { if (p.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) allMonthItems.push({ ...p, isReal: false, sortDate: p.date }); });
+    trans.forEach(t => {
+        if ((t.date || '').startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
+            allMonthItems.push({ ...t, isReal: true, sortDate: t.date });
+        }
+    });
+    
+    plans.forEach(p => {
+        if (p.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
+            allMonthItems.push({ ...p, isReal: false, sortDate: p.date });
+        }
+    });
+    
     allMonthItems.sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
 
     allMonthItems.forEach(item => {
         const isInc = item.type === 'income';
         const color = isInc ? 'var(--success)' : 'var(--danger)';
         const sign = isInc ? '+' : '-';
+        
         if (item.isReal) {
             ml.innerHTML += `<div class="item"><span>${item.category} <small style="color:#888">${(item.date || '').split('T')[0]}</small><br><small style="color:#aaa">${item.description || 'Gerçekleşen İşlem'}</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span></div></div>`;
         } else {
@@ -1143,6 +1701,7 @@ function openDay(d) {
                 </div>
             </div>`;
     });
+    
     openModal('m-day');
 }
 
@@ -1163,11 +1722,9 @@ function confirmPay() {
         if (loan) loan.remaining -= p.amount;
     }
 
-    let sourceId = 'acc-' + accIdx;
-    if (acc) {
-        if (p.type === 'expense') acc.balance -= amt;
-        else acc.balance += amt;
-    }
+    let sourceId = accIdx !== 'none' ? 'acc-' + accIdx : null;
+    
+    applyBalanceEffect(sourceId, p.type, amt, false);
 
     p.isPaid = true;
     db.transactions.push({
@@ -1203,11 +1760,11 @@ function openCloseLoan(idx) {
 
 function doCloseLoan() {
     const amt = parseFloat(document.getElementById('mcl-amt').value);
-    const acc = db.accounts[document.getElementById('mcl-acc').value];
+    const accIdx = document.getElementById('mcl-acc').value;
     const loan = db.loans[closeId];
     
-    if (acc) acc.balance -= amt;
-    
+    applyBalanceEffect('acc-'+accIdx, 'expense', amt, false);
+
     db.transactions.push({
         id: 't_' + Date.now(),
         type: 'expense',
@@ -1237,11 +1794,19 @@ function del(type, idx) {
 }
 
 function updSel() {
-    const accs = document.querySelectorAll('#it-acc, #mp-acc, #mcl-acc');
+    const accs = document.querySelectorAll('#mp-acc, #mcl-acc');
     accs.forEach(s => {
         s.innerHTML = '';
         db.accounts.forEach((a, i) => s.add(new Option(a.name, i)));
     });
+
+    const itAcc = document.getElementById('it-acc');
+    if (itAcc) {
+        itAcc.innerHTML = '';
+        itAcc.add(new Option('Belirtilmedi / Sadece Rapor', 'none'));
+        db.accounts.forEach((a, i) => itAcc.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
+        db.cards.forEach((c, i) => itAcc.add(new Option('Kart: ' + c.name, 'card-' + i)));
+    }
 
     const tgs = document.getElementById('it-target');
     if (tgs) {
@@ -1249,6 +1814,14 @@ function updSel() {
         db.accounts.forEach((a, i) => tgs.add(new Option('H:' + a.name, 'acc-' + i)));
         db.cards.forEach((c, i) => tgs.add(new Option('K:' + c.name, 'card-' + i)));
         db.loans.forEach((l, i) => tgs.add(new Option('Kr:' + l.name, 'loan-' + i)));
+    }
+    
+    const itTo = document.getElementById('it-to');
+    if (itTo) {
+        itTo.innerHTML = '';
+        db.accounts.forEach((a, i) => itTo.add(new Option('Hesap: ' + a.name, 'acc-' + i)));
+        db.cards.forEach((c, i) => itTo.add(new Option('Kart: ' + c.name, 'card-' + i)));
+        db.loans.forEach((l, i) => itTo.add(new Option('Kredi: ' + l.name, 'loan-' + i)));
     }
 
     const bnks = document.querySelectorAll('#ia-bank, #ic-bank, #il-bank');
@@ -1289,6 +1862,7 @@ function calcLoan() {
     const term = parseFloat(document.getElementById('la-term').value);
     const inst = parseFloat(document.getElementById('la-inst').value);
     const res = document.getElementById('loan-compare-res');
+    
     res.innerHTML = '';
     
     if (amt && term && inst) {
@@ -1318,6 +1892,7 @@ function doPaste() {
         if (j.planned) db.planned = db.planned.concat(j.planned);
         if (j.accounts) db.accounts = db.accounts.concat(j.accounts);
         if (j.cards) db.cards = db.cards.concat(j.cards);
+        
         save();
         closeModal('m-paste');
     } catch (e) {
@@ -1339,6 +1914,7 @@ function renderAnl() {
     filteredTx = filteredTx.filter(t => {
         if (!t.date) return false;
         const d = new Date(t.date);
+        
         if (period === 'all') return true;
         if (period === 'year') return d.getFullYear() === now.getFullYear();
         if (period === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
@@ -1351,6 +1927,7 @@ function renderAnl() {
 
     const cats = {};
     let totExpense = 0;
+    
     filteredTx.forEach(t => {
         cats[t.category] = (cats[t.category] || 0) + t.amount;
         totExpense += t.amount;
@@ -1358,6 +1935,7 @@ function renderAnl() {
     
     let maxCat = '-';
     let maxCatAmt = 0;
+    
     for (let k in cats) {
         if (cats[k] > maxCatAmt) {
             maxCatAmt = cats[k];
@@ -1376,6 +1954,7 @@ function renderAnl() {
     const catData = catLabels.map(k => cats[k]);
     
     const ctxCat = document.getElementById('categoryDoughnutChart').getContext('2d');
+    
     if (catChartInstance) catChartInstance.destroy();
     
     catChartInstance = new Chart(ctxCat, {
@@ -1405,6 +1984,7 @@ function renderAnl() {
     const limKapsamDisi = db.limits.kapsamDisi || 0;
     
     let totDahil = 0, totDahilDegil = 0, totKapsamDisi = 0;
+    
     filteredTx.forEach(t => {
         if (t.planStatus === 'dahil') totDahil += t.amount;
         else if (t.planStatus === 'dahil_degil') totDahilDegil += t.amount;
@@ -1437,10 +2017,12 @@ function renderAnl() {
     barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım)', totKapsamDisi, limKapsamDisi);
 
     const trendContainer = document.getElementById('anl-trend-container');
+    
     if (period === 'year' || period === 'all') {
         trendContainer.style.display = 'block';
         
         let monthGroups = {};
+        
         filteredTx.forEach(t => {
             let d = new Date(t.date);
             let mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -1472,6 +2054,7 @@ function renderAnl() {
         }
 
         const ctxTrend = document.getElementById('monthlyTrendChart').getContext('2d');
+        
         if (monthlyTrendChartInstance) monthlyTrendChartInstance.destroy();
         
         monthlyTrendChartInstance = new Chart(ctxTrend, {
