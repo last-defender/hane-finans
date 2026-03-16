@@ -221,7 +221,7 @@
 <!-- AI TARAMA SONUÇ MODALI -->
 <div class="modal" id="m-scan-res"><div class="modal-box">
     <h3>Yapay Zeka Analiz Sonucu</h3>
-    <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Aşağıdaki işlemleri gözden geçirin. Yanlış tahmin edilen kategorileri düzeltebilir, yenisini yazabilir veya hatalı satırları silebilirsiniz.</p>
+    <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Aşağıdaki işlemleri gözden geçirin. Yanlış tahmin edilen kategorileri düzeltebilir, yenisini yazabilir veya hatalı satırları silebilirsiniz. (Buraya yazdığınız yeni kategoriler havuzunuza kalıcı eklenecektir).</p>
     
     <div class="inp-grp">
         <label class="inp-lbl">Hangi Hesaba/Karta İşlensin?</label>
@@ -245,7 +245,7 @@
     
     <div class="inp-grp">
         <label class="inp-lbl">İşlem Tipi</label>
-        <select id="et-type" class="inp">
+        <select id="et-type" class="inp" onchange="updateEditCatList()">
             <option value="expense">Gider (-)</option>
             <option value="income">Gelir (+)</option>
         </select>
@@ -255,9 +255,8 @@
     <div class="inp-grp"><label class="inp-lbl">Tutar (₺)</label><input type="number" id="et-amt" class="inp" step="0.01"></div>
     
     <div class="inp-grp">
-        <label class="inp-lbl">Kategori</label>
-        <input type="text" id="et-cat" class="inp" list="edit-cat-list" placeholder="Listeden seçin veya yeni yazın...">
-        <datalist id="edit-cat-list"></datalist>
+        <label class="inp-lbl">Kategori (Sadece Listeden)</label>
+        <select id="et-cat" class="inp"></select>
     </div>
 
     <div class="inp-grp">
@@ -270,11 +269,11 @@
     <button class="btn-clo" onclick="closeModal('m-edit-trans')">İptal</button>
 </div></div>
 
-<!-- DİĞER MODALLAR -->
-<div class="modal" id="m-asset"><div class="modal-box"><h3>Yatırım / Varlık Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ias-own" class="inp"><option>Hane</option><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Tür</label><select id="ias-type" class="inp"><option>Altın</option><option>Döviz</option><option>Kripto</option><option>Gayrimenkul</option><option>Araç</option><option>Diğer</option></select></div><div class="inp-grp"><label class="inp-lbl">Varlık Adı</label><input id="ias-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Güncel Toplam Değeri (TL)</label><input type="number" id="ias-val" class="inp"></div><button class="btn-pri" onclick="saveAsset()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-asset')">Kapat</button></div></div>
-<div class="modal" id="m-goal"><div class="modal-box"><h3>Birikim Hedefi Ekle</h3><div class="inp-grp"><label class="inp-lbl">Hedef Adı</label><input id="ig-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Hedeflenen Tutar</label><input type="number" id="ig-target" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Şu An Biriken</label><input type="number" id="ig-current" class="inp"></div><button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Hedefi Başlat</button><button class="btn-clo" onclick="closeModal('m-goal')">Kapat</button></div></div>
+<!-- DİĞER MODALLAR (Sahiplikleri Düzenlendi) -->
+<div class="modal" id="m-asset"><div class="modal-box"><h3>Yatırım / Varlık Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip (Sadece Birey)</label><select id="ias-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Tür</label><select id="ias-type" class="inp"><option>Altın</option><option>Döviz</option><option>Kripto</option><option>Gayrimenkul</option><option>Araç</option><option>Diğer</option></select></div><div class="inp-grp"><label class="inp-lbl">Varlık Adı</label><input id="ias-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Güncel Toplam Değeri (TL)</label><input type="number" id="ias-val" class="inp"></div><button class="btn-pri" onclick="saveAsset()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-asset')">Kapat</button></div></div>
+<div class="modal" id="m-goal"><div class="modal-box"><h3>Birikim Hedefi Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip (Sadece Birey)</label><select id="ig-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Hedef Adı</label><input id="ig-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Hedeflenen Tutar</label><input type="number" id="ig-target" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Şu An Biriken</label><input type="number" id="ig-current" class="inp"></div><button class="btn-pri" style="background:var(--info)" onclick="saveGoal()">Hedefi Başlat</button><button class="btn-clo" onclick="closeModal('m-goal')">Kapat</button></div></div>
 <div class="modal" id="m-acc"><div class="modal-box"><h3>Hesap Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ia-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ia-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ia-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Bakiye</label><input type="number" id="ia-bal" class="inp"></div><button class="btn-pri" onclick="saveAcc()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-acc')">Kapat</button></div></div>
-<div class="modal" id="m-card"><div class="modal-box"><h3>Kart Ekle</h3><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ic-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ic-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Limit</label><input type="number" id="ic-lim" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Borç</label><input type="number" id="ic-debt" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Gelecek Taksitler</label><input type="number" id="ic-fut" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Kesim / Son Ödeme</label><div style="display:flex; gap:10px"><input type="number" id="ic-cut" class="inp" placeholder="Kesim"><input type="number" id="ic-due" class="inp" placeholder="Son Ö."></div></div><button class="btn-pri" onclick="saveCard()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-card')">Kapat</button></div></div>
+<div class="modal" id="m-card"><div class="modal-box"><h3>Kart Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="ic-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="ic-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="ic-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Limit</label><input type="number" id="ic-lim" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Borç</label><input type="number" id="ic-debt" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Gelecek Taksitler</label><input type="number" id="ic-fut" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Kesim / Son Ödeme</label><div style="display:flex; gap:10px"><input type="number" id="ic-cut" class="inp" placeholder="Kesim"><input type="number" id="ic-due" class="inp" placeholder="Son Ö."></div></div><button class="btn-pri" onclick="saveCard()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-card')">Kapat</button></div></div>
 <div class="modal" id="m-loan"><div class="modal-box"><h3>Kredi Ekle</h3><div class="inp-grp"><label class="inp-lbl">Sahip</label><select id="il-own" class="inp"><option>Baba</option><option>Anne</option></select></div><div class="inp-grp"><label class="inp-lbl">Banka</label><select id="il-bank" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Ad</label><input id="il-name" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Toplam Tutar</label><input type="number" id="il-tot" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Taksit Sayısı</label><input type="number" id="il-cnt" class="inp"></div><div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px;"><label class="inp-lbl">1. Taksit</label><div style="display:flex; gap:10px;"><input type="date" id="il-date" class="inp"><input type="number" id="il-amt1" class="inp" placeholder="Tutar"></div></div><div class="inp-grp"><label class="inp-lbl">Diğer Taksitler</label><input type="number" id="il-amtr" class="inp"></div><button class="btn-pri" onclick="saveLoan()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-loan')">Kapat</button></div></div>
 <div class="modal" id="m-trans"><div class="modal-box"><h3 id="it-tit">İşlem</h3><input type="hidden" id="it-type"><div class="inp-grp"><label class="inp-lbl">Tarih</label><input type="date" id="it-date" class="inp"></div><div class="inp-grp"><label class="inp-lbl">Tutar</label><input type="number" id="it-amt" class="inp"></div><div class="inp-grp" id="it-cat-div"><label class="inp-lbl">Kategori</label><select id="it-cat" class="inp"></select></div><div class="inp-grp"><label class="inp-lbl">Hesap</label><select id="it-acc" class="inp"></select></div><div class="inp-grp d-none" id="it-to-div"><label class="inp-lbl">Alıcı</label><select id="it-to" class="inp"></select></div><div class="inp-grp" style="background:#f1f5f9; padding:10px; border-radius:8px;"><label><input type="checkbox" id="it-plan" onchange="toggle('it-plan-opts', this.checked)"> Planlı / Gelecek İşlem</label><div id="it-plan-opts" class="d-none" style="margin-top:5px;"><input type="number" id="it-rep" class="inp" placeholder="Kaç Ay Tekrar Etsin?" value="1"></div></div><button class="btn-pri" onclick="saveTrans()">Kaydet</button><button class="btn-clo" onclick="closeModal('m-trans')">Kapat</button></div></div>
 <div class="modal" id="m-pay"><div class="modal-box"><h3>Ödeme Yap</h3><p id="mp-desc"></p><div class="inp-grp"><label class="inp-lbl">Kaynak Hesap</label><select id="mp-acc" class="inp"></select></div><div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;"><label><input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> Erken / İndirimli Ödeme</label><div id="mp-early-opts" class="d-none" style="margin-top:5px;"><label class="inp-lbl">Gerçek Ödenen</label><input type="number" id="mp-real" class="inp"><small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small></div></div><button class="btn-pri" onclick="confirmPay()">Öde</button><button class="btn-clo" onclick="closeModal('m-pay')">İptal</button></div></div>
@@ -293,7 +292,7 @@ let db = { banks:['Ziraat','Garanti','Enpara','Akbank'], categories:{expense:['M
 let curPro='Hane', curDate=new Date(), payId=null, closeId=null;
 let scannedItems = [];
 
-// YENİ: İŞLEM DÜZENLEME İÇİN DEĞİŞKENLER
+// İŞLEM DÜZENLEME İÇİN DEĞİŞKENLER
 let editTransId = null;
 let editIsPlan = false;
 
@@ -415,6 +414,7 @@ function renderScanModal(items) {
     db.accounts.forEach((a,i)=> aiAccSelect.add(new Option('Hesap: ' + a.name, 'acc-'+i)));
     db.cards.forEach((c,i)=> aiAccSelect.add(new Option('Kart: ' + c.name, 'card-'+i)));
     
+    // Yapay Zeka ekranındaki input listeleri (Serbest girişe izin var, onayla havuza eklenecek)
     let dl = document.getElementById('cat-list-options');
     if(!dl) {
         dl = document.createElement('datalist');
@@ -446,7 +446,7 @@ function renderScanModal(items) {
 
 function saveScannedData() {
     const targetVal = document.getElementById('ai-acc').value;
-    let owner = 'Hane';
+    let owner = 'Baba'; // Varsayılan Sahiplik
     let tType = null;
     let tIdx = null;
 
@@ -459,7 +459,6 @@ function saveScannedData() {
     }
 
     let totalDeduction = 0;
-    let newCatsAdded = false;
 
     scannedItems.forEach((item, index) => {
         const descEl = document.getElementById(`ai-desc-${index}`);
@@ -476,9 +475,10 @@ function saveScannedData() {
         }
 
         let cat = document.getElementById(`ai-cat-${index}`).value.trim() || 'Diğer';
+        
+        // YENİ: AI'nin önerdiği veya kullanıcının yazdığı yeni kategoriyi Ana Havuza Ekle
         if (!db.categories.expense.includes(cat) && !db.categories.income.includes(cat)) {
             db.categories.expense.push(cat);
-            newCatsAdded = true;
         }
 
         const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
@@ -583,9 +583,9 @@ function fmt(n) { return new Intl.NumberFormat('tr-TR', {style:'currency', curre
 function filter(arr) { return curPro==='Hane' ? arr : arr.filter(x=>x.owner===curPro); }
 
 function saveAsset() { const a = { id:Date.now(), owner:document.getElementById('ias-own').value, type:document.getElementById('ias-type').value, name:document.getElementById('ias-name').value, value:parseFloat(document.getElementById('ias-val').value)||0 }; if(!a.name) return alert('İsim girin'); db.assets.push(a); save(); closeModal('m-asset'); }
-function saveGoal() { const g = { id:Date.now(), owner:'Hane', name:document.getElementById('ig-name').value, target:parseFloat(document.getElementById('ig-target').value)||0, current:parseFloat(document.getElementById('ig-current').value)||0 }; if(!g.name || !g.target) return alert('Eksik bilgi'); db.goals.push(g); save(); closeModal('m-goal'); }
+function saveGoal() { const g = { id:Date.now(), owner:document.getElementById('ig-own').value, name:document.getElementById('ig-name').value, target:parseFloat(document.getElementById('ig-target').value)||0, current:parseFloat(document.getElementById('ig-current').value)||0 }; if(!g.name || !g.target) return alert('Eksik bilgi'); db.goals.push(g); save(); closeModal('m-goal'); }
 function saveAcc() { const a = { id:Date.now(), owner:document.getElementById('ia-own').value, bank:document.getElementById('ia-bank').value, name:document.getElementById('ia-name').value, balance:parseFloat(document.getElementById('ia-bal').value)||0 }; if(!a.bank || !a.name) return alert('Eksik'); db.accounts.push(a); save(); closeModal('m-acc'); }
-function saveCard() { db.cards.push({ id:Date.now(), owner:'Hane', bank:document.getElementById('ic-bank').value, name:document.getElementById('ic-name').value, limit:parseFloat(document.getElementById('ic-lim').value)||0, debt:parseFloat(document.getElementById('ic-debt').value)||0, future:parseFloat(document.getElementById('ic-fut').value)||0, cut:document.getElementById('ic-cut').value, due:document.getElementById('ic-due').value }); save(); closeModal('m-card'); }
+function saveCard() { db.cards.push({ id:Date.now(), owner:document.getElementById('ic-own').value, bank:document.getElementById('ic-bank').value, name:document.getElementById('ic-name').value, limit:parseFloat(document.getElementById('ic-lim').value)||0, debt:parseFloat(document.getElementById('ic-debt').value)||0, future:parseFloat(document.getElementById('ic-fut').value)||0, cut:document.getElementById('ic-cut').value, due:document.getElementById('ic-due').value }); save(); closeModal('m-card'); }
 function saveLoan() { const l = { id:Date.now(), owner:document.getElementById('il-own').value, bank:document.getElementById('il-bank').value, name:document.getElementById('il-name').value, total:parseFloat(document.getElementById('il-tot').value), remaining:parseFloat(document.getElementById('il-tot').value), count:parseInt(document.getElementById('il-cnt').value), amt1:parseFloat(document.getElementById('il-amt1').value), amtr:parseFloat(document.getElementById('il-amtr').value) }; db.loans.push(l); let d = new Date(document.getElementById('il-date').value); for(let i=0; i<l.count; i++) { db.planned.push({ id:'p_'+Date.now()+'_'+i, type:'expense', category:'Kredi', title:`${l.name} (${i+1}/${l.count})`, amount: i===0?l.amt1:l.amtr, date:d.toISOString().split('T')[0], isPaid:false, owner:l.owner }); d.setMonth(d.getMonth()+1); } save(); closeModal('m-loan'); }
 function openTrans(type) { document.getElementById('it-type').value=type; document.getElementById('it-tit').innerText=type; toggle('it-cat-div', type!=='transfer'); toggle('it-to-div', type==='transfer'); openModal('m-trans'); }
 
@@ -597,7 +597,7 @@ function saveTrans() {
     const tDate = document.getElementById('it-date').value;
     
     if(!amt) return alert('Tutar?');
-    const acc = db.accounts[accIdx] || {owner:'Hane'};
+    const acc = db.accounts[accIdx] || {owner:'Baba'}; // Varsayılanı Baba yaptık
     let sourceId = 'acc-' + accIdx;
     
     if(type === 'transfer') {
@@ -628,6 +628,15 @@ function saveTrans() {
 }
 
 // GELİŞTİRİLMİŞ İŞLEM DÜZENLEME
+function updateEditCatList() {
+    const type = document.getElementById('et-type').value;
+    const catSelect = document.getElementById('et-cat');
+    catSelect.innerHTML = '';
+    if(db.categories[type]) {
+        db.categories[type].forEach(c => catSelect.add(new Option(c, c)));
+    }
+}
+
 function openEditTrans(id, isPlan) {
     editTransId = id;
     editIsPlan = isPlan;
@@ -638,6 +647,9 @@ function openEditTrans(id, isPlan) {
     document.getElementById('et-amt').value = t.amount;
     document.getElementById('et-date').value = (t.date || '').split('T')[0];
     document.getElementById('et-desc').value = t.description || t.title || '';
+    
+    // Kategori listesini seçili Tipe göre doldur
+    updateEditCatList();
     document.getElementById('et-cat').value = t.category || '';
 
     // Kaynak Hesap / Kart Listesi
@@ -647,18 +659,11 @@ function openEditTrans(id, isPlan) {
     db.accounts.forEach((a,i)=> etAccSelect.add(new Option('Hesap: ' + a.name, 'acc-'+i)));
     db.cards.forEach((c,i)=> etAccSelect.add(new Option('Kart: ' + c.name, 'card-'+i)));
     
-    // Eski işlemin kaynağını seç (Varsa)
     if(t.sourceId) {
         etAccSelect.value = t.sourceId;
     } else {
         etAccSelect.value = 'none';
     }
-
-    // Sabit Datalist İçini Doldur (Gelir & Gider bir arada)
-    const dl = document.getElementById('edit-cat-list');
-    dl.innerHTML = '';
-    db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
-    db.categories.income.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
 
     openModal('m-edit-trans');
 }
@@ -675,18 +680,8 @@ function saveEditTrans() {
         t.date = `${dateVal}T12:00:00.000Z`; // Gün ortası, takvim kaymasını engeller
     }
 
-    const newCat = document.getElementById('et-cat').value.trim();
-    if(newCat) {
-        t.category = newCat;
-        if(!db.categories.expense.includes(newCat) && !db.categories.income.includes(newCat)) {
-            // İşlem tipine göre doğru kategori havuzuna ekle
-            if (t.type === 'income') {
-                db.categories.income.push(newCat); 
-            } else {
-                db.categories.expense.push(newCat); 
-            }
-        }
-    }
+    // Kategori artık stric select üzerinden alınıyor
+    t.category = document.getElementById('et-cat').value;
 
     if(editIsPlan) {
         t.title = document.getElementById('et-desc').value;
@@ -720,7 +715,6 @@ function delTrans(id) {
         db.transactions = db.transactions.filter(x => x.id != id);
         save();
         
-        // Eğer takvim modalı açıksa onu güncelle
         const mdTit = document.getElementById('md-tit').innerText;
         if (mdTit && mdTit.includes('Detayları')) {
             openDay(mdTit.replace(' Detayları', '').trim());
