@@ -218,7 +218,7 @@
     <button class="btn-clo" onclick="closeModal('m-settings')">Kapat</button>
 </div></div>
 
-<!-- AI TARAMA SONUÇ MODALI (GELİŞMİŞ EKRAN) -->
+<!-- AI TARAMA SONUÇ MODALI -->
 <div class="modal" id="m-scan-res"><div class="modal-box">
     <h3>Yapay Zeka Analiz Sonucu</h3>
     <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Aşağıdaki işlemleri gözden geçirin. Yanlış tahmin edilen kategorileri düzeltebilir, yenisini yazabilir veya hatalı satırları silebilirsiniz.</p>
@@ -236,6 +236,18 @@
     
     <button class="btn-pri" style="background:var(--success)" onclick="saveScannedData()">Onayla ve Toplu Kaydet</button>
     <button class="btn-clo" onclick="closeModal('m-scan-res')">İptal Et</button>
+</div></div>
+
+<!-- YENİ: İŞLEM DÜZENLE MODALI -->
+<div class="modal" id="m-edit-trans"><div class="modal-box">
+    <h3>İşlemi Düzenle</h3>
+    <p style="font-size:0.75rem; color:var(--warning); margin-bottom:10px;">Not: Geçmiş işlemlerin tutarını değiştirmek banka bakiyelerini otomatik güncellemez, sadece raporlamayı düzeltir.</p>
+    <div class="inp-grp"><label class="inp-lbl">Tarih</label><input type="date" id="et-date" class="inp"></div>
+    <div class="inp-grp"><label class="inp-lbl">Tutar (₺)</label><input type="number" id="et-amt" class="inp" step="0.01"></div>
+    <div class="inp-grp"><label class="inp-lbl">Kategori</label><input type="text" id="et-cat" class="inp" list="edit-cat-list"></div>
+    <div class="inp-grp"><label class="inp-lbl">Açıklama</label><input type="text" id="et-desc" class="inp"></div>
+    <button class="btn-pri" onclick="saveEditTrans()">Değişiklikleri Kaydet</button>
+    <button class="btn-clo" onclick="closeModal('m-edit-trans')">İptal</button>
 </div></div>
 
 <!-- DİĞER MODALLAR -->
@@ -260,6 +272,10 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let db = { banks:['Ziraat','Garanti','Enpara','Akbank'], categories:{expense:['Market','Fatura','Kira'], income:['Maaş']}, accounts:[], cards:[], loans:[], transactions:[], planned:[], assets:[], goals:[] };
 let curPro='Hane', curDate=new Date(), payId=null, closeId=null;
 let scannedItems = [];
+
+// YENİ: İŞLEM DÜZENLEME İÇİN DEĞİŞKENLER
+let editTransId = null;
+let editIsPlan = false;
 
 // --- AYARLAR (API KEY) ---
 function loadSettings() {
@@ -351,9 +367,7 @@ async function processScan(input) {
     reader.readAsDataURL(file);
 }
 
-// YENİ: TARANAN İŞLEMİ SİLME (ÇÖP KUTUSU)
 function removeScannedItem(idx) {
-    // Silmeden önce kullanıcının diğer kutularda yaptığı değişiklikleri kaydet ki kaybolmasın
     scannedItems.forEach((item, i) => {
         const descEl = document.getElementById(`ai-desc-${i}`);
         if (descEl) {
@@ -364,26 +378,23 @@ function removeScannedItem(idx) {
         }
     });
 
-    scannedItems.splice(idx, 1); // Listeden sil
+    scannedItems.splice(idx, 1);
     
     if (scannedItems.length === 0) {
         closeModal('m-scan-res');
         alert("Tüm işlemler listeden silindi.");
     } else {
-        renderScanModal(scannedItems); // Tabloyu yeni haliyle tekrar çiz
+        renderScanModal(scannedItems); 
     }
 }
 
-// AI SONUÇLARINI ONAY EKRANINA BASMA (GELİŞTİRİLDİ)
 function renderScanModal(items) {
     const aiAccSelect = document.getElementById('ai-acc');
     aiAccSelect.innerHTML = '';
-    // YENİ: Sadece Geçmişe Kaydet seçeneği ve Kredi Kartları eklendi
     aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
     db.accounts.forEach((a,i)=> aiAccSelect.add(new Option('Hesap: ' + a.name, 'acc-'+i)));
     db.cards.forEach((c,i)=> aiAccSelect.add(new Option('Kart: ' + c.name, 'card-'+i)));
     
-    // YENİ: Kategoriler için Akıllı Liste (Datalist) oluşturma
     let dl = document.getElementById('cat-list-options');
     if(!dl) {
         dl = document.createElement('datalist');
@@ -397,7 +408,6 @@ function renderScanModal(items) {
     list.innerHTML = '';
 
     items.forEach((item, index) => {
-        // select yerine input list kullanıldı (Hem seçilebilir hem yeni yazılabilir)
         list.innerHTML += `
             <div class="ai-table-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 30px; gap: 5px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee; align-items: center;">
                 <div style="display:flex; flex-direction:column; gap:2px;">
@@ -414,14 +424,12 @@ function renderScanModal(items) {
     openModal('m-scan-res');
 }
 
-// ONAYLANAN VERİLERİ VERİTABANINA KAYDET (GELİŞTİRİLDİ)
 function saveScannedData() {
     const targetVal = document.getElementById('ai-acc').value;
     let owner = 'Hane';
     let tType = null;
     let tIdx = null;
 
-    // Hangi hesaba veya karta ait olduğunu çözümle
     if (targetVal !== 'none') {
         const parts = targetVal.split('-');
         tType = parts[0];
@@ -440,15 +448,13 @@ function saveScannedData() {
         const desc = descEl.value;
         let dateVal = document.getElementById(`ai-date-${index}`).value;
         
-        // YENİ: Saat dilimi (timezone) kaymasını önlemek için tarihi tam sabitle
         let finalDate = new Date().toISOString();
         if (dateVal && dateVal.length === 10) {
-            finalDate = `${dateVal}T12:00:00.000Z`; // Gün ortasına sabitlendi, takvimde şaşmaz
+            finalDate = `${dateVal}T12:00:00.000Z`;
         } else if (dateVal) {
             finalDate = new Date(dateVal).toISOString();
         }
 
-        // Kategori Kontrolü ve Havuza Ekleme
         let cat = document.getElementById(`ai-cat-${index}`).value.trim() || 'Diğer';
         if (!db.categories.expense.includes(cat) && !db.categories.income.includes(cat)) {
             db.categories.expense.push(cat);
@@ -459,8 +465,9 @@ function saveScannedData() {
 
         if (amt !== 0) { 
             totalDeduction += amt;
-            // Eğer eksi tutar girdiyse (Örn: İade), bunu gelir gibi düşünecek
+            // YENİ: Otomatik ID Ekleme (Düzenleme/Silme için gerekli)
             db.transactions.push({
+                id: 't_' + Date.now() + '_' + index,
                 type: amt >= 0 ? 'expense' : 'income',
                 amount: Math.abs(amt),
                 category: cat,
@@ -471,7 +478,6 @@ function saveScannedData() {
         }
     });
 
-    // Hesap veya Kart Bakiyelerini Güncelleme
     if (targetVal !== 'none') {
         if(tType === 'acc' && db.accounts[tIdx]) {
             db.accounts[tIdx].balance -= totalDeduction;
@@ -487,7 +493,65 @@ function saveScannedData() {
 }
 
 // --- STANDART BAŞLATMA VE VERİ İŞLEMLERİ ---
-async function init() { let localDataLoaded = false; try { const s = localStorage.getItem('hf_cloud'); if(s) { const p = JSON.parse(s); if(p.banks) { db = p; db.assets = db.assets || []; db.goals = db.goals || []; render(); localDataLoaded = true; } } } catch(e){} if (!localDataLoaded) { render(); } try { document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor..."; document.getElementById('cloud-status').style.color = "white"; const { data, error } = await client.from('app_state').select('*').eq('id', 1); if (error) throw error; if (!data || data.length === 0) { document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor..."; const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]); if (insertErr) throw insertErr; document.getElementById('cloud-status').innerText = "☁️ Güncel"; document.getElementById('cloud-status').style.color = "#10b981"; } else { db = data[0].data; db.assets = db.assets || []; db.goals = db.goals || []; localStorage.setItem('hf_cloud', JSON.stringify(db)); document.getElementById('cloud-status').innerText = "☁️ Güncel"; document.getElementById('cloud-status').style.color = "#10b981"; render(); } } catch(e) { document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor"); document.getElementById('cloud-status').style.color = "#ef4444"; render(); } const t = new Date().toISOString().split('T')[0]; ['il-date','it-date'].forEach(i=>{ if(document.getElementById(i)) document.getElementById(i).value=t; }); loadSettings(); }
+async function init() { 
+    let localDataLoaded = false; 
+    try { 
+        const s = localStorage.getItem('hf_cloud'); 
+        if(s) { 
+            const p = JSON.parse(s); 
+            if(p.banks) { 
+                db = p; 
+                db.assets = db.assets || []; 
+                db.goals = db.goals || []; 
+                // YENİ: Geçmiş verilere Düzenle/Sil özelliği için otomatik ID atama
+                if(db.transactions) db.transactions.forEach((t, i) => { if(!t.id) t.id = 'old_t_' + Date.now() + '_' + i; });
+                if(db.planned) db.planned.forEach((p, i) => { if(!p.id) p.id = 'old_p_' + Date.now() + '_' + i; });
+                
+                render(); 
+                localDataLoaded = true; 
+            } 
+        } 
+    } catch(e){} 
+    
+    if (!localDataLoaded) { render(); } 
+    
+    try { 
+        document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor..."; 
+        document.getElementById('cloud-status').style.color = "white"; 
+        const { data, error } = await client.from('app_state').select('*').eq('id', 1); 
+        if (error) throw error; 
+        
+        if (!data || data.length === 0) { 
+            document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor..."; 
+            const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]); 
+            if (insertErr) throw insertErr; 
+            document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
+            document.getElementById('cloud-status').style.color = "#10b981"; 
+        } else { 
+            db = data[0].data; 
+            db.assets = db.assets || []; 
+            db.goals = db.goals || []; 
+            
+            // YENİ: Geçmiş verilere Düzenle/Sil özelliği için otomatik ID atama
+            if(db.transactions) db.transactions.forEach((t, i) => { if(!t.id) t.id = 'old_t_' + Date.now() + '_' + i; });
+            if(db.planned) db.planned.forEach((p, i) => { if(!p.id) p.id = 'old_p_' + Date.now() + '_' + i; });
+
+            localStorage.setItem('hf_cloud', JSON.stringify(db)); 
+            document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
+            document.getElementById('cloud-status').style.color = "#10b981"; 
+            render(); 
+        } 
+    } catch(e) { 
+        document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Bilinmiyor"); 
+        document.getElementById('cloud-status').style.color = "#ef4444"; 
+        render(); 
+    } 
+    
+    const t = new Date().toISOString().split('T')[0]; 
+    ['il-date','it-date'].forEach(i=>{ if(document.getElementById(i)) document.getElementById(i).value=t; }); 
+    loadSettings(); 
+}
+
 async function save() { localStorage.setItem('hf_cloud', JSON.stringify(db)); render(); document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor..."; document.getElementById('cloud-status').style.color = "white"; try { const { error } = await client.from('app_state').upsert({ id: 1, data: db }); if(error) throw error; document.getElementById('cloud-status').innerText = "☁️ Güncel"; document.getElementById('cloud-status').style.color = "#10b981"; } catch (e) { document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi"); document.getElementById('cloud-status').style.color = "#ef4444"; } }
 
 function resetApp() { if(confirm('Tüm veriler cihazdan ve buluttan silinecek! Emin misiniz?')) { db = { banks:['Ziraat','Garanti','Enpara','Akbank'], categories:{expense:['Market','Fatura','Kira'], income:['Maaş']}, accounts:[], cards:[], loans:[], transactions:[], planned:[], assets:[], goals:[] }; save(); } }
@@ -503,7 +567,7 @@ function saveAsset() { const a = { id:Date.now(), owner:document.getElementById(
 function saveGoal() { const g = { id:Date.now(), owner:'Hane', name:document.getElementById('ig-name').value, target:parseFloat(document.getElementById('ig-target').value)||0, current:parseFloat(document.getElementById('ig-current').value)||0 }; if(!g.name || !g.target) return alert('Eksik bilgi'); db.goals.push(g); save(); closeModal('m-goal'); }
 function saveAcc() { const a = { id:Date.now(), owner:document.getElementById('ia-own').value, bank:document.getElementById('ia-bank').value, name:document.getElementById('ia-name').value, balance:parseFloat(document.getElementById('ia-bal').value)||0 }; if(!a.bank || !a.name) return alert('Eksik'); db.accounts.push(a); save(); closeModal('m-acc'); }
 function saveCard() { db.cards.push({ id:Date.now(), owner:'Hane', bank:document.getElementById('ic-bank').value, name:document.getElementById('ic-name').value, limit:parseFloat(document.getElementById('ic-lim').value)||0, debt:parseFloat(document.getElementById('ic-debt').value)||0, future:parseFloat(document.getElementById('ic-fut').value)||0, cut:document.getElementById('ic-cut').value, due:document.getElementById('ic-due').value }); save(); closeModal('m-card'); }
-function saveLoan() { const l = { id:Date.now(), owner:document.getElementById('il-own').value, bank:document.getElementById('il-bank').value, name:document.getElementById('il-name').value, total:parseFloat(document.getElementById('il-tot').value), remaining:parseFloat(document.getElementById('il-tot').value), count:parseInt(document.getElementById('il-cnt').value), amt1:parseFloat(document.getElementById('il-amt1').value), amtr:parseFloat(document.getElementById('il-amtr').value) }; db.loans.push(l); let d = new Date(document.getElementById('il-date').value); for(let i=0; i<l.count; i++) { db.planned.push({ id:Date.now()+i, type:'expense', category:'Kredi', title:`${l.name} (${i+1}/${l.count})`, amount: i===0?l.amt1:l.amtr, date:d.toISOString().split('T')[0], isPaid:false, owner:l.owner }); d.setMonth(d.getMonth()+1); } save(); closeModal('m-loan'); }
+function saveLoan() { const l = { id:Date.now(), owner:document.getElementById('il-own').value, bank:document.getElementById('il-bank').value, name:document.getElementById('il-name').value, total:parseFloat(document.getElementById('il-tot').value), remaining:parseFloat(document.getElementById('il-tot').value), count:parseInt(document.getElementById('il-cnt').value), amt1:parseFloat(document.getElementById('il-amt1').value), amtr:parseFloat(document.getElementById('il-amtr').value) }; db.loans.push(l); let d = new Date(document.getElementById('il-date').value); for(let i=0; i<l.count; i++) { db.planned.push({ id:'p_'+Date.now()+'_'+i, type:'expense', category:'Kredi', title:`${l.name} (${i+1}/${l.count})`, amount: i===0?l.amt1:l.amtr, date:d.toISOString().split('T')[0], isPaid:false, owner:l.owner }); d.setMonth(d.getMonth()+1); } save(); closeModal('m-loan'); }
 function openTrans(type) { document.getElementById('it-type').value=type; document.getElementById('it-tit').innerText=type; toggle('it-cat-div', type!=='transfer'); toggle('it-to-div', type==='transfer'); openModal('m-trans'); }
 
 function saveTrans() {
@@ -512,21 +576,23 @@ function saveTrans() {
     const accIdx = document.getElementById('it-acc').value;
     const isPlan = document.getElementById('it-plan').checked;
     const tDate = document.getElementById('it-date').value;
+    
     if(!amt) return alert('Tutar?');
     const acc = db.accounts[accIdx] || {owner:'Hane'};
+    
     if(type === 'transfer') {
         const [tt,ti] = document.getElementById('it-to').value.split('-');
         if(db.accounts[accIdx]) db.accounts[accIdx].balance -= amt;
         if(tt==='acc') db.accounts[ti].balance += amt;
         if(tt==='card') db.cards[ti].debt -= amt;
         if(tt==='loan') db.loans[ti].remaining -= amt;
-        db.transactions.push({type, amount:amt, category:'Transfer', date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner});
+        db.transactions.push({id: 't_' + Date.now(), type, amount:amt, category:'Transfer', date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner});
     } else {
         if(isPlan) {
             let d = new Date(tDate || new Date().toISOString());
             let rep = parseInt(document.getElementById('it-rep').value)||1;
             for(let i=0; i<rep; i++) {
-                db.planned.push({id:Date.now()+i, type, category:document.getElementById('it-cat').value, title:document.getElementById('it-cat').value, amount:amt, date:d.toISOString().split('T')[0], isPaid:false, owner:acc.owner});
+                db.planned.push({id:'p_' + Date.now() + '_' + i, type, category:document.getElementById('it-cat').value, title:document.getElementById('it-cat').value, amount:amt, date:d.toISOString().split('T')[0], isPaid:false, owner:acc.owner});
                 d.setMonth(d.getMonth()+1);
             }
         } else {
@@ -534,11 +600,87 @@ function saveTrans() {
                 if(type==='expense') acc.balance -= amt;
                 else acc.balance += amt;
             }
-            db.transactions.push({type, amount:amt, category:document.getElementById('it-cat').value, date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner});
+            db.transactions.push({id: 't_' + Date.now(), type, amount:amt, category:document.getElementById('it-cat').value, date: tDate ? new Date(tDate).toISOString() : new Date().toISOString(), owner:acc.owner});
         }
     }
     save();
     closeModal('m-trans');
+}
+
+// YENİ: İŞLEM DÜZENLEME EKRANINI AÇ
+function openEditTrans(id, isPlan) {
+    editTransId = id;
+    editIsPlan = isPlan;
+    const t = isPlan ? db.planned.find(x => x.id == id) : db.transactions.find(x => x.id == id);
+    if(!t) return;
+
+    document.getElementById('et-amt').value = t.amount;
+    document.getElementById('et-date').value = (t.date || '').split('T')[0];
+    document.getElementById('et-desc').value = t.description || t.title || '';
+    document.getElementById('et-cat').value = t.category || '';
+
+    // Kategoriler için dinamik datalist
+    let dl = document.getElementById('edit-cat-list');
+    if(!dl) {
+        dl = document.createElement('datalist');
+        dl.id = 'edit-cat-list';
+        document.body.appendChild(dl);
+    }
+    dl.innerHTML = '';
+    db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
+    db.categories.income.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
+
+    openModal('m-edit-trans');
+}
+
+// YENİ: DÜZENLENEN İŞLEMİ KAYDET
+function saveEditTrans() {
+    const t = editIsPlan ? db.planned.find(x => x.id == editTransId) : db.transactions.find(x => x.id == editTransId);
+    if(!t) return;
+
+    t.amount = parseFloat(document.getElementById('et-amt').value) || 0;
+    
+    let dateVal = document.getElementById('et-date').value;
+    if(dateVal) {
+        t.date = `${dateVal}T12:00:00.000Z`; // Gün ortası, takvim kaymasını engeller
+    }
+
+    const newCat = document.getElementById('et-cat').value.trim();
+    if(newCat) {
+        t.category = newCat;
+        if(!db.categories.expense.includes(newCat) && !db.categories.income.includes(newCat)) {
+            db.categories.expense.push(newCat); // Havuza eklendi
+        }
+    }
+
+    if(editIsPlan) {
+        t.title = document.getElementById('et-desc').value;
+    } else {
+        t.description = document.getElementById('et-desc').value;
+    }
+
+    save();
+    closeModal('m-edit-trans');
+
+    // Eğer takvim modalı açıksa onu güncelle
+    const mdTit = document.getElementById('md-tit').innerText;
+    if (mdTit && mdTit.includes('Detayları')) {
+        openDay(mdTit.replace(' Detayları', '').trim());
+    }
+}
+
+// YENİ: GEÇMİŞ VEYA PLANLI İŞLEMİ SİL
+function delTrans(id) {
+    if(confirm('Bu işlemi silmek istediğinize emin misiniz? (Banka bakiyeniz otomatik etkilenmez)')) {
+        db.transactions = db.transactions.filter(x => x.id != id);
+        save();
+        
+        // Eğer takvim modalı açıksa onu güncelle
+        const mdTit = document.getElementById('md-tit').innerText;
+        if (mdTit && mdTit.includes('Detayları')) {
+            openDay(mdTit.replace(' Detayları', '').trim());
+        }
+    }
 }
 
 function render() {
@@ -656,7 +798,7 @@ function renderCal(plans, trans) {
         if(item.isReal) {
             ml.innerHTML+=`<div class="item"><span>${item.category} <small style="color:#888">${(item.date||'').split('T')[0]}</small><br><small style="color:#aaa">${item.description||'Gerçekleşen İşlem'}</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span></div></div>`;
         } else {
-            ml.innerHTML+=`<div class="item" style="opacity:${item.isPaid?0.5:1}"><span>${item.title} <small style="color:#888">${item.date}</small><br><small style="color:#aaa">Planlanan</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> ${!item.isPaid?`<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay(${item.id})">Öde</button>`:'<span class="badge">✓</span>'}</div></div>`;
+            ml.innerHTML+=`<div class="item" style="opacity:${item.isPaid?0.5:1}"><span>${item.title} <small style="color:#888">${item.date}</small><br><small style="color:#aaa">Planlanan</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> ${!item.isPaid?`<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay('${item.id}')">Öde</button>`:'<span class="badge">✓</span>'}</div></div>`;
         }
     });
 }
@@ -687,14 +829,37 @@ function openDay(d) {
         l.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Bu tarihte işlem bulunmuyor.</div>';
     }
     
+    // GEÇMİŞ İŞLEMLERE DÜZENLE VE SİL EKLENDİ
     dayTrans.forEach((t, i) => {
         const isInc = t.type === 'income';
-        l.innerHTML += `<div class="item"><span>${t.category} <br><small>${t.description || 'Tamamlanan İşlem'}</small></span><div><b style="color:${isInc?'var(--success)':'var(--danger)'}">${isInc?'+':'-'}${fmt(t.amount)}</b> <span style="font-size:0.7rem; color:#888; margin-left:5px;">(Geçmiş)</span></div></div>`;
+        l.innerHTML += `
+        <div class="item" style="align-items:flex-start;">
+            <span>${t.category} <br><small>${t.description || 'Tamamlanan İşlem'}</small></span>
+            <div style="text-align:right;">
+                <b style="color:${isInc?'var(--success)':'var(--danger)'}">${isInc?'+':'-'}${fmt(t.amount)}</b><br>
+                <div style="margin-top:5px;">
+                    <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditTrans('${t.id}', false)">✏️</button>
+                    <button class="btn-del" onclick="delTrans('${t.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                </div>
+            </div>
+        </div>`;
     });
     
+    // PLANLANAN İŞLEMLERE DÜZENLE VE SİL EKLENDİ
     dayPlans.forEach(p => {
         const isInc = p.type === 'income';
-        l.innerHTML += `<div class="item"><span>${p.title} <br><small>Planlanan</small></span><div><b style="color:${isInc?'var(--success)':'var(--danger)'}">${isInc?'+':'-'}${fmt(p.amount)}</b> ${!p.isPaid ? `<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay(${p.id})">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-left:5px;">(Ödendi)</span>'}<button class="btn-del" onclick="delPlan(${p.id})" style="margin-left:5px;">🗑</button></div></div>`;
+        l.innerHTML += `
+        <div class="item" style="align-items:flex-start;">
+            <span>${p.title} <br><small>Planlanan</small></span>
+            <div style="text-align:right;">
+                <b style="color:${isInc?'var(--success)':'var(--danger)'}">${isInc?'+':'-'}${fmt(p.amount)}</b><br>
+                <div style="margin-top:5px; display:flex; align-items:center; justify-content:flex-end;">
+                    ${!p.isPaid ? `<button class="act-btn" style="background:var(--primary);" onclick="initPay('${p.id}')">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-right:5px;">(Ödendi)</span>'}
+                    <button class="act-btn" style="background:#64748b; margin-left:5px; padding:4px 8px;" onclick="openEditTrans('${p.id}', true)">✏️</button>
+                    <button class="btn-del" onclick="delPlan('${p.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                </div>
+            </div>
+        </div>`;
     });
     openModal('m-day');
 }
@@ -718,11 +883,11 @@ function confirmPay() {
     }
     
     p.isPaid=true;
-    db.transactions.push({type:p.type, amount:amt, category:p.category, date:new Date().toISOString(), owner:p.owner, description: p.title});
+    db.transactions.push({id: 't_' + Date.now(), type:p.type, amount:amt, category:p.category, date:new Date().toISOString(), owner:p.owner, description: p.title});
     save(); closeModal('m-pay'); closeModal('m-day');
 }
 
-function delPlan(id) { if(confirm('Sil?')) { db.planned=db.planned.filter(x=>x.id!=id); save(); closeModal('m-day'); } }
+function delPlan(id) { if(confirm('Bu planlı işlemi silmek istediğinize emin misiniz?')) { db.planned=db.planned.filter(x=>x.id!=id); save(); closeModal('m-day'); } }
 function openCloseLoan(idx) { closeId=idx; updSel(); openModal('m-close-loan'); }
 
 function doCloseLoan() {
@@ -730,7 +895,7 @@ function doCloseLoan() {
     const acc=db.accounts[document.getElementById('mcl-acc').value];
     const loan=db.loans[closeId];
     if(acc) acc.balance-=amt;
-    db.transactions.push({type:'expense', amount:amt, category:'Kredi Kapama', owner:loan.owner, date:new Date().toISOString()});
+    db.transactions.push({id: 't_' + Date.now(), type:'expense', amount:amt, category:'Kredi Kapama', owner:loan.owner, date:new Date().toISOString()});
     db.planned = db.planned.filter(p=>!p.title.includes(loan.name));
     db.loans.splice(closeId,1);
     save(); closeModal('m-close-loan');
