@@ -687,6 +687,17 @@
             <label class="inp-lbl">Kaynak Hesap</label>
             <select id="mp-acc" class="inp"></select>
         </div>
+        <div style="background:#ecfdf5; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <label>
+                <input type="checkbox" id="mp-early" onchange="toggle('mp-early-opts', this.checked)"> 
+                Erken / İndirimli Ödeme
+            </label>
+            <div id="mp-early-opts" class="d-none" style="margin-top:5px;">
+                <label class="inp-lbl">Gerçek Ödenen</label>
+                <input type="number" id="mp-real" class="inp" step="0.01">
+                <small style="color:#666">* Hesaptan bu düşer, borçtan tam tutar silinir.</small>
+            </div>
+        </div>
         <button class="btn-pri" onclick="confirmPay()">Öde</button>
         <button class="btn-clo" onclick="closeModal('m-pay')">İptal</button>
     </div>
@@ -832,9 +843,15 @@ function chgMonth(n) {
 function openModal(id) { 
     updSel(); 
     document.getElementById(id).classList.add('show'); 
-    if (id === 'm-banks') renderBanks(); 
-    if (id === 'm-cats') renderCats(); 
-    if (id === 'm-limits') openLimits(); 
+    if (id === 'm-banks') {
+        renderBanks(); 
+    }
+    if (id === 'm-cats') {
+        renderCats(); 
+    }
+    if (id === 'm-limits') {
+        openLimits(); 
+    }
 }
 
 function closeModal(id) { 
@@ -1102,14 +1119,18 @@ function saveLimits() {
 
 // --- BAKİYE ETKİLEME (ÇİFT TARAFLI MUHASEBE) ---
 function applyBalanceEffect(sourceId, type, amount, reverse = false) { 
-    if (!sourceId || sourceId === 'none') return; 
+    if (!sourceId || sourceId === 'none') {
+        return; 
+    }
     
     const parts = sourceId.split('-'); 
     const sType = parts[0]; 
     const sIdx = parts[1]; 
     
     let sign = (type === 'expense') ? -1 : 1; 
-    if (reverse) sign *= -1; 
+    if (reverse) {
+        sign *= -1; 
+    }
     
     if (sType === 'acc' && db.accounts[sIdx]) { 
         db.accounts[sIdx].balance += (sign * amount); 
@@ -1167,9 +1188,15 @@ function updateAccListByOwner(prefix, selectedVal = null) {
         if(toSelect) {
             const currentTo = toSelect.value;
             toSelect.innerHTML = '';
-            db.accounts.forEach((a, i) => toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
-            db.cards.forEach((c, i) => toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
-            db.loans.forEach((l, i) => toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i)));
+            db.accounts.forEach((a, i) => {
+                toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i));
+            });
+            db.cards.forEach((c, i) => {
+                toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i));
+            });
+            db.loans.forEach((l, i) => {
+                toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i));
+            });
             
             if (currentTo && Array.from(toSelect.options).some(opt => opt.value === currentTo)) {
                 toSelect.value = currentTo;
@@ -1197,7 +1224,9 @@ function saveTrans() {
     const owner = document.getElementById('it-own').value; 
     const planStatus = type === 'transfer' ? 'kapsam_disi' : document.getElementById('it-planStatus').value; 
     
-    if (!amt) return alert('Tutar?'); 
+    if (!amt) {
+        return alert('Tutar?'); 
+    }
     
     let sourceId = document.getElementById('it-acc').value !== 'none' ? document.getElementById('it-acc').value : null; 
     
@@ -1205,6 +1234,7 @@ function saveTrans() {
         let toIdVal = document.getElementById('it-to').value; 
         applyBalanceEffect(sourceId, 'expense', amt, false); 
         applyBalanceEffect(toIdVal, 'income', amt, false); 
+        
         db.transactions.push({ 
             id: 't_' + Date.now(), 
             type: type, 
@@ -1256,7 +1286,10 @@ function saveTrans() {
 function updateEditCatList(prefix = 'et') { 
     const type = document.getElementById(prefix + '-type').value; 
     const catSelect = document.getElementById(prefix + '-cat'); 
-    if (!catSelect) return; 
+    
+    if (!catSelect) {
+        return; 
+    }
     
     catSelect.innerHTML = ''; 
     if (db.categories[type]) { 
@@ -1268,7 +1301,10 @@ function openEditTrans(id, isPlan) {
     editTransId = id; 
     editIsPlan = isPlan; 
     const t = isPlan ? db.planned.find(x => x.id == id) : db.transactions.find(x => x.id == id); 
-    if (!t) return; 
+    
+    if (!t) {
+        return; 
+    }
     
     document.getElementById('et-type').value = t.type || 'expense'; 
     document.getElementById('et-own').value = t.owner || 'Baba'; 
@@ -1286,7 +1322,10 @@ function openEditTrans(id, isPlan) {
 
 function saveEditTrans() { 
     const t = editIsPlan ? db.planned.find(x => x.id == editTransId) : db.transactions.find(x => x.id == editTransId); 
-    if (!t) return; 
+    
+    if (!t) {
+        return; 
+    }
     
     // Eski işlemi geri al
     if (!editIsPlan) { 
@@ -1375,7 +1414,9 @@ function saveAsset() {
         name: document.getElementById('ias-name').value, 
         value: parseFloat(document.getElementById('ias-val').value) || 0 
     }; 
-    if (!a.name) return alert('İsim girin'); 
+    if (!a.name) {
+        return alert('İsim girin'); 
+    }
     db.assets.push(a); 
     save(); 
     closeModal('m-asset'); 
@@ -1389,7 +1430,9 @@ function saveGoal() {
         target: parseFloat(document.getElementById('ig-target').value) || 0, 
         current: parseFloat(document.getElementById('ig-current').value) || 0 
     }; 
-    if (!g.name || !g.target) return alert('Eksik bilgi'); 
+    if (!g.name || !g.target) {
+        return alert('Eksik bilgi'); 
+    }
     db.goals.push(g); 
     save(); 
     closeModal('m-goal'); 
@@ -1445,11 +1488,15 @@ function calcLoan() {
     const term = parseFloat(document.getElementById('la-term').value); 
     const inst = parseFloat(document.getElementById('la-inst').value); 
     const res = document.getElementById('loan-compare-res'); 
+    
     res.innerHTML = ''; 
     if (amt && term && inst) { 
         res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`; 
     } 
-    db.loans.forEach(l => res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`); 
+    
+    db.loans.forEach(l => {
+        res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`;
+    }); 
 }
 
 function triggerExport() { 
@@ -1484,7 +1531,18 @@ function doPaste() {
 
 function resetApp() { 
     if (confirm('Tüm veriler silinecek! Emin misiniz?')) { 
-        db = { banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [], limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } }; 
+        db = { 
+            banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
+            categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
+            accounts: [], 
+            cards: [], 
+            loans: [], 
+            transactions: [], 
+            planned: [], 
+            assets: [], 
+            goals: [], 
+            limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } 
+        }; 
         save(); 
     } 
 }
@@ -1567,7 +1625,9 @@ async function init() {
     
     const t = new Date().toISOString().split('T')[0]; 
     ['il-date', 'it-date'].forEach(i => { 
-        if (document.getElementById(i)) document.getElementById(i).value = t; 
+        if (document.getElementById(i)) {
+            document.getElementById(i).value = t; 
+        }
     }); 
     
     loadSettings();
@@ -1612,15 +1672,22 @@ function render() {
 
     let score = 0, desc = "Analiz Ediliyor";
     if (ast === 0 && dbt === 0) { 
-        score = 50; desc = "Yeni Başlangıç"; 
+        score = 50; 
+        desc = "Yeni Başlangıç"; 
     } else if (ast > 0 && dbt === 0) { 
-        score = 99; desc = "Mükemmel Durum 🏆"; 
+        score = 99; 
+        desc = "Mükemmel Durum 🏆"; 
     } else { 
         score = Math.round((ast / (ast + dbt)) * 100); 
-        if (score > 75) desc = "Çok İyi Durum 🌟"; 
-        else if (score > 50) desc = "Sağlıklı Denge 👍"; 
-        else if (score > 25) desc = "Dikkatli Olun ⚠️"; 
-        else desc = "Kritik Seviye 🚨"; 
+        if (score > 75) {
+            desc = "Çok İyi Durum 🌟"; 
+        } else if (score > 50) {
+            desc = "Sağlıklı Denge 👍"; 
+        } else if (score > 25) {
+            desc = "Dikkatli Olun ⚠️"; 
+        } else {
+            desc = "Kritik Seviye 🚨"; 
+        }
     }
     
     document.getElementById('health-score').innerText = score; 
@@ -1630,9 +1697,18 @@ function render() {
     bl.innerHTML = '';
     db.banks.forEach(b => {
         let net = 0, has = false; 
-        fAcc.filter(x => x.bank === b).forEach(x => { net += x.balance; has = true; }); 
-        fCards.filter(x => x.bank === b).forEach(x => { net -= (x.debt + x.future); has = true; }); 
-        fLoans.filter(x => x.bank === b).forEach(x => { net -= x.remaining; has = true; });
+        fAcc.filter(x => x.bank === b).forEach(x => { 
+            net += x.balance; 
+            has = true; 
+        }); 
+        fCards.filter(x => x.bank === b).forEach(x => { 
+            net -= (x.debt + x.future); 
+            has = true; 
+        }); 
+        fLoans.filter(x => x.bank === b).forEach(x => { 
+            net -= x.remaining; 
+            has = true; 
+        });
         if (has) {
             bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`;
         }
@@ -1646,8 +1722,14 @@ function render() {
         al.innerHTML += `
             <div class="acc-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div><span class="badge" style="margin-left:0; margin-right:5px;">${a.owner}</span><span style="font-weight:bold; font-size:0.95rem;">${a.bank} - ${a.name}</span></div>
-                    <div><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditAcc(${i})">✏️</button><button class="btn-del" onclick="del('accounts',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
+                    <div>
+                        <span class="badge" style="margin-left:0; margin-right:5px;">${a.owner}</span>
+                        <span style="font-weight:bold; font-size:0.95rem;">${a.bank} - ${a.name}</span>
+                    </div>
+                    <div>
+                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditAcc(${i})">✏️</button>
+                        <button class="btn-del" onclick="del('accounts',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                    </div>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--light);">
                     <span>Mevcut Bakiye: <b style="color:${a.balance < 0 ? 'var(--danger)' : 'var(--text)'}">${fmt(a.balance)}</b></span>
@@ -1660,8 +1742,16 @@ function render() {
     const asl = document.getElementById('list-assets'); 
     asl.innerHTML = '';
     fAssets.forEach((a, i) => { 
-        asl.innerHTML += `<div class="item"><span><span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> ${a.name}</span><b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b></div>`; 
+        asl.innerHTML += `
+            <div class="item">
+                <span>
+                    <span class="badge" style="background:#f1f5f9; color:var(--text)">${a.type}</span> 
+                    ${a.name}
+                </span>
+                <b>${fmt(a.value)} <button class="btn-del" onclick="del('assets',${i})">×</button></b>
+            </div>`; 
     });
+    
     if (fAssets.length === 0) {
         asl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Henüz yatırım eklenmemiş.</div>';
     }
@@ -1670,8 +1760,20 @@ function render() {
     gl.innerHTML = '';
     (db.goals || []).forEach((g, i) => { 
         let pct = Math.min(100, Math.round((g.current / g.target) * 100)) || 0; 
-        gl.innerHTML += `<div style="padding:15px 0; border-bottom:1px solid #f1f5f9;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; font-size:0.9rem;">${g.name}</span><span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span></div><div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;"><span>Biriken: ${fmt(g.current)}</span><span>Hedef: ${fmt(g.target)}</span></div><div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div></div>`; 
+        gl.innerHTML += `
+            <div style="padding:15px 0; border-bottom:1px solid #f1f5f9;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-weight:bold; font-size:0.9rem;">${g.name}</span>
+                    <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">${pct}% <button class="btn-del" onclick="del('goals',${i})" style="margin-left:5px;">×</button></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;">
+                    <span>Biriken: ${fmt(g.current)}</span>
+                    <span>Hedef: ${fmt(g.target)}</span>
+                </div>
+                <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+            </div>`; 
     });
+    
     if ((db.goals || []).length === 0) {
         gl.innerHTML = '<div style="color:#aaa; font-size:0.8rem; text-align:center; padding:10px;">Hedef belirlenmemiş.</div>';
     }
@@ -1688,20 +1790,50 @@ function render() {
         dl.innerHTML += `
             <div class="cc-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div><span class="badge" style="margin-left:0; margin-right:5px;">${c.owner}</span><span style="font-weight:bold; font-size:0.95rem;">${c.bank} - ${c.name}</span></div>
-                    <div><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditCard(${i})">✏️</button><button class="btn-del" onclick="del('cards',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
+                    <div>
+                        <span class="badge" style="margin-left:0; margin-right:5px;">${c.owner}</span>
+                        <span style="font-weight:bold; font-size:0.95rem;">${c.bank} - ${c.name}</span>
+                    </div>
+                    <div>
+                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditCard(${i})">✏️</button>
+                        <button class="btn-del" onclick="del('cards',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                    </div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; font-size:0.8rem; margin-bottom:8px;">
-                    <div>Dönem Borcu: <b class="text-red">-${fmt(debt)}</b></div><div style="text-align:right;">Gelecek Taksitler: <b class="text-warning">-${fmt(future)}</b></div>
+                    <div>Dönem Borcu: <b class="text-red">-${fmt(debt)}</b></div>
+                    <div style="text-align:right;">Gelecek Taksitler: <b class="text-warning">-${fmt(future)}</b></div>
                 </div>
-                <div class="prog-bg" style="height:6px; margin-bottom:5px;"><div class="prog-fill ${pct>80 ? 'danger' : 'warning'}" style="width:${pct}%; background:var(--purple);"></div></div>
-                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--light);"><span>Kullanılabilir: <b style="color:var(--success)">${fmt(available)}</b></span><span>Limit: ${fmt(limit)}</span></div>
-                <div style="font-size:0.7rem; color:#888; margin-top:8px; border-top:1px dashed #eee; padding-top:5px;">Kesim: ${c.cut || '-'} | Son Ödeme: ${c.due || '-'}</div>
+                <div class="prog-bg" style="height:6px; margin-bottom:5px;">
+                    <div class="prog-fill ${pct>80 ? 'danger' : 'warning'}" style="width:${pct}%; background:var(--purple);"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--light);">
+                    <span>Kullanılabilir: <b style="color:var(--success)">${fmt(available)}</b></span>
+                    <span>Limit: ${fmt(limit)}</span>
+                </div>
+                <div style="font-size:0.7rem; color:#888; margin-top:8px; border-top:1px dashed #eee; padding-top:5px;">
+                    Kesim: ${c.cut || '-'} | Son Ödeme: ${c.due || '-'}
+                </div>
             </div>`;
     });
     
     fLoans.forEach((l, i) => {
-        dl.innerHTML += `<div class="loan-card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><div><span class="badge" style="margin-left:0; margin-right:5px;">${l.owner}</span><span style="font-weight:bold; font-size:0.95rem;">${l.bank} - ${l.name}</span></div><div><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditLoan(${i})">✏️</button><button class="act-btn" style="background:var(--danger); color:white; padding:4px 8px; margin-left:5px;" onclick="openCloseLoan(${i})">Kapat</button><button class="btn-del" onclick="del('loans',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div></div><div style="font-size:0.8rem;">Kalan Borç: <b class="text-red">-${fmt(l.remaining)}</b></div></div>`;
+        dl.innerHTML += `
+            <div class="loan-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <div>
+                        <span class="badge" style="margin-left:0; margin-right:5px;">${l.owner}</span>
+                        <span style="font-weight:bold; font-size:0.95rem;">${l.bank} - ${l.name}</span>
+                    </div>
+                    <div>
+                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditLoan(${i})">✏️</button>
+                        <button class="act-btn" style="background:var(--danger); color:white; padding:4px 8px; margin-left:5px;" onclick="openCloseLoan(${i})">Kapat</button>
+                        <button class="btn-del" onclick="del('loans',${i})" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                    </div>
+                </div>
+                <div style="font-size:0.8rem;">
+                    Kalan Borç: <b class="text-red">-${fmt(l.remaining)}</b>
+                </div>
+            </div>`;
     });
 
     renderCal(fPlans, fTrans);
@@ -1713,7 +1845,9 @@ function renderCal(plans, trans) {
     
     const grid = document.getElementById('cal-grid'); 
     grid.innerHTML = ''; 
-    ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].forEach(d => grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`);
+    ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].forEach(d => {
+        grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`;
+    });
     
     const dim = new Date(y, m + 1, 0).getDate(); 
     const start = new Date(y, m, 1).getDay() || 7;
@@ -1727,45 +1861,74 @@ function renderCal(plans, trans) {
         const dayTrans = trans.filter(t => (t.date || '').split('T')[0] === ds);
         
         let classes = 'cal-day'; 
-        if (dayPlans.some(p => !p.isPaid)) classes += ' today'; 
-        else if (dayTrans.length > 0 || dayPlans.some(p => p.isPaid)) classes += ' past-act';
+        if (dayPlans.some(p => !p.isPaid)) {
+            classes += ' today'; 
+        } else if (dayTrans.length > 0 || dayPlans.some(p => p.isPaid)) {
+            classes += ' past-act';
+        }
         
         let dots = ''; 
-        if (dayTrans.some(t => t.type === 'income') || dayPlans.some(p => p.type === 'income')) dots += '<span style="color:var(--success)">●</span>'; 
-        if (dayTrans.some(t => t.type === 'expense') || dayPlans.some(p => p.type === 'expense')) dots += '<span style="color:var(--danger)">●</span>';
+        if (dayTrans.some(t => t.type === 'income') || dayPlans.some(p => p.type === 'income')) {
+            dots += '<span style="color:var(--success)">●</span>'; 
+        }
+        if (dayTrans.some(t => t.type === 'expense') || dayPlans.some(p => p.type === 'expense')) {
+            dots += '<span style="color:var(--danger)">●</span>';
+        }
         
-        grid.innerHTML += `<div class="${classes}" onclick="openDay('${ds}')">${d}<div style="position:absolute; bottom:2px; font-size:0.4rem; display:flex; gap:2px;">${dots}</div></div>`;
+        grid.innerHTML += `
+            <div class="${classes}" onclick="openDay('${ds}')">
+                ${d}
+                <div style="position:absolute; bottom:2px; font-size:0.4rem; display:flex; gap:2px;">${dots}</div>
+            </div>`;
     }
 
     const pv = document.getElementById('period-view'); 
     pv.innerHTML = '';
+    
     [{ s: 1, e: 14 }, { s: 15, e: 20 }, { s: 21, e: 31 }].forEach(pr => {
         let inc = 0, exp = 0;
+        
         trans.forEach(t => { 
             const pd = new Date(t.date); 
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e) { 
-                if (t.type === 'income') inc += t.amount; 
-                else if (t.type === 'expense') exp += t.amount; 
+                if (t.type === 'income') {
+                    inc += t.amount; 
+                } else if (t.type === 'expense') {
+                    exp += t.amount; 
+                }
             } 
         });
+        
         plans.forEach(p => { 
             const pd = new Date(p.date); 
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) { 
-                if (p.type === 'income') inc += p.amount; 
-                else if (p.type === 'expense') exp += p.amount; 
+                if (p.type === 'income') {
+                    inc += p.amount; 
+                } else if (p.type === 'expense') {
+                    exp += p.amount; 
+                }
             } 
         });
-        pv.innerHTML += `<div class="p-card"><div class="p-head">${pr.s}-${pr.e}</div><div class="text-grn">+${fmt(inc)}</div><div class="text-red">-${fmt(exp)}</div><div class="p-net">${fmt(inc - exp)}</div></div>`;
+        
+        pv.innerHTML += `
+            <div class="p-card">
+                <div class="p-head">${pr.s}-${pr.e}</div>
+                <div class="text-grn">+${fmt(inc)}</div>
+                <div class="text-red">-${fmt(exp)}</div>
+                <div class="p-net">${fmt(inc - exp)}</div>
+            </div>`;
     });
 
     const ml = document.getElementById('list-plans'); 
-    ml.innerHTML = '';
+    ml.innerHTML = ''; 
     let allMonthItems = [];
+    
     trans.forEach(t => { 
         if ((t.date || '').startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
             allMonthItems.push({ ...t, isReal: true, sortDate: t.date }); 
         }
     });
+    
     plans.forEach(p => { 
         if (p.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
             allMonthItems.push({ ...p, isReal: false, sortDate: p.date }); 
@@ -1778,10 +1941,31 @@ function renderCal(plans, trans) {
         const isInc = item.type === 'income'; 
         const color = isInc ? 'var(--success)' : 'var(--danger)'; 
         const sign = isInc ? '+' : '-';
+        
         if (item.isReal) {
-            ml.innerHTML += `<div class="item"><span>${item.category} <small style="color:#888">${(item.date || '').split('T')[0]}</small><br><small style="color:#aaa">${item.description || 'Gerçekleşen İşlem'}</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span></div></div>`;
+            ml.innerHTML += `
+                <div class="item">
+                    <span>
+                        ${item.category} <small style="color:#888">${(item.date || '').split('T')[0]}</small><br>
+                        <small style="color:#aaa">${item.description || 'Gerçekleşen İşlem'}</small>
+                    </span>
+                    <div>
+                        <strong style="color:${color}">${sign}${fmt(item.amount)}</strong> 
+                        <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span>
+                    </div>
+                </div>`;
         } else {
-            ml.innerHTML += `<div class="item" style="opacity:${item.isPaid ? 0.5 : 1}"><span>${item.title} <small style="color:#888">${item.date}</small><br><small style="color:#aaa">Planlanan</small></span><div><strong style="color:${color}">${sign}${fmt(item.amount)}</strong> ${!item.isPaid ? `<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay('${item.id}')">Öde</button>` : '<span class="badge">✓</span>'}</div></div>`;
+            ml.innerHTML += `
+                <div class="item" style="opacity:${item.isPaid ? 0.5 : 1}">
+                    <span>
+                        ${item.title} <small style="color:#888">${item.date}</small><br>
+                        <small style="color:#aaa">Planlanan</small>
+                    </span>
+                    <div>
+                        <strong style="color:${color}">${sign}${fmt(item.amount)}</strong> 
+                        ${!item.isPaid ? `<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay('${item.id}')">Öde</button>` : '<span class="badge">✓</span>'}
+                    </div>
+                </div>`;
         }
     });
 }
@@ -1797,47 +1981,151 @@ function openDay(d) {
     if (dayTrans.length === 0 && dayPlans.length === 0) {
         l.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Bu tarihte işlem bulunmuyor.</div>';
     }
-    
+
     dayTrans.forEach((t, i) => {
         const isInc = t.type === 'income'; 
         const planBdg = t.planStatus === 'dahil' ? '<span class="badge-plan" style="color:var(--success)">Dahil</span>' : (t.planStatus === 'kapsam_disi' ? '<span class="badge-plan">Kapsam Dışı</span>' : '<span class="badge-plan" style="color:var(--warning)">Dahil Değil</span>');
         l.innerHTML += `
             <div class="item" style="align-items:flex-start;">
-                <span><span class="badge" style="margin:0 5px 0 0;">${t.owner}</span>${t.category} ${planBdg}<br><small>${t.description || 'Tamamlanan İşlem'}</small></span>
+                <span>
+                    <span class="badge" style="margin:0 5px 0 0;">${t.owner}</span>${t.category} ${planBdg}<br>
+                    <small>${t.description || 'Tamamlanan İşlem'}</small>
+                </span>
                 <div style="text-align:right;">
                     <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(t.amount)}</b><br>
-                    <div style="margin-top:5px;"><button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditTrans('${t.id}', false)">✏️</button><button class="btn-del" onclick="delTrans('${t.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
+                    <div style="margin-top:5px;">
+                        <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditTrans('${t.id}', false)">✏️</button>
+                        <button class="btn-del" onclick="delTrans('${t.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                    </div>
                 </div>
             </div>`;
     });
-    
+
     dayPlans.forEach(p => {
         const isInc = p.type === 'income'; 
         const planBdg = p.planStatus === 'dahil' ? '<span class="badge-plan" style="color:var(--success)">Dahil</span>' : (p.planStatus === 'kapsam_disi' ? '<span class="badge-plan">Kapsam Dışı</span>' : '<span class="badge-plan" style="color:var(--warning)">Dahil Değil</span>');
         l.innerHTML += `
             <div class="item" style="align-items:flex-start;">
-                <span><span class="badge" style="margin:0 5px 0 0;">${p.owner}</span>${p.title} ${planBdg}<br><small>Planlanan</small></span>
+                <span>
+                    <span class="badge" style="margin:0 5px 0 0;">${p.owner}</span>${p.title} ${planBdg}<br>
+                    <small>Planlanan</small>
+                </span>
                 <div style="text-align:right;">
                     <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(p.amount)}</b><br>
-                    <div style="margin-top:5px; display:flex; align-items:center; justify-content:flex-end;">${!p.isPaid ? `<button class="act-btn" style="background:var(--primary);" onclick="initPay('${p.id}')">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-right:5px;">(Ödendi)</span>'}<button class="act-btn" style="background:#64748b; margin-left:5px; padding:4px 8px;" onclick="openEditTrans('${p.id}', true)">✏️</button><button class="btn-del" onclick="delPlan('${p.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button></div>
+                    <div style="margin-top:5px; display:flex; align-items:center; justify-content:flex-end;">
+                        ${!p.isPaid ? `<button class="act-btn" style="background:var(--primary);" onclick="initPay('${p.id}')">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-right:5px;">(Ödendi)</span>'}
+                        <button class="act-btn" style="background:#64748b; margin-left:5px; padding:4px 8px;" onclick="openEditTrans('${p.id}', true)">✏️</button>
+                        <button class="btn-del" onclick="delPlan('${p.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
+                    </div>
                 </div>
             </div>`;
     });
     openModal('m-day');
 }
 
+function initPay(id) {
+    payId = id; 
+    const mpAccSelect = document.getElementById('mp-acc'); 
+    mpAccSelect.innerHTML = '';
+    
+    db.accounts.forEach((a, i) => {
+        mpAccSelect.add(new Option(`${a.owner} - ${a.name}`, 'acc-'+i));
+    });
+    
+    openModal('m-pay');
+}
+
+function confirmPay() {
+    const p = db.planned.find(x => x.id == payId); 
+    const accIdx = document.getElementById('mp-acc').value;
+    let amt = parseFloat(document.getElementById('mp-real').value) || p.amount;
+    
+    if (document.getElementById('mp-early').checked && p.category === 'Kredi') { 
+        const loan = db.loans.find(l => p.title.includes(l.name)); 
+        if (loan) {
+            loan.remaining -= p.amount; 
+        }
+    }
+    
+    let sourceId = accIdx !== 'none' ? accIdx : null;
+    applyBalanceEffect(sourceId, p.type, amt, false); 
+    
+    p.isPaid = true;
+    db.transactions.push({ 
+        id: 't_' + Date.now(), 
+        type: p.type, 
+        amount: amt, 
+        category: p.category, 
+        date: new Date().toISOString(), 
+        owner: p.owner, 
+        description: p.title, 
+        sourceId: sourceId, 
+        planStatus: p.planStatus 
+    });
+    
+    save(); 
+    closeModal('m-pay'); 
+    closeModal('m-day');
+}
+
+function delPlan(id) { 
+    if (confirm('Bu planlı işlemi silmek istediğinize emin misiniz?')) { 
+        db.planned = db.planned.filter(x => x.id != id); 
+        save(); 
+        closeModal('m-day'); 
+    } 
+}
+
+function openCloseLoan(idx) { 
+    closeId = idx; 
+    const mclAccSelect = document.getElementById('mcl-acc'); 
+    mclAccSelect.innerHTML = ''; 
+    
+    db.accounts.forEach((a, i) => {
+        mclAccSelect.add(new Option(`${a.owner} - ${a.name}`, i));
+    });
+    
+    openModal('m-close-loan'); 
+}
+
+function doCloseLoan() {
+    const amt = parseFloat(document.getElementById('mcl-amt').value); 
+    const accIdx = document.getElementById('mcl-acc').value; 
+    const loan = db.loans[closeId];
+    
+    applyBalanceEffect('acc-'+accIdx, 'expense', amt, false);
+    
+    db.transactions.push({ 
+        id: 't_' + Date.now(), 
+        type: 'expense', 
+        amount: amt, 
+        category: 'Kredi Kapama', 
+        owner: loan.owner, 
+        date: new Date().toISOString(), 
+        planStatus: 'kapsam_disi', 
+        sourceId: 'acc-'+accIdx 
+    });
+    
+    db.planned = db.planned.filter(p => !p.title.includes(loan.name)); 
+    db.loans.splice(closeId, 1); 
+    
+    save(); 
+    closeModal('m-close-loan');
+}
+
 // ----------------------------------------------------
 // KURUMSAL ANALİZ PANELI VE CHART.JS MOTORU 
 // ----------------------------------------------------
-const CHART_COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899', '#14b8a6', '#f97316', '#64748b', '#334155', '#be123c', '#fb923c'];
-
 function updateCatFilterOptions() {
     const catSelect = document.getElementById('anl-cat-filter');
     const currentVal = catSelect.value;
+    
     catSelect.innerHTML = '<option value="all">Tüm Kategoriler</option>';
+    
     db.categories.expense.forEach(c => {
         catSelect.add(new Option(c, c));
     });
+    
     if (Array.from(catSelect.options).some(opt => opt.value === currentVal)) {
         catSelect.value = currentVal;
     }
@@ -1854,7 +2142,9 @@ function renderAnl() {
     // Tarih Filtresi
     filteredTx = filteredTx.filter(t => {
         if (!t.date) return false;
+        
         const d = new Date(t.date);
+        
         if (period === 'all') return true;
         if (period === 'year') return d.getFullYear() === now.getFullYear();
         if (period === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
@@ -1871,8 +2161,11 @@ function renderAnl() {
     filteredTx.forEach(t => {
         if (catFilter === 'all' || t.category === catFilter) {
             totalExpense += t.amount;
-            if (t.planStatus === 'dahil') plannedExpense += t.amount;
-            else unplannedExpense += t.amount; // Dahil Değil + Kapsam Dışı
+            if (t.planStatus === 'dahil') {
+                plannedExpense += t.amount;
+            } else {
+                unplannedExpense += t.amount; 
+            }
         }
     });
 
@@ -1904,7 +2197,7 @@ function renderAnl() {
         if (t.planStatus === 'dahil') planData['Plana Dahil'] += t.amount;
         else if (t.planStatus === 'dahil_degil') planData['Dahil Değil'] += t.amount;
         else if (t.planStatus === 'kapsam_disi') planData['Kapsam Dışı'] += t.amount;
-        else planData['Plana Dahil'] += t.amount; 
+        else planData['Plana Dahil'] += t.amount; // Varsayılan eski veri
     });
 
     const ctxPlan = document.getElementById('planStatusChart').getContext('2d');
@@ -1917,11 +2210,13 @@ function renderAnl() {
             datasets: [{
                 data: Object.values(planData),
                 backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
-                borderWidth: 2, borderColor: '#ffffff'
+                borderWidth: 2, 
+                borderColor: '#ffffff'
             }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, 
+            maintainAspectRatio: false,
             plugins: {
                 legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
                 tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
@@ -1932,6 +2227,7 @@ function renderAnl() {
     // --- GRAFİK 2: SADECE PLANA DAHİL KATEGORİ DAĞILIMI ---
     const plannedCats = {};
     let totalPlannedForChart = 0;
+    
     chartTx.filter(t => t.planStatus === 'dahil').forEach(t => {
         plannedCats[t.category] = (plannedCats[t.category] || 0) + t.amount;
         totalPlannedForChart += t.amount;
@@ -1946,9 +2242,19 @@ function renderAnl() {
     if (totalPlannedForChart > 0) {
         catChartInstance = new Chart(ctxCat, {
             type: 'doughnut',
-            data: { labels: pCatLabels, datasets: [{ data: pCatData, backgroundColor: CHART_COLORS, borderWidth: 2, borderColor: '#ffffff' }] },
+            data: { 
+                labels: pCatLabels, 
+                datasets: [{ 
+                    data: pCatData, 
+                    backgroundColor: CHART_COLORS, 
+                    borderWidth: 2, 
+                    borderColor: '#ffffff' 
+                }] 
+            },
             options: {
-                responsive: true, maintainAspectRatio: false, cutout: '60%',
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '60%',
                 plugins: {
                     legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
                     tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
@@ -1958,13 +2264,36 @@ function renderAnl() {
     }
 
     // --- LİMİT ÇUBUKLARI ---
-    const limDahil = db.limits.planDahil || 0; const limDahilDegil = db.limits.planDahilDegil || 0; const limKapsamDisi = db.limits.kapsamDisi || 0;
-    const barsContainer = document.getElementById('anl-limits-bars'); barsContainer.innerHTML = '';
+    const limDahil = db.limits.planDahil || 0; 
+    const limDahilDegil = db.limits.planDahilDegil || 0; 
+    const limKapsamDisi = db.limits.kapsamDisi || 0;
+    
+    const barsContainer = document.getElementById('anl-limits-bars'); 
+    barsContainer.innerHTML = '';
+    
     const renderBar = (title, spent, limit) => {
-        let pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0; let limitText = limit > 0 ? fmt(limit) : 'Limitsiz'; let barClass = 'prog-fill';
-        if (limit > 0 && spent > limit) barClass += ' danger'; else if (limit > 0 && spent > (limit * 0.8)) barClass += ' warning';
-        return `<div style="margin-bottom:15px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span style="font-weight:bold;">${title}</span><span>${fmt(spent)} / ${limitText}</span></div><div class="prog-bg"><div class="${barClass}" style="width:${limit > 0 ? pct : 100}%"></div></div></div>`;
+        let pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0; 
+        let limitText = limit > 0 ? fmt(limit) : 'Limitsiz'; 
+        let barClass = 'prog-fill';
+        
+        if (limit > 0 && spent > limit) {
+            barClass += ' danger'; 
+        } else if (limit > 0 && spent > (limit * 0.8)) {
+            barClass += ' warning';
+        }
+        
+        return `
+            <div style="margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
+                    <span style="font-weight:bold;">${title}</span>
+                    <span>${fmt(spent)} / ${limitText}</span>
+                </div>
+                <div class="prog-bg">
+                    <div class="${barClass}" style="width:${limit > 0 ? pct : 100}%"></div>
+                </div>
+            </div>`;
     };
+    
     barsContainer.innerHTML += renderBar('Plana Dahil Giderler', planData['Plana Dahil'], limDahil);
     barsContainer.innerHTML += renderBar('Plana Dahil Olmayan Giderler', planData['Dahil Değil'], limDahilDegil);
     barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım vs.)', planData['Kapsam Dışı'], limKapsamDisi);
@@ -1979,29 +2308,41 @@ function renderAnl() {
         pivotContainer.style.display = 'block';
         document.getElementById('trend-title').innerText = catFilter === 'all' ? 'Aylık Tüm Gider Trendi' : `Aylık "${catFilter}" Trendi`;
         
-        let monthGroups = {}; 
+        let monthGroups = {}; // Ay -> Plan Status -> Kategori
         
         chartTx.forEach(t => {
             let d = new Date(t.date);
             let mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (!monthGroups[mKey]) monthGroups[mKey] = { 'dahil': {}, 'kapsam_disi': {} };
             
+            if (!monthGroups[mKey]) {
+                monthGroups[mKey] = { 'dahil': {}, 'kapsam_disi': {} };
+            }
+            
+            // Gruplamayı Excel'deki gibi iki ana dala indirelim: Dahil vs Kapsam Dışı
             let pStatus = (t.planStatus === 'kapsam_disi' || t.planStatus === 'dahil_degil') ? 'kapsam_disi' : 'dahil';
+            
             monthGroups[mKey][pStatus][t.category] = (monthGroups[mKey][pStatus][t.category] || 0) + t.amount;
         });
 
         let monthLabels = Object.keys(monthGroups).sort();
         
-        // 1. TREND GRAFİĞİNİ ÇİZ
+        // 1. TREND GRAFİĞİNİ ÇİZ (Sadece Aylık Toplamlar)
         let trendDahil = monthLabels.map(m => {
-            let sum = 0; for(let c in monthGroups[m]['dahil']) sum += monthGroups[m]['dahil'][c]; return sum;
+            let sum = 0; 
+            for(let c in monthGroups[m]['dahil']) sum += monthGroups[m]['dahil'][c]; 
+            return sum;
         });
+        
         let trendKapsamDisi = monthLabels.map(m => {
-            let sum = 0; for(let c in monthGroups[m]['kapsam_disi']) sum += monthGroups[m]['kapsam_disi'][c]; return sum;
+            let sum = 0; 
+            for(let c in monthGroups[m]['kapsam_disi']) sum += monthGroups[m]['kapsam_disi'][c]; 
+            return sum;
         });
 
         const ctxTrend = document.getElementById('monthlyTrendChart').getContext('2d');
-        if (monthlyTrendChartInstance) monthlyTrendChartInstance.destroy();
+        if (monthlyTrendChartInstance) {
+            monthlyTrendChartInstance.destroy();
+        }
         
         monthlyTrendChartInstance = new Chart(ctxTrend, {
             type: 'bar',
@@ -2013,23 +2354,38 @@ function renderAnl() {
                 ] 
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } },
-                plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } }
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: true, grid: { display: false } }, 
+                    y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } 
+                },
+                plugins: { 
+                    legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, 
+                    tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } 
+                }
             }
         });
 
         // 2. EXCEL BENZERİ PİVOT TABLOYU OLUŞTUR
+        // Tüm Benzersiz Kategorileri Bul (Sütunlar İçin)
         let allUniqueCats = new Set();
         chartTx.forEach(t => allUniqueCats.add(t.category));
         let columns = Array.from(allUniqueCats).sort();
 
+        // Başlık (Header) Satırı
         let tableHTML = `<tr><th style="text-align:left;">Aylar / Durum</th><th>Genel Toplam</th>`;
-        columns.forEach(c => tableHTML += `<th>${c}</th>`);
+        columns.forEach(c => {
+            tableHTML += `<th>${c}</th>`;
+        });
         tableHTML += `</tr>`;
 
+        // Satırları (Aylar) Oluştur
         monthLabels.forEach(m => {
+            // Ayın Genel Toplamı
             let mTotal = trendDahil[monthLabels.indexOf(m)] + trendKapsamDisi[monthLabels.indexOf(m)];
+            
+            // Ay Başlığı (Ana Satır)
             tableHTML += `<tr class="row-group"><td>📅 ${m}</td><td>${fmt(mTotal)}</td>`;
             columns.forEach(c => {
                 let catSum = (monthGroups[m]['dahil'][c] || 0) + (monthGroups[m]['kapsam_disi'][c] || 0);
@@ -2037,17 +2393,23 @@ function renderAnl() {
             });
             tableHTML += `</tr>`;
 
+            // Alt Satır 1: Kapsam Dışı
             let mKapsamDisi = trendKapsamDisi[monthLabels.indexOf(m)];
             if (mKapsamDisi > 0) {
                 tableHTML += `<tr><td class="row-sub">└ Kapsam Dışı</td><td>${fmt(mKapsamDisi)}</td>`;
-                columns.forEach(c => tableHTML += `<td>${monthGroups[m]['kapsam_disi'][c] > 0 ? fmt(monthGroups[m]['kapsam_disi'][c]) : '-'}</td>`);
+                columns.forEach(c => {
+                    tableHTML += `<td>${monthGroups[m]['kapsam_disi'][c] > 0 ? fmt(monthGroups[m]['kapsam_disi'][c]) : '-'}</td>`;
+                });
                 tableHTML += `</tr>`;
             }
 
+            // Alt Satır 2: Plana Dahil
             let mDahil = trendDahil[monthLabels.indexOf(m)];
             if (mDahil > 0) {
                 tableHTML += `<tr><td class="row-sub" style="color:var(--success);">└ Plana Dahil</td><td style="color:var(--success);">${fmt(mDahil)}</td>`;
-                columns.forEach(c => tableHTML += `<td style="color:var(--success);">${monthGroups[m]['dahil'][c] > 0 ? fmt(monthGroups[m]['dahil'][c]) : '-'}</td>`);
+                columns.forEach(c => {
+                    tableHTML += `<td style="color:var(--success);">${monthGroups[m]['dahil'][c] > 0 ? fmt(monthGroups[m]['dahil'][c]) : '-'}</td>`;
+                });
                 tableHTML += `</tr>`;
             }
         });
