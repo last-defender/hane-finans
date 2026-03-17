@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hane Finans: Kurumsal Analiz Paneli</title>
+    <title>Hane Finans: Kurumsal BI Paneli</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
+        /* ---------------- DEĞİŞKENLER VE TEMEL AYARLAR ---------------- */
         :root {
             --primary: #4f46e5; 
             --bg: #f8fafc; 
@@ -296,6 +299,7 @@
             font-weight: bold; 
         }
 
+        /* ---------------- PERİYOT KARTLARI ---------------- */
         .p-row { 
             display: flex; 
             gap: 10px; 
@@ -482,9 +486,17 @@
             display: none !important; 
         }
         
-        .text-grn { color: var(--success); } 
-        .text-red { color: var(--danger); }
-        .text-warning { color: var(--warning); }
+        .text-grn { 
+            color: var(--success); 
+        } 
+        
+        .text-red { 
+            color: var(--danger); 
+        }
+        
+        .text-warning { 
+            color: var(--warning); 
+        }
         
         .page { 
             display: none; 
@@ -531,7 +543,7 @@
             width: 100%; 
             background: #f8fafc; 
         }
-
+        
         /* ---------------- YENİ ANALİZ PANELİ (KURUMSAL) ---------------- */
 
         /* Zaman Navigatörü */
@@ -651,6 +663,9 @@
             background: rgba(255,255,255,0.8); 
             z-index: 10; 
             border-radius: 10px; 
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
         }
 
         /* Bilgisayar/Tablet Ekranları İçin Grid Düzeni */
@@ -789,12 +804,16 @@
 
 <header>
     <div class="head-row">
-        <div class="head-title">Hane Finans <span class="cloud-icon" id="cloud-status">☁️ Bağlanıyor...</span></div>
+        <div class="head-title">
+            Hane Finans 
+            <span class="cloud-icon" id="cloud-status">☁️ Bağlanıyor...</span>
+        </div>
         <button class="act-btn" style="background:#64748b; border:none;" onclick="openModal('m-settings')">⚙️ Ayarlar</button>
     </div>
     <div class="head-actions">
         <button class="act-btn" style="background:var(--success); border:none; font-weight:bold;" onclick="document.getElementById('scan-in').click()">📸 Ekstre Tara (AI)</button>
         <input type="file" id="scan-in" accept="image/*" hidden onchange="processScan(this)">
+        
         <button class="act-btn" onclick="openModal('m-paste')">JSON Ekle</button>
         <button class="act-btn" onclick="triggerExport()">Yedekle</button>
         <button class="act-btn" onclick="document.getElementById('f-in').click()">Yükle</button>
@@ -816,6 +835,7 @@
             </div>
             <div class="score-circle" id="health-score">0</div>
         </div>
+        
         <div class="card" style="text-align:center;">
             <div style="color:var(--light); font-size:0.85rem;">Net Durum (Portföy + Hesaplar - Borçlar)</div>
             <h1 id="dash-net" style="margin:5px 0">0.00 ₺</h1>
@@ -830,10 +850,12 @@
                 </div>
             </div>
         </div>
+        
         <div class="card">
             <div class="stat-lbl" style="margin-bottom:10px;">BANKA DURUMU</div>
             <div id="list-banks-status"></div>
         </div>
+        
         <div class="card">
             <div class="stat-lbl" style="margin-bottom:10px;">YAKLAŞAN (7 GÜN)</div>
             <div id="list-upcoming"></div>
@@ -869,7 +891,9 @@
             <span id="cal-title" style="font-size:1.1rem;"></span>
             <span onclick="chgMonth(1)" style="cursor:pointer; padding:10px;">Sonraki ❯</span>
         </div>
-        <div class="card"><div class="cal-grid" id="cal-grid"></div></div>
+        <div class="card">
+            <div class="cal-grid" id="cal-grid"></div>
+        </div>
         
         <h4 style="margin:15px 5px 10px;">Ay İçi Nakit Akışı</h4>
         <div id="period-view" class="p-row"></div>
@@ -897,9 +921,15 @@
         </div>
         <div class="card" style="border:1px solid var(--purple);">
             <h4>Yeni Teklif</h4>
-            <div class="inp-grp"><input type="number" id="la-amt" class="inp" placeholder="Ele Geçen Tutar"></div>
-            <div class="inp-grp"><input type="number" id="la-term" class="inp" placeholder="Vade (Ay)"></div>
-            <div class="inp-grp"><input type="number" id="la-inst" class="inp" placeholder="Aylık Taksit"></div>
+            <div class="inp-grp">
+                <input type="number" id="la-amt" class="inp" placeholder="Ele Geçen Tutar">
+            </div>
+            <div class="inp-grp">
+                <input type="number" id="la-term" class="inp" placeholder="Vade (Ay)">
+            </div>
+            <div class="inp-grp">
+                <input type="number" id="la-inst" class="inp" placeholder="Aylık Taksit">
+            </div>
             <button class="btn-pur" onclick="calcLoan()">Hesapla</button>
         </div>
         <div id="loan-compare-res"></div>
@@ -947,11 +977,11 @@
                 <div class="stat-val text-grn" id="kpi-inc">0</div>
             </div>
             <div class="stat-box" style="background:#fef2f2; border:1px solid #fca5a5;">
-                <div class="stat-lbl" style="color:#b91c1c;">Toplam Gider</div>
+                <div class="stat-lbl" style="color:#b91c1c;">Filtrelenen Gider</div>
                 <div class="stat-val text-red" id="kpi-exp">0</div>
             </div>
             <div class="stat-box" style="background:#eff6ff; border:1px solid #bfdbfe; grid-column: span 2;">
-                <div class="stat-lbl" style="color:#1d4ed8;">Dönem İçi Net Etki (Tasarruf)</div>
+                <div class="stat-lbl" style="color:#1d4ed8;">Dönem İçi Net Akış (Tasarruf)</div>
                 <div class="stat-val" style="color:#1e40af;" id="kpi-net">0</div>
             </div>
         </div>
@@ -965,7 +995,7 @@
             <div class="card full-width" id="anl-cashflow-container">
                 <h4 style="margin:0 0 10px 0; text-align:center;">Gelir / Gider Karşılaştırması</h4>
                 <div class="chart-container" style="height: 240px; position:relative;">
-                    <div id="cashflow-empty" class="chart-empty" style="display:none;">Nakit akışı verisi bulunamadı.</div>
+                    <div id="cashflow-empty-err" class="chart-empty" style="display:none;">Nakit akışı verisi bulunamadı.</div>
                     <canvas id="cashFlowChart"></canvas>
                 </div>
             </div>
@@ -973,7 +1003,7 @@
             <div class="card">
                 <h4 style="margin:0 0 10px 0; text-align:center;" id="doughnut-title">Harcama Dağılımı</h4>
                 <div class="chart-container" style="height: 240px; position:relative;">
-                    <div id="doughnut-empty" class="chart-empty" style="display:none;">Bu filtreye uygun harcama bulunamadı.</div>
+                    <div id="doughnut-empty-err" class="chart-empty" style="display:none;">Bu filtreye uygun harcama bulunamadı.</div>
                     <canvas id="categoryDoughnutChart"></canvas>
                 </div>
             </div>
@@ -981,28 +1011,28 @@
             <div class="card">
                 <h4 style="margin:0 0 10px 0; text-align:center;">Bütçe Stratejisi (Plan Durumu)</h4>
                 <div class="chart-container" style="height: 240px; position:relative;">
-                    <div id="plan-empty" class="chart-empty" style="display:none;">Gider kaydı bulunamadı.</div>
+                    <div id="plan-empty-err" class="chart-empty" style="display:none;">Gider kaydı bulunamadı.</div>
                     <canvas id="planStatusChart"></canvas>
                 </div>
             </div>
 
             <div class="card full-width" id="anl-trend-container">
                 <h4 style="margin:0 0 10px 0; text-align:center;" id="trend-title">Aylık Harcama Trendi</h4>
-                <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Aydan aya değişimi gösterir.</p>
+                <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Seçili filtrelere göre değişimi gösterir.</p>
                 <div class="chart-container" style="height: 260px; position:relative;">
-                    <div id="trend-empty" class="chart-empty" style="display:none;">Trend oluşturulacak veri bulunamadı.</div>
+                    <div id="trend-empty-err" class="chart-empty" style="display:none;">Trend oluşturulacak veri bulunamadı.</div>
                     <canvas id="monthlyTrendChart"></canvas>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <h4 style="margin:0 0 10px 0;">En Büyük 5 Çıkış (Filtrelenmiş)</h4>
+            <h4 style="margin:0 0 10px 0;">En Büyük 5 Çıkış (Seçili Dönem ve Filtre)</h4>
             <div id="top-5-list"></div>
         </div>
 
         <div class="card">
-            <h4 style="margin:0 0 15px 0;">Aylık Limit Takibi</h4>
+            <h4 style="margin:0 0 15px 0;">Dinamik Limit Takibi</h4>
             <div id="anl-limits-bars"></div>
         </div>
 
@@ -1034,7 +1064,7 @@
 <div class="modal" id="m-limits">
     <div class="modal-box">
         <h3>Dönemsel Bütçe Limitleri</h3>
-        <p style="font-size:0.75rem; color:var(--light); margin-bottom:15px;">Aylık bazda planlı ve plansız giderleriniz için kendinize bir üst sınır belirleyin. Analizde periyot değiştiğinde sistem bunu otomatik çarpacaktır.</p>
+        <p style="font-size:0.75rem; color:var(--light); margin-bottom:15px;">Lütfen buraya sadece 1 Aylık limitlerinizi girin. Sistem, çeyreklik veya yıllık analiz yaparken bu limiti otomatik olarak hesaplayıp çarpacaktır.</p>
         <div class="inp-grp">
             <label class="inp-lbl">AYLIK Plana Dahil Gider Limiti (₺)</label>
             <input type="number" id="lim-dahil" class="inp" placeholder="Örn: 30000">
@@ -1615,7 +1645,7 @@ function setPro(p) {
     }
 }
 
-// --- YAPAY ZEKA TARAMA MOTORU ---
+// --- DÜZELTİLEN YAPAY ZEKA FONKSİYONLARI ---
 
 async function processScan(input) {
     try {
@@ -1631,7 +1661,10 @@ async function processScan(input) {
             return;
         }
         
+        // Inputu sıfırla
         input.value = "";
+
+        // Ekrana yükleniyor modalını çıkar
         document.getElementById('ai-loading-overlay').style.display = 'flex';
 
         const reader = new FileReader();
@@ -1792,7 +1825,9 @@ function saveScannedData() {
     
     scannedItems.forEach((item, index) => {
         const descEl = document.getElementById(`ai-desc-${index}`);
-        if (!descEl) return;
+        if (!descEl) {
+            return;
+        }
         
         const desc = descEl.value;
         const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
@@ -1838,7 +1873,7 @@ function saveScannedData() {
     alert(`${scannedItems.length} işlem başarıyla buluta kaydedildi!`);
 }
 
-// --- HESAP, KART VE KREDİ DÜZENLEME (CRUD) KISMI ---
+// --- CRUD İŞLEMLERİ (HESAP, KART, KREDİ) ---
 
 function openAddAcc() { 
     editAccIdx = null; 
@@ -2148,11 +2183,9 @@ function updateAccListByOwner(prefix, selectedVal = null) {
             db.accounts.forEach((a, i) => {
                 toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i));
             });
-            
             db.cards.forEach((c, i) => {
                 toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i));
             });
-            
             db.loans.forEach((l, i) => {
                 toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i));
             });
@@ -2191,7 +2224,6 @@ function saveTrans() {
     
     if (type === 'transfer') { 
         let toIdVal = document.getElementById('it-to').value; 
-        
         applyBalanceEffect(sourceId, 'expense', amt, false); 
         applyBalanceEffect(toIdVal, 'income', amt, false); 
         
@@ -2228,7 +2260,6 @@ function saveTrans() {
             } 
         } else { 
             applyBalanceEffect(sourceId, type, amt, false); 
-            
             db.transactions.push({ 
                 id: 't_' + Date.now(), 
                 type: type, 
@@ -2241,7 +2272,6 @@ function saveTrans() {
             }); 
         } 
     } 
-    
     save(); 
     closeModal('m-trans'); 
 }
@@ -2292,7 +2322,6 @@ function saveEditTrans() {
         return; 
     }
     
-    // Eski işlemi geri al
     if (!editIsPlan) { 
         if (t.type === 'transfer' && t.toId) { 
             applyBalanceEffect(t.sourceId, 'expense', t.amount, true); 
@@ -2302,7 +2331,6 @@ function saveEditTrans() {
         } 
     } 
     
-    // Yeni değerleri ata
     t.type = document.getElementById('et-type').value; 
     t.owner = document.getElementById('et-own').value; 
     t.planStatus = document.getElementById('et-planStatus').value; 
@@ -2324,7 +2352,6 @@ function saveEditTrans() {
     const accVal = document.getElementById('et-acc').value; 
     t.sourceId = accVal !== 'none' ? accVal : null; 
     
-    // Yeni durumu banka bakiyesine uygula
     if (!editIsPlan) { 
         if (t.type === 'transfer' && t.toId) { 
             applyBalanceEffect(t.sourceId, 'expense', t.amount, false); 
@@ -2358,7 +2385,6 @@ function delTrans(id) {
                 applyBalanceEffect(t.sourceId, t.type, t.amount, true); 
             } 
         } 
-        
         db.transactions = db.transactions.filter(x => x.id != id); 
         save(); 
         
@@ -2380,11 +2406,9 @@ function saveAsset() {
         name: document.getElementById('ias-name').value, 
         value: parseFloat(document.getElementById('ias-val').value) || 0 
     }; 
-    
     if (!a.name) {
         return alert('İsim girin'); 
     }
-    
     db.assets.push(a); 
     save(); 
     closeModal('m-asset'); 
@@ -2398,11 +2422,9 @@ function saveGoal() {
         target: parseFloat(document.getElementById('ig-target').value) || 0, 
         current: parseFloat(document.getElementById('ig-current').value) || 0 
     }; 
-    
     if (!g.name || !g.target) {
         return alert('Eksik bilgi'); 
     }
-    
     db.goals.push(g); 
     save(); 
     closeModal('m-goal'); 
@@ -2450,7 +2472,6 @@ function renderCats() {
 function addCat() { 
     const t = document.getElementById('ic-type').value; 
     const v = document.getElementById('ic-new').value; 
-    
     if (v) { 
         db.categories[t].push(v); 
         save(); 
@@ -2468,7 +2489,6 @@ function calcLoan() {
     if (amt && term && inst) { 
         res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`; 
     } 
-    
     db.loans.forEach(l => {
         res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`;
     }); 
@@ -2493,7 +2513,6 @@ function processImport(el) {
 function doPaste() { 
     try { 
         const j = JSON.parse(document.getElementById('paste-txt').value); 
-        
         if (j.transactions) {
             db.transactions = db.transactions.concat(j.transactions); 
         }
@@ -2506,7 +2525,6 @@ function doPaste() {
         if (j.cards) {
             db.cards = db.cards.concat(j.cards); 
         }
-        
         save(); 
         closeModal('m-paste'); 
     } catch (e) { 
@@ -2545,21 +2563,18 @@ async function init() {
                 db.assets = db.assets || []; 
                 db.goals = db.goals || []; 
                 db.limits = db.limits || { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 }; 
-                
                 if (db.transactions) {
                     db.transactions.forEach((t, i) => { 
                         if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; 
                         if (!t.planStatus) t.planStatus = 'dahil'; 
                     }); 
                 }
-                
                 if (db.planned) {
                     db.planned.forEach((p, i) => { 
                         if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; 
                         if (!p.planStatus) p.planStatus = 'dahil'; 
                     }); 
                 }
-                
                 render(); 
                 localDataLoaded = true; 
             } 
@@ -2574,13 +2589,16 @@ async function init() {
         document.getElementById('cloud-status').innerText = "☁️ Bağlanıyor..."; 
         document.getElementById('cloud-status').style.color = "white";
         const { data, error } = await client.from('app_state').select('*').eq('id', 1);
-        if (error) throw error;
+        if (error) {
+            throw error;
+        }
         
         if (!data || data.length === 0) {
             document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor..."; 
             const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]); 
-            if (insertErr) throw insertErr;
-            
+            if (insertErr) {
+                throw insertErr;
+            }
             document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
             document.getElementById('cloud-status').style.color = "#10b981";
         } else {
@@ -2595,14 +2613,12 @@ async function init() {
                     if (!t.planStatus) t.planStatus = 'dahil'; 
                 });
             }
-            
             if (db.planned) {
                 db.planned.forEach((p, i) => { 
                     if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; 
                     if (!p.planStatus) p.planStatus = 'dahil'; 
                 });
             }
-            
             localStorage.setItem('hf_cloud', JSON.stringify(db)); 
             document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
             document.getElementById('cloud-status').style.color = "#10b981"; 
@@ -2630,18 +2646,17 @@ async function save() {
     render(); 
     document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor..."; 
     document.getElementById('cloud-status').style.color = "white";
-    
     try { 
         const { error } = await client.from('app_state').upsert({ id: 1, data: db }); 
-        if (error) throw error; 
-        
+        if (error) {
+            throw error; 
+        }
         document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
         document.getElementById('cloud-status').style.color = "#10b981"; 
     } catch (e) { 
         document.getElementById('cloud-status').innerText = "HATA: " + (e.message || "Kaydedilemedi"); 
         document.getElementById('cloud-status').style.color = "#ef4444"; 
     }
-    
     if (document.getElementById('p-analysis').classList.contains('active')) {
         updateCatFilterOptions();
     }
@@ -2691,7 +2706,6 @@ function render() {
 
     const bl = document.getElementById('list-banks-status'); 
     bl.innerHTML = '';
-    
     db.banks.forEach(b => {
         let net = 0, has = false; 
         fAcc.filter(x => x.bank === b).forEach(x => { 
@@ -2707,7 +2721,11 @@ function render() {
             has = true; 
         });
         if (has) {
-            bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`;
+            bl.innerHTML += `
+                <div class="item">
+                    <span>${b}</span>
+                    <b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b>
+                </div>`;
         }
     });
 
@@ -2732,7 +2750,7 @@ function render() {
                     <span>Mevcut Bakiye: <b style="color:${a.balance < 0 ? 'var(--danger)' : 'var(--text)'}">${fmt(a.balance)}</b></span>
                     <span>Kullanılabilir: <b style="color:var(--success)">${fmt(available)}</b></span>
                 </div>
-                ${overdraft > 0 ? `<div style="font-size:0.7rem; color:var(--light); margin-top:3px;">Esnek Hesap Limiti: ${fmt(overdraft)}</div>` : ''}
+                ${overdraft > 0 ? `<div style="font-size:0.7rem; color:var(--light); margin-top:3px;">Esnek Limit: ${fmt(overdraft)}</div>` : ''}
             </div>`;
     });
 
@@ -2767,7 +2785,9 @@ function render() {
                     <span>Biriken: ${fmt(g.current)}</span>
                     <span>Hedef: ${fmt(g.target)}</span>
                 </div>
-                <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+                <div class="prog-bg">
+                    <div class="prog-fill" style="width:${pct}%"></div>
+                </div>
             </div>`; 
     });
     
@@ -2837,11 +2857,14 @@ function render() {
 }
 
 function renderCal(plans, trans) {
-    const y = curDate.getFullYear(), m = curDate.getMonth(); 
+    const y = curDate.getFullYear();
+    const m = curDate.getMonth(); 
+    
     document.getElementById('cal-title').innerText = `${y} / ${m + 1}`;
     
     const grid = document.getElementById('cal-grid'); 
     grid.innerHTML = ''; 
+    
     ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].forEach(d => {
         grid.innerHTML += `<div style="color:#ccc;font-size:0.7rem;">${d}</div>`;
     });
@@ -2887,23 +2910,29 @@ function renderCal(plans, trans) {
         let inc = 0, exp = 0;
         
         trans.forEach(t => { 
+            if(!t.date) {
+                return;
+            }
             const pd = new Date(t.date); 
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e) { 
                 if (t.type === 'income') {
-                    inc += t.amount; 
+                    inc += parseFloat(t.amount) || 0; 
                 } else if (t.type === 'expense') {
-                    exp += t.amount; 
+                    exp += parseFloat(t.amount) || 0; 
                 }
             } 
         });
         
         plans.forEach(p => { 
+            if(!p.date) {
+                return;
+            }
             const pd = new Date(p.date); 
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) { 
                 if (p.type === 'income') {
-                    inc += p.amount; 
+                    inc += parseFloat(p.amount) || 0; 
                 } else if (p.type === 'expense') {
-                    exp += p.amount; 
+                    exp += parseFloat(p.amount) || 0; 
                 }
             } 
         });
@@ -2928,7 +2957,7 @@ function renderCal(plans, trans) {
     });
     
     plans.forEach(p => { 
-        if (p.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
+        if (p.date && p.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
             allMonthItems.push({ ...p, isReal: false, sortDate: p.date }); 
         }
     });
@@ -2939,6 +2968,7 @@ function renderCal(plans, trans) {
         const isInc = item.type === 'income'; 
         const color = isInc ? 'var(--success)' : 'var(--danger)'; 
         const sign = isInc ? '+' : '-';
+        const amt = parseFloat(item.amount) || 0;
         
         if (item.isReal) {
             ml.innerHTML += `
@@ -2948,7 +2978,7 @@ function renderCal(plans, trans) {
                         <small style="color:#aaa">${item.description || 'Gerçekleşen İşlem'}</small>
                     </span>
                     <div>
-                        <strong style="color:${color}">${sign}${fmt(item.amount)}</strong> 
+                        <strong style="color:${color}">${sign}${fmt(amt)}</strong> 
                         <span class="badge" style="background:#f1f5f9;color:#64748b">✓</span>
                     </div>
                 </div>`;
@@ -2960,7 +2990,7 @@ function renderCal(plans, trans) {
                         <small style="color:#aaa">Planlanan</small>
                     </span>
                     <div>
-                        <strong style="color:${color}">${sign}${fmt(item.amount)}</strong> 
+                        <strong style="color:${color}">${sign}${fmt(amt)}</strong> 
                         ${!item.isPaid ? `<button class="act-btn" style="background:var(--primary); margin-left:5px;" onclick="initPay('${item.id}')">Öde</button>` : '<span class="badge">✓</span>'}
                     </div>
                 </div>`;
@@ -2983,6 +3013,8 @@ function openDay(d) {
     dayTrans.forEach((t, i) => {
         const isInc = t.type === 'income'; 
         const planBdg = t.planStatus === 'dahil' ? '<span class="badge-plan" style="color:var(--success)">Dahil</span>' : (t.planStatus === 'kapsam_disi' ? '<span class="badge-plan">Kapsam Dışı</span>' : '<span class="badge-plan" style="color:var(--warning)">Dahil Değil</span>');
+        const amt = parseFloat(t.amount) || 0;
+        
         l.innerHTML += `
             <div class="item" style="align-items:flex-start;">
                 <span>
@@ -2990,7 +3022,7 @@ function openDay(d) {
                     <small>${t.description || 'Tamamlanan İşlem'}</small>
                 </span>
                 <div style="text-align:right;">
-                    <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(t.amount)}</b><br>
+                    <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(amt)}</b><br>
                     <div style="margin-top:5px;">
                         <button class="act-btn" style="background:#64748b; padding:4px 8px;" onclick="openEditTrans('${t.id}', false)">✏️</button>
                         <button class="btn-del" onclick="delTrans('${t.id}')" style="margin-left:5px; font-size:1.1rem; color:var(--danger)">🗑</button>
@@ -3002,6 +3034,8 @@ function openDay(d) {
     dayPlans.forEach(p => {
         const isInc = p.type === 'income'; 
         const planBdg = p.planStatus === 'dahil' ? '<span class="badge-plan" style="color:var(--success)">Dahil</span>' : (p.planStatus === 'kapsam_disi' ? '<span class="badge-plan">Kapsam Dışı</span>' : '<span class="badge-plan" style="color:var(--warning)">Dahil Değil</span>');
+        const amt = parseFloat(p.amount) || 0;
+        
         l.innerHTML += `
             <div class="item" style="align-items:flex-start;">
                 <span>
@@ -3009,7 +3043,7 @@ function openDay(d) {
                     <small>Planlanan</small>
                 </span>
                 <div style="text-align:right;">
-                    <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(p.amount)}</b><br>
+                    <b style="color:${isInc ? 'var(--success)' : 'var(--danger)'}">${isInc ? '+' : '-'}${fmt(amt)}</b><br>
                     <div style="margin-top:5px; display:flex; align-items:center; justify-content:flex-end;">
                         ${!p.isPaid ? `<button class="act-btn" style="background:var(--primary);" onclick="initPay('${p.id}')">Öde</button>` : '<span style="font-size:0.7rem; color:#888; margin-right:5px;">(Ödendi)</span>'}
                         <button class="act-btn" style="background:#64748b; margin-left:5px; padding:4px 8px;" onclick="openEditTrans('${p.id}', true)">✏️</button>
@@ -3036,12 +3070,12 @@ function initPay(id) {
 function confirmPay() {
     const p = db.planned.find(x => x.id == payId); 
     const accIdx = document.getElementById('mp-acc').value;
-    let amt = parseFloat(document.getElementById('mp-real').value) || p.amount;
+    let amt = parseFloat(document.getElementById('mp-real').value) || parseFloat(p.amount) || 0;
     
     if (document.getElementById('mp-early').checked && p.category === 'Kredi') { 
         const loan = db.loans.find(l => p.title.includes(l.name)); 
         if (loan) {
-            loan.remaining -= p.amount; 
+            loan.remaining -= amt; 
         }
     }
     
@@ -3087,11 +3121,11 @@ function openCloseLoan(idx) {
 }
 
 function doCloseLoan() {
-    const amt = parseFloat(document.getElementById('mcl-amt').value); 
+    const amt = parseFloat(document.getElementById('mcl-amt').value) || 0; 
     const accIdx = document.getElementById('mcl-acc').value; 
     const loan = db.loans[closeId];
     
-    applyBalanceEffect('acc-'+accIdx, 'expense', amt, false);
+    applyBalanceEffect(accIdx, 'expense', amt, false);
     
     db.transactions.push({ 
         id: 't_' + Date.now(), 
@@ -3101,7 +3135,7 @@ function doCloseLoan() {
         owner: loan.owner, 
         date: new Date().toISOString(), 
         planStatus: 'kapsam_disi', 
-        sourceId: 'acc-'+accIdx 
+        sourceId: accIdx 
     });
     
     db.planned = db.planned.filter(p => !p.title.includes(loan.name)); 
@@ -3111,11 +3145,11 @@ function doCloseLoan() {
     closeModal('m-close-loan');
 }
 
-
 // ----------------------------------------------------
-// ZAMAN NAVİGATÖRÜ (TIME TRAVEL MOTORU) VE BI
+// KURUMSAL ANALİZ PANELI VE CHART.JS MOTORU (ULTIMATE)
 // ----------------------------------------------------
 
+// ZAMAN MAKİNESİ GÜNCELLEYİCİ
 function updateAnlDateLabel() {
     const lbl = document.getElementById('anl-date-label');
     if(!lbl) {
@@ -3147,7 +3181,6 @@ function updateAnlDateLabel() {
 function anlNavChangeType() {
     anlState.type = document.getElementById('anl-period-type').value;
     anlState.date = new Date(); 
-    document.getElementById('anl-period').value = anlState.type; 
     renderAnl();
 }
 
@@ -3216,6 +3249,9 @@ function getAnlDateRange() {
         
         let minDate = new Date();
         db.transactions.forEach(t => {
+            if(!t.date) {
+                return;
+            }
             let d = new Date(t.date);
             if(d < minDate) {
                 minDate = d;
@@ -3237,33 +3273,51 @@ function setPlanFilter(val) {
     document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
     
     let tabId = 'tab-plan-all';
-    if(val === 'dahil') tabId = 'tab-plan-dahil';
-    if(val === 'dahil_degil') tabId = 'tab-plan-plansiz';
-    if(val === 'kapsam_disi') tabId = 'tab-plan-kapsam';
+    if(val === 'dahil') {
+        tabId = 'tab-plan-dahil';
+    } else if(val === 'dahil_degil') {
+        tabId = 'tab-plan-plansiz';
+    } else if(val === 'kapsam_disi') {
+        tabId = 'tab-plan-kapsam';
+    }
     
     document.getElementById(tabId).classList.add('active');
     renderAnl();
 }
 
-function updateCatFilterOptions() {
-    const catSelect = document.getElementById('anl-cat-filter');
-    if (!catSelect) {
-        return;
-    }
-    
-    const currentVal = catSelect.value;
-    catSelect.innerHTML = '<option value="all">Tüm Kategoriler (Filtresiz)</option>';
-    
-    db.categories.expense.forEach(c => {
-        catSelect.add(new Option(c, c));
-    });
-    
-    if (Array.from(catSelect.options).some(opt => opt.value === currentVal)) {
-        catSelect.value = currentVal;
+// Hata Korumalı Grafik Çizici (Fail-Safe)
+function drawChartSafe(chartId, chartVarName, configOptions) {
+    try {
+        const canvas = document.getElementById(chartId);
+        if (!canvas) {
+            return null;
+        }
+        
+        const errDiv = document.getElementById(chartId + '-err');
+        if (errDiv) {
+            errDiv.style.display = 'none';
+        }
+
+        const ctx = canvas.getContext('2d');
+        
+        if (window[chartVarName]) {
+            window[chartVarName].destroy();
+        }
+        
+        window[chartVarName] = new Chart(ctx, configOptions);
+        return window[chartVarName];
+        
+    } catch (e) {
+        console.error("Grafik Çizim Hatası (" + chartId + "): ", e);
+        const errDiv = document.getElementById(chartId + '-err');
+        if (errDiv) {
+            errDiv.style.display = 'flex';
+            errDiv.innerHTML = `<span style="color:var(--danger); text-align:center; padding:10px;">Grafik Hatası:<br><small>${e.message}</small></span>`;
+        }
+        return null;
     }
 }
 
-// ANA ANALİZ RENDER MOTORU (GELİŞMİŞ BI)
 function renderAnl() {
     updateAnlDateLabel();
 
@@ -3272,9 +3326,20 @@ function renderAnl() {
     
     const range = getAnlDateRange();
     
-    let baseTx = filter(db.transactions);
+    // Verileri Güvenli Formata Getir ve Filtrele
+    let baseTx = filter(db.transactions).map(t => {
+        return {
+            ...t,
+            amount: parseFloat(t.amount) || 0,
+            category: t.category || 'Diğer',
+            planStatus: t.planStatus || 'dahil'
+        };
+    });
+
     baseTx = baseTx.filter(t => {
-        if (!t.date) return false;
+        if (!t.date) {
+            return false;
+        }
         const d = new Date(t.date);
         return d >= range.start && d <= range.end;
     });
@@ -3286,6 +3351,7 @@ function renderAnl() {
     let expenseTx = baseTx.filter(t => t.type === 'expense');
     let incomeTx = baseTx.filter(t => t.type === 'income');
 
+    // --- KPI KARTLARI ---
     let totalIncome = incomeTx.reduce((sum, t) => sum + t.amount, 0);
     let totalExpenseAll = expenseTx.reduce((sum, t) => sum + t.amount, 0);
     
@@ -3308,7 +3374,8 @@ function renderAnl() {
         kpiNetEl.style.color = "var(--danger)";
     }
 
-    const insightText = document.getElementById('anl-insight-card');
+    // --- İÇGÖRÜ KARTI ---
+    const insightText = document.getElementById('anl-insight-text');
     let topCatName = '-';
     let topCatAmount = 0;
     
@@ -3326,17 +3393,102 @@ function renderAnl() {
 
     if (kpiExpense > 0) {
         if (catFilter !== 'all') {
-            document.getElementById('anl-insight-text').innerHTML = `Seçili dönemde <b>${catFilter}</b> için <b>${fmt(kpiExpense)}</b> harcadınız. Seçili dönemin genel net bakiyesi: ${fmt(kpiNet)}.`;
+            insightText.innerHTML = `Seçili dönemde <b>${catFilter}</b> için <b>${fmt(kpiExpense)}</b> harcadınız. Bu dönemin genel net bakiyesi: <b>${fmt(kpiNet)}</b>.`;
         } else {
-            document.getElementById('anl-insight-text').innerHTML = `Seçili dönemde çıkışınız <b>${fmt(kpiExpense)}</b>. En çok harcanan kategori <b>${fmt(topCatAmount)}</b> ile <b>"${topCatName}"</b>.`;
+            insightText.innerHTML = `Seçili filtreye göre toplam çıkış <b>${fmt(kpiExpense)}</b>. En çok harcanan kategori <b>${fmt(topCatAmount)}</b> ile <b>"${topCatName}"</b>.`;
         }
     } else {
-        document.getElementById('anl-insight-text').innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor. Yeni işlem girdiğinizde analizler buraya yansıyacaktır.`;
+        insightText.innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor. Yeni işlem girdiğinizde analizler buraya yansıyacaktır.`;
     }
 
     Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, sans-serif';
     Chart.defaults.color = '#64748b';
 
+    // --- NAKİT AKIŞI GRAFİĞİ (GELİR VS GİDER) ---
+    const cashflowEmpty = document.getElementById('cashflow-empty-err');
+    
+    if (totalIncome > 0 || kpiExpense > 0) {
+        if(cashflowEmpty) {
+            cashflowEmpty.style.display = 'none';
+        }
+        
+        drawChartSafe('cashFlowChart', 'cashFlowChartInstance', {
+            type: 'bar',
+            data: {
+                labels: ['Nakit Akışı'],
+                datasets: [
+                    { label: 'Gelir', data: [totalIncome], backgroundColor: '#10b981' },
+                    { label: 'Gider', data: [kpiExpense], backgroundColor: '#ef4444' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', 
+                scales: {
+                    x: { beginAtZero: true, ticks: { callback: function(val) { return val / 1000 + 'k'; } } }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } }
+                }
+            }
+        });
+    } else {
+        if(cashflowEmpty) {
+            cashflowEmpty.style.display = 'flex';
+            cashflowEmpty.innerText = "Nakit akışı verisi bulunamadı.";
+        }
+    }
+
+    // --- GRAFİK 1: PLAN DURUMU DAĞILIMI (PASTA) ---
+    let planData = { 'Plana Dahil': 0, 'Dahil Değil': 0, 'Kapsam Dışı': 0 };
+    expenseTx.forEach(t => {
+        if (t.planStatus === 'dahil') {
+            planData['Plana Dahil'] += t.amount;
+        } else if (t.planStatus === 'dahil_degil') {
+            planData['Dahil Değil'] += t.amount;
+        } else if (t.planStatus === 'kapsam_disi') {
+            planData['Kapsam Dışı'] += t.amount;
+        }
+    });
+
+    const planEmpty = document.getElementById('plan-empty-err');
+    let hasPlanData = planData['Plana Dahil'] > 0 || planData['Dahil Değil'] > 0 || planData['Kapsam Dışı'] > 0;
+    
+    if (hasPlanData) {
+        if(planEmpty) {
+            planEmpty.style.display = 'none';
+        }
+        
+        drawChartSafe('planStatusChart', 'planStatusChartInstance', {
+            type: 'pie',
+            data: {
+                labels: Object.keys(planData),
+                datasets: [{
+                    data: Object.values(planData),
+                    backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
+                    borderWidth: 2, 
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
+                }
+            }
+        });
+    } else {
+        if(planEmpty) {
+            planEmpty.style.display = 'flex';
+            planEmpty.innerText = "Gider kaydı bulunamadı.";
+        }
+    }
+
+    // --- GRAFİK 2: KATEGORİ DAĞILIMI (DOUGHNUT) ---
     const plannedCats = {};
     let totalForDoughnut = 0;
     
@@ -3347,51 +3499,49 @@ function renderAnl() {
 
     const pCatLabels = Object.keys(plannedCats).sort((a, b) => plannedCats[b] - plannedCats[a]);
     const pCatData = pCatLabels.map(k => plannedCats[k]);
-
-    const ctxCat = document.getElementById('categoryDoughnutChart');
-    const emptyDoughnut = document.getElementById('doughnut-empty');
+    const emptyDoughnut = document.getElementById('doughnut-empty-err');
     
-    if (ctxCat) {
-        if (catChartInstance) {
-            catChartInstance.destroy();
+    if (totalForDoughnut > 0) {
+        if(emptyDoughnut) {
+            emptyDoughnut.style.display = 'none';
         }
         
-        if (totalForDoughnut > 0) {
-            emptyDoughnut.style.display = 'none';
-            
-            let titleText = 'Tüm Harcama Dağılımı';
-            if (planFilter === 'dahil') titleText = 'Asıl Bütçe Dağılımı (Plana Dahil)';
-            if (planFilter === 'dahil_degil') titleText = 'Plansız Harcama Dağılımı';
-            if (planFilter === 'kapsam_disi') titleText = 'Kapsam Dışı Çıkış Dağılımı';
-            
-            document.getElementById('doughnut-title').innerText = titleText;
-            
-            catChartInstance = new Chart(ctxCat.getContext('2d'), {
-                type: 'doughnut',
-                data: { 
-                    labels: pCatLabels, 
-                    datasets: [{ 
-                        data: pCatData, 
-                        backgroundColor: CHART_COLORS, 
-                        borderWidth: 2, 
-                        borderColor: '#ffffff' 
-                    }] 
-                },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    cutout: '60%',
-                    plugins: { 
-                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }, 
-                        tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } } 
-                    }
+        let titleText = 'Tüm Harcama Dağılımı';
+        if (planFilter === 'dahil') titleText = 'Asıl Bütçe Dağılımı (Plana Dahil)';
+        if (planFilter === 'dahil_degil') titleText = 'Plansız Harcama Dağılımı';
+        if (planFilter === 'kapsam_disi') titleText = 'Kapsam Dışı Çıkış Dağılımı';
+        
+        document.getElementById('doughnut-title').innerText = titleText;
+        
+        drawChartSafe('categoryDoughnutChart', 'catChartInstance', {
+            type: 'doughnut',
+            data: { 
+                labels: pCatLabels, 
+                datasets: [{ 
+                    data: pCatData, 
+                    backgroundColor: CHART_COLORS, 
+                    borderWidth: 2, 
+                    borderColor: '#ffffff' 
+                }] 
+            },
+            options: {
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '60%',
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
                 }
-            });
-        } else {
+            }
+        });
+    } else {
+        if(emptyDoughnut) {
             emptyDoughnut.style.display = 'flex';
+            emptyDoughnut.innerText = "Bu filtreye uygun harcama bulunamadı.";
         }
     }
 
+    // --- EN BÜYÜK 5 HARCAMA LİSTESİ ---
     const top5List = document.getElementById('top-5-list');
     top5List.innerHTML = '';
     
@@ -3412,17 +3562,22 @@ function renderAnl() {
         top5List.innerHTML = '<div style="color:var(--light); font-size:0.8rem; text-align:center; padding:10px;">İşlem bulunamadı.</div>';
     }
 
+    // --- LİMİT ÇUBUKLARI ---
     const limDahil = (db.limits.planDahil || 0) * range.mult; 
     const limDahilDegil = (db.limits.planDahilDegil || 0) * range.mult; 
     const limKapsamDisi = (db.limits.kapsamDisi || 0) * range.mult;
     
-    let planData = { 'Plana Dahil': 0, 'Dahil Değil': 0, 'Kapsam Dışı': 0 };
-    
+    let planDataBar = { 'Plana Dahil': 0, 'Dahil Değil': 0, 'Kapsam Dışı': 0 };
     expenseTx.forEach(t => {
-        if (t.planStatus === 'dahil') planData['Plana Dahil'] += t.amount;
-        else if (t.planStatus === 'dahil_degil') planData['Dahil Değil'] += t.amount;
-        else if (t.planStatus === 'kapsam_disi') planData['Kapsam Dışı'] += t.amount;
-        else planData['Plana Dahil'] += t.amount; 
+        if (t.planStatus === 'dahil') {
+            planDataBar['Plana Dahil'] += t.amount;
+        } else if (t.planStatus === 'dahil_degil') {
+            planDataBar['Dahil Değil'] += t.amount;
+        } else if (t.planStatus === 'kapsam_disi') {
+            planDataBar['Kapsam Dışı'] += t.amount;
+        } else {
+            planDataBar['Plana Dahil'] += t.amount; 
+        }
     });
 
     const barsContainer = document.getElementById('anl-limits-bars'); 
@@ -3442,7 +3597,8 @@ function renderAnl() {
         return `
             <div style="margin-bottom:15px;">
                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
-                    <span style="font-weight:bold;">${title}</span>
+                    <span style="font-weight:bold;">${title} 
+                    ${limit > 0 && anlState.type !== 'month' && anlState.type !== 'week' ? `(Aylık Limit x ${range.mult})` : ''}</span>
                     <span>${fmt(spent)} / ${limitText}</span>
                 </div>
                 <div class="prog-bg">
@@ -3451,14 +3607,15 @@ function renderAnl() {
             </div>`;
     };
     
-    barsContainer.innerHTML += renderBar('Plana Dahil Giderler', planData['Plana Dahil'], limDahil);
-    barsContainer.innerHTML += renderBar('Plansız (Dahil Olmayan) Giderler', planData['Dahil Değil'], limDahilDegil);
-    barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım)', planData['Kapsam Dışı'], limKapsamDisi);
+    barsContainer.innerHTML += renderBar('Plana Dahil Giderler', planDataBar['Plana Dahil'], limDahil);
+    barsContainer.innerHTML += renderBar('Plansız (Dahil Olmayan) Giderler', planDataBar['Dahil Değil'], limDahilDegil);
+    barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım)', planDataBar['Kapsam Dışı'], limKapsamDisi);
 
+    // --- AYLIK TREND VE PİVOT TABLO ---
     const trendContainer = document.getElementById('anl-trend-container');
     const pivotContainer = document.getElementById('pivot-container');
     const pivotTable = document.getElementById('pivot-table-elem');
-    const trendEmpty = document.getElementById('trend-empty');
+    const trendEmpty = document.getElementById('trend-empty-err');
     
     trendContainer.style.display = 'block';
     pivotContainer.style.display = 'block';
@@ -3486,69 +3643,72 @@ function renderAnl() {
     });
 
     let timeLabels = Object.keys(timeGroups).sort();
-    const ctxTrend = document.getElementById('monthlyTrendChart');
     
-    if (ctxTrend) {
-        if (monthlyTrendChartInstance) {
-            monthlyTrendChartInstance.destroy();
+    if (timeLabels.length > 0) {
+        if(trendEmpty) {
+            trendEmpty.style.display = 'none';
+        }
+        
+        let trendDahil = timeLabels.map(k => {
+            let sum = 0; 
+            for(let c in timeGroups[k]['dahil']) {
+                sum += timeGroups[k]['dahil'][c]; 
+            }
+            return sum;
+        });
+        
+        let trendKapsamDisi = timeLabels.map(k => {
+            let sum = 0; 
+            for(let c in timeGroups[k]['kapsam_disi']) {
+                sum += timeGroups[k]['kapsam_disi'][c]; 
+            }
+            return sum;
+        });
+
+        let datasetsForTrend = [];
+        
+        if (planFilter === 'all') {
+            datasetsForTrend = [
+                { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0', borderRadius: 4 },
+                { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0', borderRadius: 4 }
+            ];
+        } else if (planFilter === 'dahil') {
+            datasetsForTrend = [
+                { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0', borderRadius: 4 }
+            ];
+        } else {
+            datasetsForTrend = [
+                { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0', borderRadius: 4 }
+            ];
         }
 
-        if (timeLabels.length > 0) {
-            trendEmpty.style.display = 'none';
-            
-            let trendDahil = timeLabels.map(k => {
-                let sum = 0; 
-                for(let c in timeGroups[k]['dahil']) sum += timeGroups[k]['dahil'][c]; 
-                return sum;
-            });
-            
-            let trendKapsamDisi = timeLabels.map(k => {
-                let sum = 0; 
-                for(let c in timeGroups[k]['kapsam_disi']) sum += timeGroups[k]['kapsam_disi'][c]; 
-                return sum;
-            });
-
-            let datasetsForTrend = [];
-            
-            if (planFilter === 'all') {
-                datasetsForTrend = [
-                    { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0', borderRadius: 4 },
-                    { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0', borderRadius: 4 }
-                ];
-            } else if (planFilter === 'dahil') {
-                datasetsForTrend = [
-                    { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0', borderRadius: 4 }
-                ];
-            } else {
-                datasetsForTrend = [
-                    { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0', borderRadius: 4 }
-                ];
-            }
-
-            monthlyTrendChartInstance = new Chart(ctxTrend.getContext('2d'), {
-                type: 'bar',
-                data: { 
-                    labels: timeLabels, 
-                    datasets: datasetsForTrend 
+        drawChartSafe('monthlyTrendChart', 'monthlyTrendChartInstance', {
+            type: 'bar',
+            data: { labels: timeLabels, datasets: datasetsForTrend },
+            options: {
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: true, grid: { display: false } }, 
+                    y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } 
                 },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    scales: { 
-                        x: { stacked: true, grid: { display: false } }, 
-                        y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } 
-                    },
-                    plugins: { 
-                        legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, 
-                        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } 
-                    }
+                plugins: { 
+                    legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, 
+                    tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } 
                 }
-            });
-        } else {
+            }
+        });
+    } else {
+        if(trendEmpty) {
             trendEmpty.style.display = 'flex';
+            trendEmpty.innerText = "Trend çizilecek veri bulunamadı.";
+        }
+        if(monthlyTrendChartInstance) {
+            monthlyTrendChartInstance.destroy();
         }
     }
 
+    // 2. EXCEL BENZERİ PİVOT TABLOYU OLUŞTUR
     let allUniqueCats = new Set();
     expenseTx.forEach(t => allUniqueCats.add(t.category));
     let columns = Array.from(allUniqueCats).sort();
