@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hane Finans: Kurumsal Yönetim Paneli</title>
+    <title>Hane Finans: Kurumsal BI Paneli</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -52,141 +52,27 @@
             z-index: 50; 
         }
         
-        .head-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-        }
+        .head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .head-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap: 8px; }
+        .cloud-icon { font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; font-weight: normal; }
+        .head-actions { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .act-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
         
-        .head-title { 
-            font-weight: 900; 
-            font-size: 1.3rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px;
-        }
-        
-        .cloud-icon { 
-            font-size: 0.8rem; 
-            background: rgba(0,0,0,0.3); 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-weight: normal; 
-        }
-        
-        .head-actions { 
-            display: flex; 
-            gap: 8px; 
-            overflow-x: auto; 
-            padding-bottom: 5px; 
-        }
-        
-        .act-btn { 
-            background: rgba(255,255,255,0.2); 
-            border: 1px solid rgba(255,255,255,0.3); 
-            color: white; 
-            padding: 6px 12px; 
-            border-radius: 8px; 
-            font-size: 0.75rem; 
-            cursor: pointer; 
-            white-space: nowrap; 
-        }
-        
-        .tabs { 
-            display: flex; 
-            background: rgba(0,0,0,0.2); 
-            padding: 3px; 
-            border-radius: 10px; 
-            margin-top: 5px; 
-        }
-        
-        .tab { 
-            flex: 1; 
-            text-align: center; 
-            padding: 8px; 
-            font-size: 0.8rem; 
-            border-radius: 8px; 
-            color: rgba(255,255,255,0.6); 
-            cursor: pointer; 
-            font-weight: 600; 
-            transition: 0.2s; 
-        }
-        
-        .tab.active { 
-            background: white; 
-            color: var(--primary); 
-        }
+        .tabs { display: flex; background: rgba(0,0,0,0.2); padding: 3px; border-radius: 10px; margin-top: 5px; }
+        .tab { flex: 1; text-align: center; padding: 8px; font-size: 0.8rem; border-radius: 8px; color: rgba(255,255,255,0.6); cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .tab.active { background: white; color: var(--primary); }
 
-        main { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 15px; 
-            padding-bottom: 100px; 
-            z-index: 1; 
-        }
+        main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; z-index: 1; }
 
         /* KART VE İSTATİSTİK TASARIMLARI */
-        .card { 
-            background: var(--white); 
-            border-radius: 16px; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04); 
-            border: 1px solid #e2e8f0; 
-        }
+        .card { background: var(--white); border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .stat-box { background: #f1f5f9; padding: 12px; border-radius: 10px; text-align: center; }
+        .stat-lbl { font-size: 0.7rem; font-weight: bold; color: var(--light); text-transform: uppercase; }
+        .stat-val { font-size: 1.1rem; font-weight: 800; margin-top: 4px; }
         
-        .stat-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            margin-top: 10px; 
-        }
-        
-        .stat-box { 
-            background: #f1f5f9; 
-            padding: 12px; 
-            border-radius: 10px; 
-            text-align: center; 
-        }
-        
-        .stat-lbl { 
-            font-size: 0.7rem; 
-            font-weight: bold; 
-            color: var(--light); 
-            text-transform: uppercase; 
-        }
-        
-        .stat-val { 
-            font-size: 1.1rem; 
-            font-weight: 800; 
-            margin-top: 4px; 
-        }
-        
-        .health-card { 
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6); 
-            color: white; 
-            border-radius: 16px; 
-            padding: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); 
-        }
-        
-        .score-circle { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            background: rgba(255,255,255,0.2); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 1.4rem; 
-            font-weight: bold; 
-            border: 3px solid white; 
-        }
+        .health-card { background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+        .score-circle { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; border: 3px solid white; }
 
         .prog-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .prog-fill { height: 100%; background: var(--success); border-radius: 4px; transition: 0.3s; }
@@ -222,7 +108,7 @@
         .fabs { position: fixed; bottom: calc(75px + var(--safe-bottom)); right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 90; }
         .fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
         
-        /* MODAL (AÇILIR PENCERE) TASARIMLARI */
+        /* MODAL TASARIMLARI */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 2000; pointer-events: none; }
         .modal.show { display: flex; pointer-events: auto; }
         .modal-box { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(30px + var(--safe-bottom)); max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s; }
@@ -239,6 +125,7 @@
         .d-none { display: none !important; }
         .text-grn { color: var(--success); } 
         .text-red { color: var(--danger); }
+        .text-warning { color: var(--warning); }
         
         .page { display: none; animation: fadeIn 0.3s; } 
         .page.active { display: block; }
@@ -250,11 +137,19 @@
         .ai-row-bot { display:flex; gap:8px; align-items:center; }
         .ai-inp { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.85rem; width:100%; background:#f8fafc; }
         
-        /* ANALİZ KARTLARI */
+        /* ANALİZ & BI KARTLARI */
         .insight-card { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 15px; }
         .insight-title { font-size: 0.75rem; font-weight: bold; color: #166534; display: flex; align-items: center; gap: 5px; text-transform: uppercase; margin-bottom: 5px; }
+        
         .chart-container { position: relative; width: 100%; height: 240px; display: flex; justify-content: center; align-items: center; }
         .chart-empty { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #94a3b8; font-style: italic; background: rgba(255,255,255,0.8); z-index: 10; border-radius: 10px; }
+
+        /* YENİ: BİLGİSAYAR EKRANLARI İÇİN GRID DÜZENİ */
+        .chart-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 768px) {
+            .chart-grid { grid-template-columns: 1fr 1fr; }
+            .chart-grid .full-width { grid-column: span 2; }
+        }
 
         /* HESAP / KART GÖRÜNÜMLERİ */
         .acc-card { border-left: 4px solid var(--success); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
@@ -266,7 +161,7 @@
         .pivot-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 500px; }
         .pivot-table th, .pivot-table td { padding: 8px; border: 1px solid #e2e8f0; text-align: right; }
         .pivot-table th { background: #f8fafc; font-weight: bold; color: var(--text); text-align: center; }
-        .pivot-table .row-group { background: #eef2ff; font-weight: bold; text-align: left; color: var(--primary); }
+        .pivot-table .row-group { background: #e0e7ff; font-weight: bold; text-align: left; color: var(--primary); }
         .pivot-table .row-sub { text-align: left; padding-left: 20px; }
 
         /* YÜKLENİYOR (LOADING) EKRANI */
@@ -300,7 +195,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ANALİZ PLAN SEKMELERİ */
+        /* YENİ: ANALİZ PLAN SEKMELERİ */
         .plan-tabs {
             display: flex;
             background: #e2e8f0;
@@ -331,7 +226,7 @@
 <div id="ai-loading-overlay">
     <div class="spinner"></div>
     <h2 style="margin: 0 0 10px 0;">Yapay Zeka Fişi Okuyor...</h2>
-    <p style="font-size: 0.9rem; opacity: 0.8; margin: 0; padding: 0 20px;">Bu işlem resminizin boyutuna ve detayına göre 5 ila 15 saniye sürebilir.<br>Lütfen bekleyin.</p>
+    <p style="font-size: 0.9rem; opacity: 0.8; margin: 0; padding: 0 20px;">Bu işlem resminizin boyutuna göre 5 ila 15 saniye sürebilir.<br>Lütfen bekleyin.</p>
 </div>
 
 <header>
@@ -466,7 +361,7 @@
         <input type="hidden" id="anl-plan-filter" value="all">
 
         <div class="stat-grid" style="margin-bottom: 15px;">
-            <div class="stat-box" style="background:#dcfce7; border:1px solid #86efac;">
+            <div class="stat-box" style="background:#f0fdf4; border:1px solid #86efac;">
                 <div class="stat-lbl" style="color:#166534;">Toplam Gelir</div>
                 <div class="stat-val text-grn" id="kpi-inc">0</div>
             </div>
@@ -475,7 +370,7 @@
                 <div class="stat-val text-red" id="kpi-exp">0</div>
             </div>
             <div class="stat-box" style="background:#eff6ff; border:1px solid #bfdbfe; grid-column: span 2;">
-                <div class="stat-lbl" style="color:#1d4ed8;">Dönem İçi Net Etki (Tasarruf)</div>
+                <div class="stat-lbl" style="color:#1d4ed8;">Dönem İçi Net Akış (Tasarruf)</div>
                 <div class="stat-val" style="color:#1e40af;" id="kpi-net">0</div>
             </div>
         </div>
@@ -485,27 +380,49 @@
             <div id="anl-insight-text" style="font-size:0.9rem; color:#1e293b; line-height:1.4;">Veriler analiz ediliyor...</div>
         </div>
 
-        <div class="card">
-            <h4 style="margin:0 0 10px 0; text-align:center;" id="doughnut-title">Harcama Dağılımı</h4>
-            <div class="chart-container" style="height: 240px; position:relative;">
-                <div id="doughnut-empty" class="chart-empty" style="display:none;">Bu filtreye uygun harcama bulunamadı.</div>
-                <canvas id="categoryDoughnutChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card">
-            <h4 style="margin:0 0 10px 0;">En Büyük 5 Harcama</h4>
-            <div id="top-5-list">
+        <div class="chart-grid">
+            <div class="card full-width" id="anl-cashflow-container">
+                <h4 style="margin:0 0 10px 0; text-align:center;">Gelir / Gider Karşılaştırması</h4>
+                <div class="chart-container" style="height: 240px; position:relative;">
+                    <div id="cashflow-empty" class="chart-empty" style="display:none;">Nakit akışı verisi bulunamadı.</div>
+                    <canvas id="cashFlowChart"></canvas>
                 </div>
+            </div>
+
+            <div class="card">
+                <h4 style="margin:0 0 10px 0; text-align:center;" id="doughnut-title">Harcama Dağılımı</h4>
+                <div class="chart-container" style="height: 240px; position:relative;">
+                    <div id="doughnut-empty" class="chart-empty" style="display:none;">Bu filtreye uygun harcama bulunamadı.</div>
+                    <canvas id="categoryDoughnutChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4 style="margin:0 0 10px 0; text-align:center;">Bütçe Stratejisi (Plan Durumu)</h4>
+                <div class="chart-container" style="height: 240px; position:relative;">
+                    <div id="plan-empty" class="chart-empty" style="display:none;">Gider kaydı bulunamadı.</div>
+                    <canvas id="planStatusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card full-width" id="anl-trend-container">
+                <h4 style="margin:0 0 10px 0; text-align:center;" id="trend-title">Aylık Harcama Trendi</h4>
+                <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Aydan aya değişimi gösterir.</p>
+                <div class="chart-container" style="height: 260px; position:relative;">
+                    <div id="trend-empty" class="chart-empty" style="display:none;">Trend oluşturulacak veri bulunamadı.</div>
+                    <canvas id="monthlyTrendChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <div class="card" id="anl-trend-container">
-            <h4 style="margin:0 0 10px 0; text-align:center;" id="trend-title">Aylık Harcama Trendi</h4>
-            <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Seçili filtrelere göre aydan aya değişimi gösterir.</p>
-            <div class="chart-container" style="height: 260px; position:relative;">
-                <div id="trend-empty" class="chart-empty" style="display:none;">Trend oluşturulacak veri bulunamadı.</div>
-                <canvas id="monthlyTrendChart"></canvas>
-            </div>
+        <div class="card">
+            <h4 style="margin:0 0 10px 0;">En Büyük 5 Çıkış (Filtrelenmiş)</h4>
+            <div id="top-5-list"></div>
+        </div>
+
+        <div class="card">
+            <h4 style="margin:0 0 15px 0;">Aylık Limit Takibi</h4>
+            <div id="anl-limits-bars"></div>
         </div>
 
         <div class="card" id="pivot-container" style="padding:10px;">
@@ -618,7 +535,6 @@
 <div class="modal" id="m-edit-trans">
     <div class="modal-box">
         <h3>İşlemi Düzenle</h3>
-        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Yapılan tutar veya kaynak değişimi seçilen hesaba otomatik yansıyacaktır.</p>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <div style="flex:1;">
                 <label class="inp-lbl">İşlem Tipi</label>
@@ -894,28 +810,46 @@
 </div>
 
 <script>
-// Supabase Yapılandırması
+// --- SUPABASE BAĞLANTISI ---
 const SUPABASE_URL = 'https://kdycxoweuaxslzbklprh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Tm-hZqU0CN6TPk8hKSfZ1Q_VtiWUqY1';
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// --- ANA VERİ TABANI ---
 let db = { 
     banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
     categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
-    accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [], 
+    accounts: [], 
+    cards: [], 
+    loans: [], 
+    transactions: [], 
+    planned: [], 
+    assets: [], 
+    goals: [], 
     limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } 
 };
 
-let curPro = 'Hane', curDate = new Date(), payId = null, closeId = null;
+// --- GLOBAL DEĞİŞKENLER ---
+let curPro = 'Hane';
+let curDate = new Date();
+let payId = null;
+let closeId = null;
 let scannedItems = [];
-let editTransId = null; let editIsPlan = false;
-let editAccIdx = null; let editCardIdx = null; let editLoanIdx = null;
 
+// Edit Modalı Değişkenleri
+let editTransId = null;
+let editIsPlan = false;
+let editAccIdx = null;
+let editCardIdx = null;
+let editLoanIdx = null;
+
+// Chart Instance Değişkenleri
 let catChartInstance = null;
 let monthlyTrendChartInstance = null;
+let planStatusChartInstance = null;
+let cashFlowChartInstance = null;
 
-// --- AYARLAR VE YARDIMCI FONKSİYONLAR ---
-
+// --- SİSTEM & YARDIMCI FONKSİYONLAR ---
 function loadSettings() { 
     const key = localStorage.getItem('hf_gemini_key'); 
     if (key) {
@@ -953,9 +887,15 @@ function chgMonth(n) {
 function openModal(id) { 
     updSel(); 
     document.getElementById(id).classList.add('show'); 
-    if (id === 'm-banks') renderBanks(); 
-    if (id === 'm-cats') renderCats(); 
-    if (id === 'm-limits') openLimits(); 
+    if (id === 'm-banks') {
+        renderBanks(); 
+    }
+    if (id === 'm-cats') {
+        renderCats(); 
+    }
+    if (id === 'm-limits') {
+        openLimits(); 
+    }
 }
 
 function closeModal(id) { 
@@ -988,8 +928,7 @@ function setPro(p) {
     }
 }
 
-// --- DÜZELTİLEN YAPAY ZEKA FONKSİYONLARI ---
-
+// --- YAPAY ZEKA TARAMA MOTORU ---
 async function processScan(input) {
     try {
         const apiKey = localStorage.getItem('hf_gemini_key');
@@ -1004,10 +943,7 @@ async function processScan(input) {
             return;
         }
         
-        // Inputu sıfırla
         input.value = "";
-
-        // Ekrana yükleniyor modalını çıkar
         document.getElementById('ai-loading-overlay').style.display = 'flex';
 
         const reader = new FileReader();
@@ -1113,8 +1049,12 @@ function renderScanModal(items) {
     aiAccSelect.innerHTML = '';
     aiAccSelect.add(new Option('Sadece Geçmişe Kaydet (Bakiye Etkileme)', 'none'));
     
-    db.accounts.forEach((a, i) => aiAccSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
-    db.cards.forEach((c, i) => aiAccSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
+    db.accounts.forEach((a, i) => {
+        aiAccSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i));
+    });
+    db.cards.forEach((c, i) => {
+        aiAccSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i));
+    });
     
     let dl = document.getElementById('cat-list-options');
     if (!dl) {
@@ -1123,7 +1063,9 @@ function renderScanModal(items) {
         document.body.appendChild(dl);
     }
     dl.innerHTML = '';
-    db.categories.expense.forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
+    db.categories.expense.forEach(c => {
+        dl.innerHTML += `<option value="${c}"></option>`;
+    });
     
     const list = document.getElementById('ai-results-list');
     list.innerHTML = '';
@@ -1160,7 +1102,9 @@ function saveScannedData() {
     
     scannedItems.forEach((item, index) => {
         const descEl = document.getElementById(`ai-desc-${index}`);
-        if (!descEl) return;
+        if (!descEl) {
+            return;
+        }
         
         const desc = descEl.value;
         const amt = parseFloat(document.getElementById(`ai-amt-${index}`).value) || 0;
@@ -1206,7 +1150,7 @@ function saveScannedData() {
     alert(`${scannedItems.length} işlem başarıyla buluta kaydedildi!`);
 }
 
-// --- HESAP, KART VE KREDİ DÜZENLEME (CRUD) KISMI ---
+// --- CRUD VE BAKİYE ETKİLEŞİMLERİ ---
 
 function openAddAcc() { 
     editAccIdx = null; 
@@ -1478,7 +1422,9 @@ function updateAccListByOwner(prefix, selectedVal = null) {
     const owner = document.getElementById(prefix + '-own').value;
     const accSelect = document.getElementById(prefix + '-acc');
     
-    if(!accSelect) return;
+    if(!accSelect) {
+        return;
+    }
     
     const currentSelection = selectedVal || accSelect.value; 
     accSelect.innerHTML = '';
@@ -1510,9 +1456,16 @@ function updateAccListByOwner(prefix, selectedVal = null) {
         if(toSelect) {
             const currentTo = toSelect.value;
             toSelect.innerHTML = '';
-            db.accounts.forEach((a, i) => toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i)));
-            db.cards.forEach((c, i) => toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i)));
-            db.loans.forEach((l, i) => toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i)));
+            
+            db.accounts.forEach((a, i) => {
+                toSelect.add(new Option(`${a.owner} - ${a.name} (Hesap)`, 'acc-' + i));
+            });
+            db.cards.forEach((c, i) => {
+                toSelect.add(new Option(`${c.owner} - ${c.name} (Kart)`, 'card-' + i));
+            });
+            db.loans.forEach((l, i) => {
+                toSelect.add(new Option(`${l.owner} - ${l.name} (Kredi)`, 'loan-' + i));
+            });
             
             if (currentTo && Array.from(toSelect.options).some(opt => opt.value === currentTo)) {
                 toSelect.value = currentTo;
@@ -1548,6 +1501,7 @@ function saveTrans() {
     
     if (type === 'transfer') { 
         let toIdVal = document.getElementById('it-to').value; 
+        
         applyBalanceEffect(sourceId, 'expense', amt, false); 
         applyBalanceEffect(toIdVal, 'income', amt, false); 
         
@@ -1566,6 +1520,7 @@ function saveTrans() {
         if (isPlan) { 
             let d = new Date(tDate || new Date().toISOString()); 
             let rep = parseInt(document.getElementById('it-rep').value) || 1; 
+            
             for (let i = 0; i < rep; i++) { 
                 db.planned.push({ 
                     id: 'p_' + Date.now() + '_' + i, 
@@ -1583,6 +1538,7 @@ function saveTrans() {
             } 
         } else { 
             applyBalanceEffect(sourceId, type, amt, false); 
+            
             db.transactions.push({ 
                 id: 't_' + Date.now(), 
                 type: type, 
@@ -1595,6 +1551,7 @@ function saveTrans() {
             }); 
         } 
     } 
+    
     save(); 
     closeModal('m-trans'); 
 }
@@ -1608,8 +1565,11 @@ function updateEditCatList(prefix = 'et') {
     }
     
     catSelect.innerHTML = ''; 
+    
     if (db.categories[type]) { 
-        db.categories[type].forEach(c => catSelect.add(new Option(c, c))); 
+        db.categories[type].forEach(c => {
+            catSelect.add(new Option(c, c));
+        }); 
     } 
 }
 
@@ -1709,6 +1669,7 @@ function delTrans(id) {
                 applyBalanceEffect(t.sourceId, t.type, t.amount, true); 
             } 
         } 
+        
         db.transactions = db.transactions.filter(x => x.id != id); 
         save(); 
         
@@ -1716,6 +1677,7 @@ function delTrans(id) {
         if (mdTit && mdTit.includes('Detayları')) { 
             openDay(mdTit.replace(' Detayları', '').trim()); 
         } 
+        
         if (document.getElementById('p-analysis').classList.contains('active')) {
             renderAnl(); 
         }
@@ -1730,9 +1692,11 @@ function saveAsset() {
         name: document.getElementById('ias-name').value, 
         value: parseFloat(document.getElementById('ias-val').value) || 0 
     }; 
+    
     if (!a.name) {
         return alert('İsim girin'); 
     }
+    
     db.assets.push(a); 
     save(); 
     closeModal('m-asset'); 
@@ -1746,9 +1710,11 @@ function saveGoal() {
         target: parseFloat(document.getElementById('ig-target').value) || 0, 
         current: parseFloat(document.getElementById('ig-current').value) || 0 
     }; 
+    
     if (!g.name || !g.target) {
         return alert('Eksik bilgi'); 
     }
+    
     db.goals.push(g); 
     save(); 
     closeModal('m-goal'); 
@@ -1758,13 +1724,17 @@ function updSel() {
     const bnks = document.querySelectorAll('#ia-bank, #ic-bank, #il-bank'); 
     bnks.forEach(s => { 
         s.innerHTML = ''; 
-        db.banks.forEach(b => s.add(new Option(b, b))); 
+        db.banks.forEach(b => {
+            s.add(new Option(b, b));
+        }); 
     }); 
     
     const cts = document.querySelectorAll('#it-cat'); 
     cts.forEach(s => { 
         s.innerHTML = ''; 
-        db.categories.expense.forEach(c => s.add(new Option(c, c))); 
+        db.categories.expense.forEach(c => {
+            s.add(new Option(c, c));
+        }); 
     }); 
     
     updateAccListByOwner('et'); 
@@ -1792,6 +1762,7 @@ function renderCats() {
 function addCat() { 
     const t = document.getElementById('ic-type').value; 
     const v = document.getElementById('ic-new').value; 
+    
     if (v) { 
         db.categories[t].push(v); 
         save(); 
@@ -1805,9 +1776,11 @@ function calcLoan() {
     const inst = parseFloat(document.getElementById('la-inst').value); 
     const res = document.getElementById('loan-compare-res'); 
     res.innerHTML = ''; 
+    
     if (amt && term && inst) { 
         res.innerHTML = `<div class="item"><span class="text-grn">Yeni Teklif</span><span>Maliyet: ${fmt(inst * term - amt)}</span></div>`; 
     } 
+    
     db.loans.forEach(l => {
         res.innerHTML += `<div class="item"><span>${l.name}</span><span>Mevcut</span></div>`;
     }); 
@@ -1832,10 +1805,20 @@ function processImport(el) {
 function doPaste() { 
     try { 
         const j = JSON.parse(document.getElementById('paste-txt').value); 
-        if (j.transactions) db.transactions = db.transactions.concat(j.transactions); 
-        if (j.planned) db.planned = db.planned.concat(j.planned); 
-        if (j.accounts) db.accounts = db.accounts.concat(j.accounts); 
-        if (j.cards) db.cards = db.cards.concat(j.cards); 
+        
+        if (j.transactions) {
+            db.transactions = db.transactions.concat(j.transactions); 
+        }
+        if (j.planned) {
+            db.planned = db.planned.concat(j.planned); 
+        }
+        if (j.accounts) {
+            db.accounts = db.accounts.concat(j.accounts); 
+        }
+        if (j.cards) {
+            db.cards = db.cards.concat(j.cards); 
+        }
+        
         save(); 
         closeModal('m-paste'); 
     } catch (e) { 
@@ -1845,7 +1828,18 @@ function doPaste() {
 
 function resetApp() { 
     if (confirm('Tüm veriler silinecek! Emin misiniz?')) { 
-        db = { banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, accounts: [], cards: [], loans: [], transactions: [], planned: [], assets: [], goals: [], limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } }; 
+        db = { 
+            banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
+            categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
+            accounts: [], 
+            cards: [], 
+            loans: [], 
+            transactions: [], 
+            planned: [], 
+            assets: [], 
+            goals: [], 
+            limits: { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 } 
+        }; 
         save(); 
     } 
 }
@@ -1863,18 +1857,21 @@ async function init() {
                 db.assets = db.assets || []; 
                 db.goals = db.goals || []; 
                 db.limits = db.limits || { planDahil: 0, planDahilDegil: 0, kapsamDisi: 0 }; 
+                
                 if (db.transactions) {
                     db.transactions.forEach((t, i) => { 
                         if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; 
                         if (!t.planStatus) t.planStatus = 'dahil'; 
                     }); 
                 }
+                
                 if (db.planned) {
                     db.planned.forEach((p, i) => { 
                         if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; 
                         if (!p.planStatus) p.planStatus = 'dahil'; 
                     }); 
                 }
+                
                 render(); 
                 localDataLoaded = true; 
             } 
@@ -1895,6 +1892,7 @@ async function init() {
             document.getElementById('cloud-status').innerText = "☁️ Kasa Açılıyor..."; 
             const { error: insertErr } = await client.from('app_state').insert([{ id: 1, data: db }]); 
             if (insertErr) throw insertErr;
+            
             document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
             document.getElementById('cloud-status').style.color = "#10b981";
         } else {
@@ -1909,12 +1907,14 @@ async function init() {
                     if (!t.planStatus) t.planStatus = 'dahil'; 
                 });
             }
+            
             if (db.planned) {
                 db.planned.forEach((p, i) => { 
                     if (!p.id) p.id = 'old_p_' + Date.now() + '_' + i; 
                     if (!p.planStatus) p.planStatus = 'dahil'; 
                 });
             }
+            
             localStorage.setItem('hf_cloud', JSON.stringify(db)); 
             document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
             document.getElementById('cloud-status').style.color = "#10b981"; 
@@ -1942,9 +1942,11 @@ async function save() {
     render(); 
     document.getElementById('cloud-status').innerText = "☁️ Kaydediliyor..."; 
     document.getElementById('cloud-status').style.color = "white";
+    
     try { 
         const { error } = await client.from('app_state').upsert({ id: 1, data: db }); 
         if (error) throw error; 
+        
         document.getElementById('cloud-status').innerText = "☁️ Güncel"; 
         document.getElementById('cloud-status').style.color = "#10b981"; 
     } catch (e) { 
@@ -2157,6 +2159,7 @@ function renderCal(plans, trans) {
     
     const dim = new Date(y, m + 1, 0).getDate(); 
     const start = new Date(y, m, 1).getDay() || 7;
+    
     for (let i = 1; i < start; i++) {
         grid.innerHTML += `<div></div>`;
     }
@@ -2329,6 +2332,96 @@ function openDay(d) {
     openModal('m-day');
 }
 
+function initPay(id) {
+    payId = id; 
+    const mpAccSelect = document.getElementById('mp-acc'); 
+    mpAccSelect.innerHTML = '';
+    
+    db.accounts.forEach((a, i) => {
+        mpAccSelect.add(new Option(`${a.owner} - ${a.name}`, 'acc-'+i));
+    });
+    
+    openModal('m-pay');
+}
+
+function confirmPay() {
+    const p = db.planned.find(x => x.id == payId); 
+    const accIdx = document.getElementById('mp-acc').value;
+    let amt = parseFloat(document.getElementById('mp-real').value) || p.amount;
+    
+    if (document.getElementById('mp-early').checked && p.category === 'Kredi') { 
+        const loan = db.loans.find(l => p.title.includes(l.name)); 
+        if (loan) {
+            loan.remaining -= p.amount; 
+        }
+    }
+    
+    let sourceId = accIdx !== 'none' ? accIdx : null;
+    applyBalanceEffect(sourceId, p.type, amt, false); 
+    
+    p.isPaid = true;
+    db.transactions.push({ 
+        id: 't_' + Date.now(), 
+        type: p.type, 
+        amount: amt, 
+        category: p.category, 
+        date: new Date().toISOString(), 
+        owner: p.owner, 
+        description: p.title, 
+        sourceId: sourceId, 
+        planStatus: p.planStatus 
+    });
+    
+    save(); 
+    closeModal('m-pay'); 
+    closeModal('m-day');
+}
+
+function delPlan(id) { 
+    if (confirm('Bu planlı işlemi silmek istediğinize emin misiniz?')) { 
+        db.planned = db.planned.filter(x => x.id != id); 
+        save(); 
+        closeModal('m-day'); 
+    } 
+}
+
+function openCloseLoan(idx) { 
+    closeId = idx; 
+    const mclAccSelect = document.getElementById('mcl-acc'); 
+    mclAccSelect.innerHTML = ''; 
+    
+    db.accounts.forEach((a, i) => {
+        mclAccSelect.add(new Option(`${a.owner} - ${a.name}`, 'acc-'+i));
+    });
+    
+    openModal('m-close-loan'); 
+}
+
+function doCloseLoan() {
+    const amt = parseFloat(document.getElementById('mcl-amt').value); 
+    const accIdx = document.getElementById('mcl-acc').value; 
+    const loan = db.loans[closeId];
+    
+    applyBalanceEffect(accIdx, 'expense', amt, false);
+    
+    db.transactions.push({ 
+        id: 't_' + Date.now(), 
+        type: 'expense', 
+        amount: amt, 
+        category: 'Kredi Kapama', 
+        owner: loan.owner, 
+        date: new Date().toISOString(), 
+        planStatus: 'kapsam_disi', 
+        sourceId: accIdx 
+    });
+    
+    db.planned = db.planned.filter(p => !p.title.includes(loan.name)); 
+    db.loans.splice(closeId, 1); 
+    
+    save(); 
+    closeModal('m-close-loan');
+}
+
 // ----------------------------------------------------
 // KURUMSAL ANALİZ PANELI VE CHART.JS MOTORU 
 // ----------------------------------------------------
@@ -2337,7 +2430,6 @@ function setPlanFilter(val) {
     document.getElementById('anl-plan-filter').value = val;
     document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
     
-    // Tab ID'sini bul ve aktif yap
     let tabId = 'tab-plan-all';
     if(val === 'dahil') tabId = 'tab-plan-dahil';
     if(val === 'dahil_degil') tabId = 'tab-plan-plansiz';
@@ -2349,7 +2441,9 @@ function setPlanFilter(val) {
 
 function updateCatFilterOptions() {
     const catSelect = document.getElementById('anl-cat-filter');
-    if (!catSelect) return;
+    if (!catSelect) {
+        return;
+    }
     
     const currentVal = catSelect.value;
     catSelect.innerHTML = '<option value="all">Tüm Kategoriler</option>';
@@ -2369,13 +2463,14 @@ function renderAnl() {
     const planFilter = document.getElementById('anl-plan-filter').value;
     const now = new Date();
     
-    // Filtrelenmiş Ana Veri Seti (İlgili Profilin Tüm İşlemleri)
+    // Ana Filtreleme Seti
     let baseTx = filter(db.transactions);
     
-    // Tarih Filtresi Uygula
     baseTx = baseTx.filter(t => {
         if (!t.date) return false;
+        
         const d = new Date(t.date);
+        
         if (period === 'all') return true;
         if (period === 'year') return d.getFullYear() === now.getFullYear();
         if (period === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
@@ -2386,12 +2481,10 @@ function renderAnl() {
         return true;
     });
 
-    // Kategori Filtresi Uygula
     if (catFilter !== 'all') {
         baseTx = baseTx.filter(t => t.category === catFilter);
     }
 
-    // Gider ve Gelirleri Ayır
     let expenseTx = baseTx.filter(t => t.type === 'expense');
     let incomeTx = baseTx.filter(t => t.type === 'income');
 
@@ -2399,11 +2492,11 @@ function renderAnl() {
     let totalIncome = incomeTx.reduce((sum, t) => sum + t.amount, 0);
     let totalExpenseAll = expenseTx.reduce((sum, t) => sum + t.amount, 0);
     
-    // Sadece Seçili Plan Durumuna Göre Gideri Hesapla (KPI Kartındaki Gider)
     let filteredExpense = expenseTx;
     if (planFilter !== 'all') {
         filteredExpense = expenseTx.filter(t => t.planStatus === planFilter);
     }
+    
     let kpiExpense = filteredExpense.reduce((sum, t) => sum + t.amount, 0);
     let kpiNet = totalIncome - kpiExpense;
 
@@ -2419,7 +2512,7 @@ function renderAnl() {
     }
 
     // --- İÇGÖRÜ KARTI ---
-    const insightText = document.getElementById('anl-insight-card');
+    const insightText = document.getElementById('anl-insight-text');
     let topCatName = '-';
     let topCatAmount = 0;
     
@@ -2437,16 +2530,54 @@ function renderAnl() {
 
     if (kpiExpense > 0) {
         if (catFilter !== 'all') {
-            document.getElementById('anl-insight-text').innerHTML = `Bu dönemde <b>${catFilter}</b> için toplam <b>${fmt(kpiExpense)}</b> harcadınız. (Net bakiye etkiniz: ${fmt(kpiNet)}).`;
+            insightText.innerHTML = `Bu dönemde <b>${catFilter}</b> için toplam <b>${fmt(kpiExpense)}</b> harcadınız. (Net bakiye etkiniz: ${fmt(kpiNet)}).`;
         } else {
-            document.getElementById('anl-insight-text').innerHTML = `Seçili filtrelere göre toplam çıkışınız <b>${fmt(kpiExpense)}</b>. En çok harcanan kategori <b>${fmt(topCatAmount)}</b> ile <b>"${topCatName}"</b>.`;
+            insightText.innerHTML = `Seçili filtrelere göre toplam çıkışınız <b>${fmt(kpiExpense)}</b>. En çok harcanan kategori <b>${fmt(topCatAmount)}</b> ile <b>"${topCatName}"</b>.`;
         }
     } else {
-        document.getElementById('anl-insight-text').innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor.`;
+        insightText.innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor.`;
+    }
+
+    // --- NAKİT AKIŞI GRAFİĞİ (GELİR VS GİDER) ---
+    const ctxCashflow = document.getElementById('cashFlowChart');
+    const cashflowEmpty = document.getElementById('cashflow-empty');
+    
+    if (ctxCashflow) {
+        if (cashFlowChartInstance) {
+            cashFlowChartInstance.destroy();
+        }
+
+        if (totalIncome > 0 || kpiExpense > 0) {
+            cashflowEmpty.style.display = 'none';
+            
+            cashFlowChartInstance = new Chart(ctxCashflow.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Nakit Akışı'],
+                    datasets: [
+                        { label: 'Gelir', data: [totalIncome], backgroundColor: '#10b981' },
+                        { label: 'Gider', data: [kpiExpense], backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Yatay bar
+                    scales: {
+                        x: { beginAtZero: true, ticks: { callback: function(val) { return val / 1000 + 'k'; } } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } }
+                    }
+                }
+            });
+        } else {
+            cashflowEmpty.style.display = 'flex';
+        }
     }
 
     // --- GRAFİK 1: PLAN DURUMU DAĞILIMI (PASTA) ---
-    // Bu grafik daima tüm giderleri (expenseTx) göstermelidir ki kullanıcı büyük resmi görsün.
     let planData = { 'Plana Dahil': 0, 'Dahil Değil': 0, 'Kapsam Dışı': 0 };
     expenseTx.forEach(t => {
         if (t.planStatus === 'dahil') planData['Plana Dahil'] += t.amount;
@@ -2455,31 +2586,42 @@ function renderAnl() {
         else planData['Plana Dahil'] += t.amount; 
     });
 
-    const ctxPlan = document.getElementById('planStatusChart').getContext('2d');
-    if (planStatusChartInstance) {
-        planStatusChartInstance.destroy();
-    }
+    const ctxPlan = document.getElementById('planStatusChart');
+    const planEmpty = document.getElementById('plan-empty');
     
-    planStatusChartInstance = new Chart(ctxPlan, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(planData),
-            datasets: [{
-                data: Object.values(planData),
-                backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
-                borderWidth: 2, 
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
-                tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
-            }
+    if (ctxPlan) {
+        if (planStatusChartInstance) {
+            planStatusChartInstance.destroy();
         }
-    });
+        
+        let hasPlanData = planData['Plana Dahil'] > 0 || planData['Dahil Değil'] > 0 || planData['Kapsam Dışı'] > 0;
+        
+        if (hasPlanData) {
+            planEmpty.style.display = 'none';
+            planStatusChartInstance = new Chart(ctxPlan.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(planData),
+                    datasets: [{
+                        data: Object.values(planData),
+                        backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
+                        borderWidth: 2, 
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
+                        tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
+                    }
+                }
+            });
+        } else {
+            planEmpty.style.display = 'flex';
+        }
+    }
 
     // --- LİMİT ÇUBUKLARI ---
     const limDahil = db.limits.planDahil || 0; 
@@ -2517,7 +2659,6 @@ function renderAnl() {
     barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım vs.)', planData['Kapsam Dışı'], limKapsamDisi);
 
     // --- GRAFİK 2: KATEGORİ DAĞILIMI (DOUGHNUT) ---
-    // Bu grafik seçili Tab'a (planFilter) göre çalışır.
     const plannedCats = {};
     let totalForDoughnut = 0;
     
@@ -2529,45 +2670,47 @@ function renderAnl() {
     const pCatLabels = Object.keys(plannedCats).sort((a, b) => plannedCats[b] - plannedCats[a]);
     const pCatData = pCatLabels.map(k => plannedCats[k]);
 
-    const ctxCat = document.getElementById('categoryDoughnutChart').getContext('2d');
+    const ctxCat = document.getElementById('categoryDoughnutChart');
     const emptyDoughnut = document.getElementById('doughnut-empty');
     
-    if (catChartInstance) {
-        catChartInstance.destroy();
-    }
-    
-    if (totalForDoughnut > 0) {
-        emptyDoughnut.style.display = 'none';
+    if (ctxCat) {
+        if (catChartInstance) {
+            catChartInstance.destroy();
+        }
         
-        let titleText = 'Tüm Harcama Dağılımı';
-        if (planFilter === 'dahil') titleText = 'Asıl Bütçe Dağılımı (Plana Dahil)';
-        if (planFilter === 'dahil_degil') titleText = 'Plansız Harcama Dağılımı';
-        if (planFilter === 'kapsam_disi') titleText = 'Kapsam Dışı Çıkış Dağılımı';
-        document.getElementById('doughnut-title').innerText = titleText;
-        
-        catChartInstance = new Chart(ctxCat, {
-            type: 'doughnut',
-            data: { 
-                labels: pCatLabels, 
-                datasets: [{ 
-                    data: pCatData, 
-                    backgroundColor: CHART_COLORS, 
-                    borderWidth: 2, 
-                    borderColor: '#ffffff' 
-                }] 
-            },
-            options: {
-                responsive: true, 
-                maintainAspectRatio: false, 
-                cutout: '60%',
-                plugins: {
-                    legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
-                    tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
+        if (totalForDoughnut > 0) {
+            emptyDoughnut.style.display = 'none';
+            
+            let titleText = 'Tüm Harcama Dağılımı';
+            if (planFilter === 'dahil') titleText = 'Asıl Bütçe Dağılımı (Plana Dahil)';
+            if (planFilter === 'dahil_degil') titleText = 'Plansız Harcama Dağılımı';
+            if (planFilter === 'kapsam_disi') titleText = 'Kapsam Dışı Çıkış Dağılımı';
+            document.getElementById('doughnut-title').innerText = titleText;
+            
+            catChartInstance = new Chart(ctxCat.getContext('2d'), {
+                type: 'doughnut',
+                data: { 
+                    labels: pCatLabels, 
+                    datasets: [{ 
+                        data: pCatData, 
+                        backgroundColor: CHART_COLORS, 
+                        borderWidth: 2, 
+                        borderColor: '#ffffff' 
+                    }] 
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '60%',
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: { callbacks: { label: function(context) { return ' ' + fmt(context.raw); } } }
+                    }
                 }
-            }
-        });
-    } else {
-        emptyDoughnut.style.display = 'flex';
+            });
+        } else {
+            emptyDoughnut.style.display = 'flex';
+        }
     }
 
     // --- EN BÜYÜK 5 HARCAMA LİSTESİ ---
@@ -2591,7 +2734,6 @@ function renderAnl() {
         top5List.innerHTML = '<div style="color:var(--light); font-size:0.8rem; text-align:center;">İşlem bulunamadı.</div>';
     }
 
-
     // --- AYLIK TREND VE PİVOT TABLO (SADECE YIL VE TÜM ZAMANLAR İÇİN) ---
     const trendContainer = document.getElementById('anl-trend-container');
     const pivotContainer = document.getElementById('pivot-container');
@@ -2604,7 +2746,7 @@ function renderAnl() {
         
         let monthGroups = {}; 
         
-        // Pivot Tablo her zaman Tüm Plan Durumlarını göstersin, filtre sadece Trend'i etkilesin
+        // Pivot Tablo her zaman Tüm Plan Durumlarını göstersin
         expenseTx.forEach(t => {
             let d = new Date(t.date);
             let mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -2621,65 +2763,66 @@ function renderAnl() {
         let monthLabels = Object.keys(monthGroups).sort();
         
         // 1. TREND GRAFİĞİNİ ÇİZ
-        const ctxTrend = document.getElementById('monthlyTrendChart').getContext('2d');
-        if (monthlyTrendChartInstance) {
-            monthlyTrendChartInstance.destroy();
-        }
-
-        if (monthLabels.length > 0) {
-            trendEmpty.style.display = 'none';
-            
-            let trendDahil = monthLabels.map(m => {
-                let sum = 0; 
-                for(let c in monthGroups[m]['dahil']) sum += monthGroups[m]['dahil'][c]; 
-                return sum;
-            });
-            
-            let trendKapsamDisi = monthLabels.map(m => {
-                let sum = 0; 
-                for(let c in monthGroups[m]['kapsam_disi']) sum += monthGroups[m]['kapsam_disi'][c]; 
-                return sum;
-            });
-
-            // Eğilimi Tab Filtresine göre dinamik çiz
-            let datasetsForTrend = [];
-            
-            if (planFilter === 'all') {
-                datasetsForTrend = [
-                    { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0' },
-                    { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0' }
-                ];
-            } else if (planFilter === 'dahil') {
-                datasetsForTrend = [
-                    { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0' }
-                ];
-            } else {
-                datasetsForTrend = [
-                    { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0' }
-                ];
+        const ctxTrend = document.getElementById('monthlyTrendChart');
+        if (ctxTrend) {
+            if (monthlyTrendChartInstance) {
+                monthlyTrendChartInstance.destroy();
             }
 
-            monthlyTrendChartInstance = new Chart(ctxTrend, {
-                type: 'bar',
-                data: { 
-                    labels: monthLabels, 
-                    datasets: datasetsForTrend 
-                },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    scales: { 
-                        x: { stacked: true, grid: { display: false } }, 
-                        y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } 
-                    },
-                    plugins: { 
-                        legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, 
-                        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } 
-                    }
+            if (monthLabels.length > 0) {
+                trendEmpty.style.display = 'none';
+                
+                let trendDahil = monthLabels.map(m => {
+                    let sum = 0; 
+                    for(let c in monthGroups[m]['dahil']) sum += monthGroups[m]['dahil'][c]; 
+                    return sum;
+                });
+                
+                let trendKapsamDisi = monthLabels.map(m => {
+                    let sum = 0; 
+                    for(let c in monthGroups[m]['kapsam_disi']) sum += monthGroups[m]['kapsam_disi'][c]; 
+                    return sum;
+                });
+
+                let datasetsForTrend = [];
+                
+                if (planFilter === 'all') {
+                    datasetsForTrend = [
+                        { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0' },
+                        { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0' }
+                    ];
+                } else if (planFilter === 'dahil') {
+                    datasetsForTrend = [
+                        { label: 'Plana Dahil', data: trendDahil, backgroundColor: '#10b981', stack: 'Stack 0' }
+                    ];
+                } else {
+                    datasetsForTrend = [
+                        { label: 'Plansız/Kapsam Dışı', data: trendKapsamDisi, backgroundColor: '#64748b', stack: 'Stack 0' }
+                    ];
                 }
-            });
-        } else {
-            trendEmpty.style.display = 'flex';
+
+                monthlyTrendChartInstance = new Chart(ctxTrend.getContext('2d'), {
+                    type: 'bar',
+                    data: { 
+                        labels: monthLabels, 
+                        datasets: datasetsForTrend 
+                    },
+                    options: {
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        scales: { 
+                            x: { stacked: true, grid: { display: false } }, 
+                            y: { stacked: true, border: { display: false }, ticks: { callback: function(val) { return val / 1000 + 'k'; } } } 
+                        },
+                        plugins: { 
+                            legend: { position: 'top', labels: { boxWidth: 10, font: {size: 10} } }, 
+                            tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + fmt(context.raw); } } } 
+                        }
+                    }
+                });
+            } else {
+                trendEmpty.style.display = 'flex';
+            }
         }
 
         // 2. EXCEL BENZERİ PİVOT TABLOYU OLUŞTUR
