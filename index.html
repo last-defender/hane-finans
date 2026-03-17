@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hane Finans: Kurumsal BI Paneli</title>
+    <title>Hane Finans: Kurumsal Karar Destek Sistemi</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -122,6 +122,7 @@
             color: var(--primary); 
         }
 
+        /* ---------------- ANA İSKELET (MAIN) ---------------- */
         main { 
             flex: 1; 
             overflow-y: auto; 
@@ -130,7 +131,7 @@
             z-index: 1; 
         }
 
-        /* ---------------- KARTLAR VE LİSTELER ---------------- */
+        /* ---------------- KART VE İSTATİSTİK TASARIMLARI ---------------- */
         .card { 
             background: var(--white); 
             border-radius: 16px; 
@@ -214,7 +215,7 @@
         .p-head { font-size: 0.8rem; font-weight: bold; color: var(--light); margin-bottom: 5px; }
         .p-net { font-weight: 800; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; text-align: center; }
 
-        /* ---------------- MENÜ VE MODALLAR ---------------- */
+        /* ---------------- ALT MENÜ (NAVİGASYON) ---------------- */
         nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #e2e8f0; display: flex; height: calc(60px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); z-index: 100; }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light); font-size: 0.7rem; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
@@ -223,10 +224,10 @@
         .fabs { position: fixed; bottom: calc(75px + var(--safe-bottom)); right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 90; }
         .fab { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
         
+        /* ---------------- AÇILIR PENCERELER (MODAL) ---------------- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 2000; pointer-events: none; }
         .modal.show { display: flex; pointer-events: auto; }
         .modal-box { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 25px; padding-bottom: calc(30px + var(--safe-bottom)); max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s; }
-        
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
         .inp-grp { margin-bottom: 15px; }
@@ -247,13 +248,20 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* ---------------- AI OKUMA SATIRLARI ---------------- */
         .ai-row-box { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:10px; box-shadow:0 2px 4px rgba(0,0,0,0.02); }
         .ai-row-top { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
         .ai-row-bot { display:flex; gap:8px; align-items:center; }
         .ai-inp { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.85rem; width:100%; background:#f8fafc; }
         
-        /* ---------------- KURUMSAL ANALİZ PANELİ ---------------- */
+        /* ---------------- HESAP / KART TASARIMLARI ---------------- */
+        .acc-card { border-left: 4px solid var(--success); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
+        .cc-card { border-left: 4px solid var(--purple); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
+        .loan-card { border-left: 4px solid #f59e0b; padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
 
+        /* ---------------- YENİ: KURUMSAL İŞ ZEKASI (BI) TASARIMLARI ---------------- */
+        
+        /* Zaman Navigatörü (Zaman Makinesi) */
         .date-navigator {
             display: flex;
             justify-content: space-between;
@@ -278,7 +286,9 @@
             transition: 0.2s;
         }
         
-        .date-navigator button:active { background: #e0e7ff; }
+        .date-navigator button:active { 
+            background: #e0e7ff; 
+        }
         
         .date-nav-label {
             font-weight: 800;
@@ -298,6 +308,7 @@
             padding-right: 10px;
         }
 
+        /* Plan Durumu Filtreleme (Dörtlü Sekme) */
         .plan-tabs {
             display: flex;
             background: #e2e8f0;
@@ -324,34 +335,142 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .insight-card { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 15px; }
-        .insight-title { font-size: 0.75rem; font-weight: bold; color: #166534; display: flex; align-items: center; gap: 5px; text-transform: uppercase; margin-bottom: 5px; }
+        .insight-card { 
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7); 
+            border: 1px solid #bbf7d0; 
+            border-radius: 16px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+        }
         
-        .chart-container { position: relative; width: 100%; height: 240px; display: flex; justify-content: center; align-items: center; }
-        .chart-empty { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: var(--danger); font-weight: bold; background: rgba(255,255,255,0.9); z-index: 10; border-radius: 10px; text-align: center; padding: 15px;}
-
-        .chart-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .insight-title { 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            color: #166534; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            text-transform: uppercase; 
+            margin-bottom: 5px; 
+        }
         
-        @media (min-width: 768px) {
-            .chart-grid { grid-template-columns: 1fr 1fr; }
-            .chart-grid .full-width { grid-column: span 2; }
+        /* Grafik Konteynerleri ve Hata Yakalayıcı (Fail-Safe) Kutu */
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            height: 240px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        .chart-empty { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.9rem; 
+            color: #94a3b8; 
+            font-style: italic; 
+            background: rgba(255,255,255,0.9); 
+            z-index: 10; 
+            border-radius: 10px; 
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
         }
 
-        .acc-card { border-left: 4px solid var(--success); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
-        .cc-card { border-left: 4px solid var(--purple); padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
-        .loan-card { border-left: 4px solid #f59e0b; padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
+        /* Responsive (Duyarlı) Grafik Izgarası */
+        .chart-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
+        
+        @media (min-width: 768px) {
+            .chart-grid { 
+                grid-template-columns: 1fr 1fr; 
+            }
+            .chart-grid .full-width { 
+                grid-column: span 2; 
+            }
+        }
 
-        .pivot-container { width: 100%; overflow-x: auto; background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .pivot-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 500px; }
-        .pivot-table th, .pivot-table td { padding: 8px; border: 1px solid #e2e8f0; text-align: right; }
-        .pivot-table th { background: #f8fafc; font-weight: bold; color: var(--text); text-align: center; }
-        .pivot-table .row-group { background: #e0e7ff; font-weight: bold; text-align: left; color: var(--primary); }
-        .pivot-table .row-sub { text-align: left; padding-left: 20px; }
+        /* Excel Benzeri Pivot Tablo */
+        .pivot-container { 
+            width: 100%; 
+            overflow-x: auto; 
+            background: #fff; 
+            border-radius: 10px; 
+            border: 1px solid #e2e8f0; 
+        }
+        
+        .pivot-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.75rem; 
+            min-width: 500px; 
+        }
+        
+        .pivot-table th, .pivot-table td { 
+            padding: 8px; 
+            border: 1px solid #e2e8f0; 
+            text-align: right; 
+        }
+        
+        .pivot-table th { 
+            background: #f8fafc; 
+            font-weight: bold; 
+            color: var(--text); 
+            text-align: center; 
+        }
+        
+        .pivot-table .row-group { 
+            background: #e0e7ff; 
+            font-weight: bold; 
+            text-align: left; 
+            color: var(--primary); 
+        }
+        
+        .pivot-table .row-sub { 
+            text-align: left; 
+            padding-left: 20px; 
+        }
 
-        /* ---------------- YÜKLENİYOR EKRANI ---------------- */
-        #ai-loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 9999; color: white; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: var(--success); animation: spin 1s ease-in-out infinite; margin-bottom: 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* AI Tarama Bekleme Ekranı (Loading) */
+        #ai-loading-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(15, 23, 42, 0.9); 
+            z-index: 9999; 
+            color: white; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        
+        .spinner { 
+            width: 50px; 
+            height: 50px; 
+            border: 5px solid rgba(255, 255, 255, 0.3); 
+            border-radius: 50%; 
+            border-top-color: var(--success); 
+            animation: spin 1s ease-in-out infinite; 
+            margin-bottom: 20px; 
+        }
+        
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
     </style>
 </head>
 <body>
@@ -359,7 +478,7 @@
 <div id="ai-loading-overlay">
     <div class="spinner"></div>
     <h2 style="margin: 0 0 10px 0;">Yapay Zeka İşliyor...</h2>
-    <p style="font-size: 0.9rem; opacity: 0.8; margin: 0; padding: 0 20px;">Lütfen bekleyin, bu işlem 5 ila 15 saniye sürebilir.</p>
+    <p style="font-size: 0.9rem; opacity: 0.8; margin: 0; padding: 0 20px;">Lütfen bekleyin, bu işlem internet hızınıza göre 5 ila 15 saniye sürebilir.</p>
 </div>
 
 <header>
@@ -367,7 +486,7 @@
         <div class="head-title">Hane Finans <span class="cloud-icon" id="cloud-status">☁️ Bağlanıyor...</span></div>
         <div style="display:flex; gap:5px;">
             <button class="act-btn" style="background:#64748b; border:none;" onclick="openModal('m-settings')">⚙️ Ayarlar</button>
-            <button class="act-btn" style="background:var(--danger); border:none;" onclick="resetApp()">⚠️ Sıfırla</button>
+            <button class="act-btn" style="background:var(--danger); border:none; font-weight:bold;" onclick="resetApp()">⚠️ Sıfırla</button>
         </div>
     </div>
     <div class="head-actions">
@@ -436,8 +555,10 @@
             <span onclick="chgMonth(1)" style="cursor:pointer; padding:10px;">Sonraki ❯</span>
         </div>
         <div class="card"><div class="cal-grid" id="cal-grid"></div></div>
+        
         <h4 style="margin:15px 5px 10px;">Ay İçi Nakit Akışı</h4>
         <div id="period-view" class="p-row"></div>
+        
         <h4 style="margin:15px 5px 10px;">İşlem Geçmişi & Gelecek Planlar</h4>
         <div class="card" id="list-plans"></div>
     </div>
@@ -478,24 +599,27 @@
             </div>
         </div>
         
-        <div class="date-navigator">
-            <button onclick="anlNavMove(-1)">❮</button>
-            <div class="date-nav-label" id="anl-date-label">Yükleniyor...</div>
-            <div style="display:flex; align-items:center;">
-                <select id="anl-period-type" class="date-nav-select" onchange="anlNavChangeType()">
-                    <option value="week">Haftalık</option>
-                    <option value="month" selected>Aylık</option>
-                    <option value="quarter">Çeyreklik</option>
-                    <option value="year">Yıllık</option>
-                    <option value="all">Tüm Zamanlar</option>
-                </select>
-                <button onclick="anlNavMove(1)">❯</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px; margin-bottom: 15px;">
+            
+            <div class="date-navigator" style="flex:2; margin:0;">
+                <button onclick="anlNavMove(-1)">❮</button>
+                <div class="date-nav-label" id="anl-date-label">Yükleniyor...</div>
+                <div style="display:flex; align-items:center;">
+                    <select id="anl-period-type" class="date-nav-select" onchange="anlNavChangeType()">
+                        <option value="week">Haftalık</option>
+                        <option value="month" selected>Aylık</option>
+                        <option value="quarter">Çeyreklik</option>
+                        <option value="year">Yıllık</option>
+                        <option value="all">Tüm Zamanlar</option>
+                    </select>
+                    <button onclick="anlNavMove(1)">❯</button>
+                </div>
             </div>
-        </div>
 
-        <select id="anl-cat-filter" class="inp" style="margin-bottom:15px; background:#fff; font-weight:bold; border:1px solid #cbd5e1;" onchange="renderAnl()">
-            <option value="all">Tüm Kategoriler (Filtresiz)</option>
-        </select>
+            <select id="anl-cat-filter" class="inp" style="flex:1; margin:0; border:2px solid var(--light); font-weight:bold; height: 54px;" onchange="renderAnl()">
+                <option value="all">Tüm Kategoriler</option>
+            </select>
+        </div>
 
         <div class="plan-tabs">
             <div class="plan-tab active" id="tab-plan-all" onclick="setPlanFilter('all')">Tümü</div>
@@ -526,9 +650,10 @@
         </div>
 
         <div class="chart-grid">
+            
             <div class="card full-width" id="anl-cashflow-container">
                 <h4 style="margin:0 0 10px 0; text-align:center;">Gelir / Gider Karşılaştırması</h4>
-                <div class="chart-container" style="height: 240px; position:relative;">
+                <div class="chart-container">
                     <div id="cashFlowChart-err" class="chart-empty" style="display:none;"></div>
                     <canvas id="cashFlowChart"></canvas>
                 </div>
@@ -536,7 +661,7 @@
 
             <div class="card">
                 <h4 style="margin:0 0 10px 0; text-align:center;" id="doughnut-title">Harcama Dağılımı</h4>
-                <div class="chart-container" style="height: 240px; position:relative;">
+                <div class="chart-container">
                     <div id="categoryDoughnutChart-err" class="chart-empty" style="display:none;"></div>
                     <canvas id="categoryDoughnutChart"></canvas>
                 </div>
@@ -544,7 +669,7 @@
 
             <div class="card">
                 <h4 style="margin:0 0 10px 0; text-align:center;">Bütçe Stratejisi (Plan Durumu)</h4>
-                <div class="chart-container" style="height: 240px; position:relative;">
+                <div class="chart-container">
                     <div id="planStatusChart-err" class="chart-empty" style="display:none;"></div>
                     <canvas id="planStatusChart"></canvas>
                 </div>
@@ -553,7 +678,7 @@
             <div class="card full-width" id="anl-trend-container">
                 <h4 style="margin:0 0 10px 0; text-align:center;" id="trend-title">Zamana Göre Harcama Trendi</h4>
                 <p style="font-size:0.7rem; text-align:center; color:var(--light); margin-top:-5px; margin-bottom:10px;">Seçili filtrelere göre değişimi gösterir.</p>
-                <div class="chart-container" style="height: 260px; position:relative;">
+                <div class="chart-container" style="height: 260px;">
                     <div id="monthlyTrendChart-err" class="chart-empty" style="display:none;"></div>
                     <canvas id="monthlyTrendChart"></canvas>
                 </div>
@@ -561,7 +686,7 @@
         </div>
 
         <div class="card">
-            <h4 style="margin:0 0 10px 0;">En Büyük 5 Çıkış (Seçili Dönem)</h4>
+            <h4 style="margin:0 0 10px 0;">En Büyük 5 Çıkış (Filtrelenmiş)</h4>
             <div id="top-5-list"></div>
         </div>
 
@@ -601,15 +726,15 @@
         <p style="font-size:0.75rem; color:var(--light); margin-bottom:15px;">Lütfen buraya sadece 1 Aylık limitlerinizi girin. Sistem analiz yaparken bu limitleri döneme göre otomatik çarpacaktır.</p>
         <div class="inp-grp">
             <label class="inp-lbl">AYLIK Plana Dahil Gider Limiti (₺)</label>
-            <input type="number" id="lim-dahil" class="inp">
+            <input type="number" id="lim-dahil" class="inp" placeholder="Örn: 30000">
         </div>
         <div class="inp-grp">
             <label class="inp-lbl">AYLIK Plansız Gider Limiti (₺)</label>
-            <input type="number" id="lim-dahilDegil" class="inp">
+            <input type="number" id="lim-dahilDegil" class="inp" placeholder="Örn: 5000">
         </div>
         <div class="inp-grp">
             <label class="inp-lbl">AYLIK Kapsam Dışı Limiti (₺)</label>
-            <input type="number" id="lim-kapsamDisi" class="inp">
+            <input type="number" id="lim-kapsamDisi" class="inp" placeholder="Limitsiz ise boş bırakın">
         </div>
         <button class="btn-pri" onclick="saveLimits()">Limitleri Kaydet</button>
         <button class="btn-clo" onclick="closeModal('m-limits')">Kapat</button>
@@ -680,7 +805,7 @@
 <div class="modal" id="m-edit-trans">
     <div class="modal-box">
         <h3>İşlemi Düzenle</h3>
-        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Tutar veya kaynak değişimi bakiyelere otomatik yansır.</p>
+        <p style="font-size:0.75rem; color:var(--success); margin-bottom:10px;">Not: Yapılan tutar veya kaynak değişimi seçilen hesaba otomatik yansıyacaktır.</p>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <div style="flex:1;">
                 <label class="inp-lbl">İşlem Tipi</label>
@@ -1061,8 +1186,8 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Ana Veritabanı Değişkeni
 let db = { 
-    banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
-    categories: { expense: ['Market', 'Fatura', 'Kira'], income: ['Maaş'] }, 
+    banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank', 'Yapıkredi', 'İş Bankası'], 
+    categories: { expense: ['Market', 'Fatura', 'Kira', 'Yakıt', 'Hediye', 'Yemek', 'Diğer', 'Araba', 'Ulaşım', 'Ev', 'Kredi', 'Faiz', 'Kuruyemiş', 'Gün', 'Bakıcı', 'Bağış', 'Pazar', 'Teknoloji', 'Bankacılık', 'Giyim', 'Hacer Kara', 'Hobi', 'Sağlık', 'Eğitim', 'Berber'], income: ['Maaş'] }, 
     accounts: [], 
     cards: [], 
     loans: [], 
@@ -1095,7 +1220,7 @@ let cashFlowChartInstance = null;
 
 // ZAMAN MAKİNESİ DURUMU
 let anlState = {
-    type: 'month', // Seçenekler: 'week', 'month', 'quarter', 'year', 'all'
+    type: 'month', 
     date: new Date()
 };
 
@@ -1755,6 +1880,7 @@ function saveTrans() {
     
     if (type === 'transfer') { 
         let toIdVal = document.getElementById('it-to').value; 
+        
         applyBalanceEffect(sourceId, 'expense', amt, false); 
         applyBalanceEffect(toIdVal, 'income', amt, false); 
         
@@ -1791,6 +1917,7 @@ function saveTrans() {
             } 
         } else { 
             applyBalanceEffect(sourceId, type, amt, false); 
+            
             db.transactions.push({ 
                 id: 't_' + Date.now(), 
                 type: type, 
@@ -1803,6 +1930,7 @@ function saveTrans() {
             }); 
         } 
     } 
+    
     save(); 
     closeModal('m-trans'); 
 }
@@ -1918,6 +2046,7 @@ function delTrans(id) {
                 applyBalanceEffect(t.sourceId, t.type, t.amount, true); 
             } 
         } 
+        
         db.transactions = db.transactions.filter(x => x.id != id); 
         save(); 
         
@@ -1925,6 +2054,7 @@ function delTrans(id) {
         if (mdTit && mdTit.includes('Detayları')) { 
             openDay(mdTit.replace(' Detayları', '').trim()); 
         } 
+        
         if (document.getElementById('p-analysis').classList.contains('active')) {
             renderAnl(); 
         }
@@ -1943,6 +2073,7 @@ function saveAsset() {
     if (!a.name) {
         return alert('İsim girin'); 
     }
+    
     db.assets.push(a); 
     save(); 
     closeModal('m-asset'); 
@@ -1960,6 +2091,7 @@ function saveGoal() {
     if (!g.name || !g.target) {
         return alert('Eksik bilgi'); 
     }
+    
     db.goals.push(g); 
     save(); 
     closeModal('m-goal'); 
@@ -2045,7 +2177,6 @@ function processImport(el) {
             const importedData = JSON.parse(e.target.result);
             db = importedData;
             
-            // YENİ: JSON içindeki tüm kategorileri tara ve eksikleri Kategori Havuzuna ekle
             if (db.transactions) {
                 db.transactions.forEach(t => {
                     if (t.type === 'expense' && !db.categories.expense.includes(t.category)) {
@@ -2054,7 +2185,6 @@ function processImport(el) {
                         db.categories.income.push(t.category);
                     }
                     
-                    // JSON'daki virgüllü tutarları temizle (Sık karşılaşılan JSON hatası)
                     if (typeof t.amount === 'string') {
                         t.amount = parseFloat(t.amount.replace(',', '.')) || 0;
                     }
@@ -2079,7 +2209,6 @@ function doPaste() {
                     t.amount = parseFloat(t.amount.replace(',', '.')) || 0;
                 }
                 
-                // YENİ: Yapıştırılan işlemlerin kategorilerini havuza ekle
                 if (t.type === 'expense' && !db.categories.expense.includes(t.category)) {
                     db.categories.expense.push(t.category);
                 } else if (t.type === 'income' && !db.categories.income.includes(t.category)) {
@@ -2101,16 +2230,17 @@ function doPaste() {
         
         save(); 
         closeModal('m-paste'); 
+        alert("JSON verisi başarıyla yüklendi!");
     } catch (e) { 
-        alert('Hata: JSON formatı bozuk.'); 
+        alert('Hata: JSON formatı bozuk veya eksik.'); 
     } 
 }
 
 function resetApp() { 
     if (confirm('DİKKAT! Tüm veriler kalıcı olarak silinecektir. Emin misiniz?')) { 
         db = { 
-            banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank'], 
-            categories: { expense: ['Market', 'Fatura', 'Kira', 'Ev', 'Araba', 'Eğitim', 'Giyim', 'Sağlık', 'Ulaşım', 'Yakıt', 'Yemek', 'Hobi', 'Hediye', 'Diğer'], income: ['Maaş', 'Ek Gelir', 'Kira', 'Diğer'] }, 
+            banks: ['Ziraat', 'Garanti', 'Enpara', 'Akbank', 'Yapıkredi', 'İş Bankası'], 
+            categories: { expense: ['Market', 'Fatura', 'Kira', 'Yakıt', 'Hediye', 'Yemek', 'Diğer', 'Araba', 'Ulaşım', 'Ev', 'Kredi', 'Faiz', 'Kuruyemiş', 'Gün', 'Bakıcı', 'Bağış', 'Pazar', 'Teknoloji', 'Bankacılık', 'Giyim', 'Hacer Kara', 'Hobi', 'Sağlık', 'Eğitim', 'Berber'], income: ['Maaş'] }, 
             accounts: [], 
             cards: [], 
             loans: [], 
@@ -2143,6 +2273,7 @@ async function init() {
                     db.transactions.forEach((t, i) => { 
                         if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; 
                         if (!t.planStatus) t.planStatus = 'dahil'; 
+                        if (typeof t.amount === 'string') t.amount = parseFloat(t.amount) || 0;
                     }); 
                 }
                 
@@ -2190,6 +2321,7 @@ async function init() {
                 db.transactions.forEach((t, i) => { 
                     if (!t.id) t.id = 'old_t_' + Date.now() + '_' + i; 
                     if (!t.planStatus) t.planStatus = 'dahil'; 
+                    if (typeof t.amount === 'string') t.amount = parseFloat(t.amount) || 0;
                 });
             }
             
@@ -2306,7 +2438,11 @@ function render() {
             has = true; 
         });
         if (has) {
-            bl.innerHTML += `<div class="item"><span>${b}</span><b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b></div>`;
+            bl.innerHTML += `
+                <div class="item">
+                    <span>${b}</span>
+                    <b class="${net >= 0 ? 'text-grn' : 'text-red'}">${fmt(net)}</b>
+                </div>`;
         }
     });
 
@@ -2366,7 +2502,9 @@ function render() {
                     <span>Biriken: ${fmt(g.current)}</span>
                     <span>Hedef: ${fmt(g.target)}</span>
                 </div>
-                <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+                <div class="prog-bg">
+                    <div class="prog-fill" style="width:${pct}%"></div>
+                </div>
             </div>`; 
     });
     
@@ -2458,7 +2596,10 @@ function renderCal(plans, trans) {
     for (let d = 1; d <= dim; d++) {
         const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const dayPlans = plans.filter(p => p.date === ds); 
-        const dayTrans = trans.filter(t => (t.date || '').split('T')[0] === ds);
+        const dayTrans = trans.filter(t => {
+            if(!t.date) return false;
+            return t.date.split('T')[0] === ds;
+        });
         
         let classes = 'cal-day'; 
         if (dayPlans.some(p => !p.isPaid)) {
@@ -2491,6 +2632,8 @@ function renderCal(plans, trans) {
         trans.forEach(t => { 
             if(!t.date) return;
             const pd = new Date(t.date); 
+            if (isNaN(pd.getTime())) return;
+
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e) { 
                 if (t.type === 'income') {
                     inc += parseFloat(t.amount) || 0; 
@@ -2503,6 +2646,8 @@ function renderCal(plans, trans) {
         plans.forEach(p => { 
             if(!p.date) return;
             const pd = new Date(p.date); 
+            if (isNaN(pd.getTime())) return;
+
             if (pd.getMonth() === m && pd.getFullYear() === y && pd.getDate() >= pr.s && pd.getDate() <= pr.e && !p.isPaid) { 
                 if (p.type === 'income') {
                     inc += parseFloat(p.amount) || 0; 
@@ -2526,7 +2671,7 @@ function renderCal(plans, trans) {
     let allMonthItems = [];
     
     trans.forEach(t => { 
-        if ((t.date || '').startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
+        if (t.date && t.date.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)) {
             allMonthItems.push({ ...t, isReal: true, sortDate: t.date }); 
         }
     });
@@ -2578,7 +2723,7 @@ function openDay(d) {
     l.innerHTML = ''; 
     document.getElementById('md-tit').innerText = d + ' Detayları';
     
-    let dayTrans = filter(db.transactions).filter(t => (t.date || '').split('T')[0] === d); 
+    let dayTrans = filter(db.transactions).filter(t => t.date && t.date.split('T')[0] === d); 
     let dayPlans = filter(db.planned).filter(p => p.date === d);
     
     if (dayTrans.length === 0 && dayPlans.length === 0) {
@@ -2720,7 +2865,6 @@ function doCloseLoan() {
     closeModal('m-close-loan');
 }
 
-
 // ----------------------------------------------------
 // KURUMSAL ANALİZ PANELI VE CHART.JS MOTORU (ULTIMATE)
 // ----------------------------------------------------
@@ -2827,7 +2971,7 @@ function getAnlDateRange() {
         db.transactions.forEach(t => {
             if(!t.date) return;
             let d = new Date(t.date);
-            if(d < minDate) {
+            if (!isNaN(d.getTime()) && d < minDate) {
                 minDate = d;
             }
         });
@@ -2847,9 +2991,13 @@ function setPlanFilter(val) {
     document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
     
     let tabId = 'tab-plan-all';
-    if(val === 'dahil') tabId = 'tab-plan-dahil';
-    if(val === 'dahil_degil') tabId = 'tab-plan-plansiz';
-    if(val === 'kapsam_disi') tabId = 'tab-plan-kapsam';
+    if(val === 'dahil') {
+        tabId = 'tab-plan-dahil';
+    } else if(val === 'dahil_degil') {
+        tabId = 'tab-plan-plansiz';
+    } else if(val === 'kapsam_disi') {
+        tabId = 'tab-plan-kapsam';
+    }
     
     document.getElementById(tabId).classList.add('active');
     renderAnl();
@@ -2857,7 +3005,9 @@ function setPlanFilter(val) {
 
 function updateCatFilterOptions() {
     const catSelect = document.getElementById('anl-cat-filter');
-    if (!catSelect) return;
+    if (!catSelect) {
+        return;
+    }
     
     const currentVal = catSelect.value;
     catSelect.innerHTML = '<option value="all">Tüm Kategoriler (Filtresiz)</option>';
@@ -2871,11 +3021,13 @@ function updateCatFilterOptions() {
     }
 }
 
-// Hata Korumalı Grafik Çizici (Fail-Safe)
+// Grafik Çizerken Hata Oluşursa Sistemi Çökertmeyen (Fail-Safe) Fonksiyon
 function drawChartSafe(chartId, chartVarName, configOptions) {
     try {
         const canvas = document.getElementById(chartId);
-        if (!canvas) return null;
+        if (!canvas) {
+            return null;
+        }
         
         const errDiv = document.getElementById(chartId + '-err');
         if (errDiv) {
@@ -2910,7 +3062,7 @@ function renderAnl() {
     
     const range = getAnlDateRange();
     
-    // Verileri Güvenli Formata Getir ve Filtrele
+    // Verileri Güvenli Formata Getir (Eksik alan varsa doldur)
     let baseTx = filter(db.transactions).map(t => {
         return {
             ...t,
@@ -2920,12 +3072,20 @@ function renderAnl() {
         };
     });
 
+    // Tarih ve Aralık Filtresi (Aylık/Yıllık/vs)
     baseTx = baseTx.filter(t => {
         if (!t.date) return false;
         const d = new Date(t.date);
+        
+        // Bozuk/Geçersiz tarihleri engelle
+        if (isNaN(d.getTime())) return false;
+        
+        if (anlState.type === 'all') return true;
+        
         return d >= range.start && d <= range.end;
     });
 
+    // Kategori Filtresi
     if (catFilter !== 'all') {
         baseTx = baseTx.filter(t => t.category === catFilter);
     }
@@ -2943,6 +3103,9 @@ function renderAnl() {
     }
     
     let kpiExpense = filteredExpense.reduce((sum, t) => sum + t.amount, 0);
+    
+    // Net tasarruf hesaplanırken DAİMA dönemin TÜM giderlerini baz almalıyız
+    // Eğer sadece plana dahil giderleri baz alırsak, net tasarruf yanlış (yüksek) çıkar.
     let kpiNet = totalIncome - totalExpenseAll; 
 
     document.getElementById('kpi-inc').innerText = fmt(totalIncome);
@@ -2980,17 +3143,22 @@ function renderAnl() {
             insightText.innerHTML = `Seçili filtreye göre toplam çıkış <b>${fmt(kpiExpense)}</b>. En çok harcanan kategori <b>${fmt(topCatAmount)}</b> ile <b>"${topCatName}"</b>.`;
         }
     } else {
-        insightText.innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor.`;
+        insightText.innerHTML = `Seçili filtrelere uygun harcama kaydı bulunmuyor. Eklediğiniz işlemler burada analiz edilecektir.`;
     }
 
+    // RENKLER (Grafik Çökmesini Önlemek İçin Dinamik Atama Yapılacak)
+    const CHART_COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899', '#14b8a6', '#f97316', '#64748b', '#334155', '#be123c', '#fb923c'];
+    
     Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, sans-serif';
     Chart.defaults.color = '#64748b';
 
-    // --- NAKİT AKIŞI GRAFİĞİ (GELİR VS GİDER) ---
+    // --- 1. NAKİT AKIŞI GRAFİĞİ (GELİR VS GİDER) ---
     const cashflowEmpty = document.getElementById('cashFlowChart-err');
     
     if (totalIncome > 0 || kpiExpense > 0) {
-        if(cashflowEmpty) cashflowEmpty.style.display = 'none';
+        if(cashflowEmpty) {
+            cashflowEmpty.style.display = 'none';
+        }
         
         drawChartSafe('cashFlowChart', 'cashFlowChartInstance', {
             type: 'bar',
@@ -3021,19 +3189,29 @@ function renderAnl() {
         }
     }
 
-    // --- GRAFİK 1: PLAN DURUMU DAĞILIMI (PASTA) ---
+    // --- 2. PLAN DURUMU DAĞILIMI (PASTA GRAFİĞİ) ---
+    // Plan durumu pastası daima seçili zaman dilimindeki TÜM giderleri baz almalıdır
     let planData = { 'Plana Dahil': 0, 'Dahil Değil': 0, 'Kapsam Dışı': 0 };
     expenseTx.forEach(t => {
-        if (t.planStatus === 'dahil') planData['Plana Dahil'] += t.amount;
-        else if (t.planStatus === 'dahil_degil') planData['Dahil Değil'] += t.amount;
-        else if (t.planStatus === 'kapsam_disi') planData['Kapsam Dışı'] += t.amount;
+        if (t.planStatus === 'dahil') {
+            planData['Plana Dahil'] += t.amount;
+        } else if (t.planStatus === 'dahil_degil') {
+            planData['Dahil Değil'] += t.amount;
+        } else if (t.planStatus === 'kapsam_disi') {
+            planData['Kapsam Dışı'] += t.amount;
+        } else {
+            // Varsayılan (boş gelenler dahil sayılır)
+            planData['Plana Dahil'] += t.amount;
+        }
     });
 
     const planEmpty = document.getElementById('planStatusChart-err');
     let hasPlanData = planData['Plana Dahil'] > 0 || planData['Dahil Değil'] > 0 || planData['Kapsam Dışı'] > 0;
     
     if (hasPlanData) {
-        if(planEmpty) planEmpty.style.display = 'none';
+        if(planEmpty) {
+            planEmpty.style.display = 'none';
+        }
         
         drawChartSafe('planStatusChart', 'planStatusChartInstance', {
             type: 'pie',
@@ -3062,7 +3240,8 @@ function renderAnl() {
         }
     }
 
-    // --- GRAFİK 2: KATEGORİ DAĞILIMI (DOUGHNUT) ---
+    // --- 3. KATEGORİ DAĞILIMI (DOUGHNUT) ---
+    // Bu grafik Seçili Sekmeye (planFilter) göre çalışır
     const plannedCats = {};
     let totalForDoughnut = 0;
     
@@ -3076,7 +3255,9 @@ function renderAnl() {
     const emptyDoughnut = document.getElementById('categoryDoughnutChart-err');
     
     if (totalForDoughnut > 0) {
-        if(emptyDoughnut) emptyDoughnut.style.display = 'none';
+        if(emptyDoughnut) {
+            emptyDoughnut.style.display = 'none';
+        }
         
         let titleText = 'Tüm Harcama Dağılımı';
         if (planFilter === 'dahil') titleText = 'Asıl Bütçe Dağılımı (Plana Dahil)';
@@ -3085,9 +3266,9 @@ function renderAnl() {
         
         document.getElementById('doughnut-title').innerText = titleText;
         
-        // Renkleri kategorilere göre dinamik oluştur (Çökme engellemek için)
+        // Eğer 13 renkten fazla kategori varsa, modül matematiğiyle renkleri tekrarla
         const dynamicColors = pCatLabels.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]);
-
+        
         drawChartSafe('categoryDoughnutChart', 'catChartInstance', {
             type: 'doughnut',
             data: { 
@@ -3116,7 +3297,7 @@ function renderAnl() {
         }
     }
 
-    // --- EN BÜYÜK 5 HARCAMA LİSTESİ ---
+    // --- 4. EN BÜYÜK 5 HARCAMA LİSTESİ ---
     const top5List = document.getElementById('top-5-list');
     top5List.innerHTML = '';
     
@@ -3137,10 +3318,11 @@ function renderAnl() {
         top5List.innerHTML = '<div style="color:var(--light); font-size:0.8rem; text-align:center; padding:10px;">İşlem bulunamadı.</div>';
     }
 
-    // --- LİMİT ÇUBUKLARI ---
-    const limDahil = (db.limits.planDahil || 0) * range.mult; 
-    const limDahilDegil = (db.limits.planDahilDegil || 0) * range.mult; 
-    const limKapsamDisi = (db.limits.kapsamDisi || 0) * range.mult;
+    // --- 5. LİMİT ÇUBUKLARI (DİNAMİK ÇARPANLI) ---
+    // (Aylık Bütçe x Zaman Çarpanı)
+    const limDahil = (parseFloat(db.limits.planDahil) || 0) * range.mult; 
+    const limDahilDegil = (parseFloat(db.limits.planDahilDegil) || 0) * range.mult; 
+    const limKapsamDisi = (parseFloat(db.limits.kapsamDisi) || 0) * range.mult;
     
     const barsContainer = document.getElementById('anl-limits-bars'); 
     barsContainer.innerHTML = '';
@@ -3156,7 +3338,6 @@ function renderAnl() {
             barClass += ' warning';
         }
         
-        // Çarpan metni
         let multText = "";
         if (limit > 0 && range.mult !== 1) {
             multText = `(Aylık Limit x ${range.mult})`;
@@ -3176,17 +3357,25 @@ function renderAnl() {
     
     barsContainer.innerHTML += renderBar('Plana Dahil Giderler', planData['Plana Dahil'], limDahil);
     barsContainer.innerHTML += renderBar('Plansız (Dahil Olmayan) Giderler', planData['Dahil Değil'], limDahilDegil);
-    barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım vs.)', planData['Kapsam Dışı'], limKapsamDisi);
+    barsContainer.innerHTML += renderBar('Kapsam Dışı (Transfer/Yatırım)', planData['Kapsam Dışı'], limKapsamDisi);
 
-    // --- AYLIK TREND GRAFİĞİ ---
+    // --- 6. AYLIK TREND GRAFİĞİ (STACKED BAR) VE PİVOT TABLO ---
+    const trendContainer = document.getElementById('anl-trend-container');
+    const pivotContainer = document.getElementById('pivot-container');
+    const pivotTable = document.getElementById('pivot-table-elem');
     const trendEmpty = document.getElementById('monthlyTrendChart-err');
+    
+    trendContainer.style.display = 'block';
+    pivotContainer.style.display = 'block';
     
     let timeGroups = {}; 
     
+    // Pivot tablo için her zaman TÜM giderleri dönüyoruz ki kullanıcı kıyas yapabilsin
     expenseTx.forEach(t => {
         let d = new Date(t.date);
         let tKey = '';
         
+        // Seçili periyoda göre zaman etiketlerini ayarla
         if (anlState.type === 'year' || anlState.type === 'all' || anlState.type === 'quarter') {
             tKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
             document.getElementById('trend-title').innerText = catFilter === 'all' ? 'Aylık Gider Trendi' : `Aylık "${catFilter}" Trendi`;
@@ -3206,16 +3395,27 @@ function renderAnl() {
     let timeLabels = Object.keys(timeGroups).sort();
     
     if (timeLabels.length > 0) {
-        if(trendEmpty) trendEmpty.style.display = 'none';
+        if(trendEmpty) {
+            trendEmpty.style.display = 'none';
+        }
         
         let trendDahil = timeLabels.map(k => {
-            let sum = 0; for(let c in timeGroups[k]['dahil']) sum += timeGroups[k]['dahil'][c]; return sum;
+            let sum = 0; 
+            for(let c in timeGroups[k]['dahil']) {
+                sum += timeGroups[k]['dahil'][c]; 
+            }
+            return sum;
         });
         
         let trendKapsamDisi = timeLabels.map(k => {
-            let sum = 0; for(let c in timeGroups[k]['kapsam_disi']) sum += timeGroups[k]['kapsam_disi'][c]; return sum;
+            let sum = 0; 
+            for(let c in timeGroups[k]['kapsam_disi']) {
+                sum += timeGroups[k]['kapsam_disi'][c]; 
+            }
+            return sum;
         });
 
+        // Trend grafiğinin veri setini Plan Sekmesine (Tab) göre ayarla
         let datasetsForTrend = [];
         
         if (planFilter === 'all') {
@@ -3254,10 +3454,12 @@ function renderAnl() {
             trendEmpty.style.display = 'flex';
             trendEmpty.innerText = "Trend çizilecek veri bulunamadı.";
         }
+        if(monthlyTrendChartInstance) {
+            monthlyTrendChartInstance.destroy();
+        }
     }
 
-    // --- PİVOT TABLO OLUŞTURMA ---
-    const pivotTable = document.getElementById('pivot-table-elem');
+    // 7. EXCEL PİVOT TABLO
     let allUniqueCats = new Set();
     expenseTx.forEach(t => allUniqueCats.add(t.category));
     let columns = Array.from(allUniqueCats).sort();
